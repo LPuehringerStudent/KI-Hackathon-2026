@@ -8,7 +8,7 @@ defines the tasks and the Shared Interfaces contracts — follow them exactly.
 
 | Agent | Track | Owns (Kanban issues) | Why |
 |-------|-------|----------------------|-----|
-| **GPT Astra 6** | C — Dialogue & UI | #1 scaffold, #8 proxy client, #9 dialogue, #10 panels, #11 wiring/build | Only agent with Godot MCP — scene building/editor work |
+| **GPT Astra 6** | C — Dialogue & UI | #1 scaffold, #8 proxy client, #9 dialogue, #10 panels, #11 wiring/build | Most skilled with Godot MCP — scene building/editor work |
 | **Claude Opus 5** | B — Game Core | #6 scoring, #7 day machine | Pure logic + TDD; strongest at meticulous algorithmic code |
 | **Kimi 2.8** | A — Map & Data | #2 extraction, #3 map baking, #4 data loader, #5 map view | Geo/data pipeline + visual verification of the baked map |
 
@@ -19,9 +19,10 @@ defines the tasks and the Shared Interfaces contracts — follow them exactly.
 - **Kickoff order:** Astra starts #1 (scaffold) immediately — it is the
   critical path everything plugs into. Opus starts #6, Kimi starts #2; both
   are independent of the scaffold until Task 4.
-- Track C's Godot MCP is exclusive to Astra. Tracks A and B verify headless
-  (`godot --headless --path game/godot --quit`, `node`-free — see plan) and
-  must not hand-edit `.tscn` scene files that C owns.
+- **Godot MCP:** ALL agents have it — but Track C's scenes stay Astra's job
+  (ownership, not access). Tracks A and B verify headless
+  (`godot --headless --path game/godot --quit` — see plan) and must not
+  hand-edit `.tscn` scene files that C owns.
 
 ## Cheap-task offload via the local Mistral proxy
 
