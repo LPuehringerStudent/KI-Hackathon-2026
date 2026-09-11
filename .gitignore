@@ -1,0 +1,41 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/extensions.json
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & temp
+*.log
+tmp/
+temp/
+
+# --- Uncomment the section(s) for the stack you pick: ---
+
+# Python
+# __pycache__/
+# *.py[cod]
+# .venv/
+# .ipynb_checkpoints/
+
+# Node / JS
+# node_modules/
+# dist/
+# build/
+# .next/
+
+# Build outputs (generic)
+# target/
+# bin/
+# out/
