@@ -13,6 +13,8 @@ func _load_data() -> Dictionary:
 		if not FileAccess.file_exists(path):
 			return {}
 		data[key] = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if FileAccess.file_exists(DATA_DIR + "airquality.json"):  # optional, like data_loader.gd
+		data["airquality"] = JSON.parse_string(FileAccess.get_file_as_string(DATA_DIR + "airquality.json"))
 	return data
 
 
@@ -30,6 +32,17 @@ func test_real_data_balance() -> void:
 	var fresh: Dictionary = GS.compute_meters(GS.create(), data)
 	for key: String in ["attendance", "money", "happiness"]:
 		check(fresh[key] >= 40.0 and fresh[key] <= 90.0, "fresh %s should leave room both ways (40..90), got %.1f" % [key, fresh[key]])
+
+	# Hitzetag air quality: bounded, day 3 only, and exactly the modifier (fresh happiness has room for +-10).
+	var day3: Dictionary = GS.create()
+	GS.next_day(day3)
+	GS.next_day(day3)
+	var air := GS.air_quality_modifier(day3, data)
+	check(absf(air) <= GS.AIR_MODIFIER, "air modifier out of bounds: %+.1f" % air)
+	check(is_equal_approx(GS.compute_meters(day3, data).happiness, fresh.happiness + air),
+		"day-3 happiness should be fresh %+.1f air, got %.1f vs %.1f" % [air, GS.compute_meters(day3, data).happiness, fresh.happiness])
+	if data.has("airquality"):
+		print("  INFO real air quality: PM10 %s at %s -> day-3 happiness %+.1f" % [data.airquality.get("pm10"), data.airquality.get("station"), air])
 
 	for venue: Dictionary in data.venues:
 		var m := _after(data, "venue", venue.id, "shuttle")
