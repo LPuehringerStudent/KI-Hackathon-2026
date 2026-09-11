@@ -206,8 +206,17 @@ def load_sprites():
     return sprites
 
 
+# Integration-side size control: 1.0 = native sprite pixels (the brief's
+# targets are authored at final size). Tune here, not by re-modeling.
+SPRITE_SCALE = 1.0
+
+
 def paste_sprite(base, sprite, cx, ground_y):
-    """Paste with bottom-center anchor at (cx, ground_y)."""
+    """Paste with bottom-center anchor at (cx, ground_y), scaled by SPRITE_SCALE."""
+    if SPRITE_SCALE != 1.0:
+        w, h = sprite.size
+        sprite = sprite.resize((max(1, int(w * SPRITE_SCALE)), max(1, int(h * SPRITE_SCALE))),
+                               Image.LANCZOS)
     w, h = sprite.size
     base.paste(sprite, (int(cx - w / 2), int(ground_y - h)), sprite)
 

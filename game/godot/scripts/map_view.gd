@@ -10,6 +10,7 @@ signal entity_clicked(id: String, type: String)
 const META_PATH := "res://data/map_meta.json"
 const MAP_TEXTURE_PATH := "res://assets/innenstadt_map.png"
 const MARKER_SIZE := 18
+const TREE_MARKER_SIZE := 12  # smaller dots: baked sprite trees must stay visible
 
 # marker colors tuned for the light iso map (darker cores, white ring drawn in
 # _make_dot): venue red, tree green, fountain blue, toilet purple, street gray
@@ -34,6 +35,7 @@ var _scroll: ScrollContainer
 var _map_root: Control
 var _map_rect: TextureRect
 var _dot_cache := {}
+var _badges := {}
 
 
 func _ready() -> void:
@@ -106,9 +108,10 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	if markers.has(id):
 		return
 	var dot := TextureButton.new()
-	dot.texture_normal = _make_dot(MARKER_COLORS[entity_type])
+	var marker_size := TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
+	dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], marker_size)
 	dot.tooltip_text = str(entity.get("name", id))
-	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) - Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
+	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) - Vector2(marker_size, marker_size) / 2.0
 	dot.pressed.connect(func() -> void: entity_clicked.emit(id, entity_type))
 	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
 	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
@@ -195,16 +198,16 @@ func focus_entity(id: String) -> void:
 	_scroll.scroll_vertical = int(dot.position.y - _scroll.size.y / 2.0)
 
 
-func _make_dot(color: Color) -> ImageTexture:
-	var key := color.to_html()
+func _make_dot(color: Color, size := MARKER_SIZE) -> ImageTexture:
+	var key := color.to_html() + ":" + str(size)
 	if _dot_cache.has(key):
 		return _dot_cache[key]
-	var img := Image.create_empty(MARKER_SIZE, MARKER_SIZE, false, Image.FORMAT_RGBA8)
-	var center := Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
-	var outer := MARKER_SIZE / 2.0 - 0.5
-	var inner := MARKER_SIZE / 2.0 - 3.0
-	for x in MARKER_SIZE:
-		for y in MARKER_SIZE:
+	var img := Image.create_empty(size, size, false, Image.FORMAT_RGBA8)
+	var center := Vector2(size, size) / 2.0
+	var outer := size / 2.0 - 0.5
+	var inner := size / 2.0 - 3.0
+	for x in size:
+		for y in size:
 			var d := Vector2(x, y).distance_to(center)
 			if d <= outer:
 				img.set_pixel(x, y, Color.WHITE)      # ring for contrast on the light map
@@ -213,3 +216,30 @@ func _make_dot(color: Color) -> ImageTexture:
 	var tex := ImageTexture.create_from_image(img)
 	_dot_cache[key] = tex
 	return tex
+
+
+## Mentor-pack badges: unit counts per venue. Contract (Opus, round 6/6.1):
+## purchases := { "<venue_id>": { "foodtruck": n, "security": n } }
+## Called from main.gd on every refresh; absent/malformed data is ignored.
+func refresh_badges(purchases: Dictionary) -> void:
+	for id: String in _badges:
+		_badges[id].queue_free()
+	_badges.clear()
+	for venue_id: String in purchases:
+		if not markers.has(venue_id):
+			continue
+		var counts: Dictionary = purchases[venue_id]
+		var food := int(counts.get("foodtruck", 0))
+		var security := int(counts.get("security", 0))
+		if food == 0 and security == 0:
+			continue
+		var dot: TextureButton = markers[venue_id]
+		var badge := Label.new()
+		badge.text = "%d · %d" % [food, security]
+		badge.add_theme_font_size_override("font_size", 10)
+		badge.add_theme_color_override("font_color", Color("#5a4a2f"))
+		badge.tooltip_text = "Food-Trucks · Security"
+		badge.position = Vector2(dot.texture_normal.get_width() + 2, -6)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		dot.add_child(badge)
+		_badges[venue_id] = badge
