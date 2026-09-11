@@ -48,6 +48,7 @@ var _layer_game := {}
 var _selection := {}          # id -> dot, multi-select via Ctrl+click
 var _selection_type := ""
 var _bulk_bar: HBoxContainer = null
+var _tip: PanelContainer = null
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -77,6 +78,14 @@ func _ready() -> void:
 		_map_rect.texture = tex
 	_add_layer_controls()
 	_add_zoom_controls()
+	_tip = PanelContainer.new()
+	var tip_label := Label.new()
+	tip_label.name = "L"
+	tip_label.add_theme_font_size_override("font_size", 12)
+	_tip.add_child(tip_label)
+	_tip.visible = false
+	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tip)  # PanelContainer: full rect, we position manually
 	refresh()
 
 
@@ -480,13 +489,76 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	dot.scale = Vector2(_zoom, _zoom)
 	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) * _zoom / 2.0
 	dot.pressed.connect(func() -> void: _on_marker_pressed(id, entity_type, dot))
-	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
-	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
+	dot.mouse_entered.connect(func() -> void:
+		_hover(dot, true)
+		_show_tip(dot))
+	dot.mouse_exited.connect(func() -> void:
+		_hover(dot, false)
+		_hide_tip())
+	# PASS: clicks still fire, but motion propagates to the layer probe behind
+	# (native tooltips were too flaky — the custom tip replaces them)
+	dot.mouse_filter = Control.MOUSE_FILTER_PASS
+	dot.set_meta("info", _info_line(entity, entity_type))
 	_map_root.add_child(dot)
 	markers[id] = dot
 	_pop_in(dot)
 	if entity_type == "venue":
 		_add_pulse_ring(dot)
+
+
+## One-line fact per entity type for the hover tip.
+func _info_line(entity: Dictionary, entity_type: String) -> String:
+	match entity_type:
+		"venue":
+			return "%d Veranstaltungen im Programm" % int(entity.get("events", 0))
+		"tree":
+			var age: Variant = entity.get("age_estimate")
+			return "%s%s" % [entity.get("species", "Baum"),
+				" · ca. %d Jahre" % int(age) if age != null else ""]
+		"fountain":
+			return "Trinkbrunnen"
+		"toilet":
+			return "Öffentliche Toilette"
+		"street":
+			return "Straße mit Geschichte"
+	return ""
+
+
+## Immediate custom tooltip following the cursor (native tooltips were
+## unreliable: stillness-gated, and markers blocked them in layer modes).
+func _show_tip(dot: TextureButton) -> void:
+	if _tip == null:
+		return
+	var label: Label = _tip.get_node("L")
+	var text := str(dot.tooltip_text)
+	var info := str(dot.get_meta("info", ""))
+	if not info.is_empty():
+		text += "\n" + info
+	if _layer_mode != "stadt":
+		var ll: Vector2 = dot.get_meta("latlon")
+		var layer_value := _layer_value_at(ll.x, ll.y)
+		if not layer_value.is_empty():
+			text += "\n" + layer_value
+	label.text = text
+	_tip.visible = true
+	_position_tip()
+
+
+func _hide_tip() -> void:
+	if _tip != null:
+		_tip.visible = false
+
+
+func _process(_delta: float) -> void:
+	if _tip != null and _tip.visible:
+		_position_tip()
+
+
+func _position_tip() -> void:
+	var p := get_global_mouse_position() - global_position + Vector2(16, 18)
+	p.x = minf(p.x, size.x - _tip.size.x - 8.0)
+	p.y = minf(p.y, size.y - _tip.size.y - 8.0)
+	_tip.position = p
 
 
 ## Ctrl+click toggles an entity in the multi-selection; plain click selects

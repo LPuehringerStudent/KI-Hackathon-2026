@@ -136,4 +136,11 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.update_planted_trees([])
 	await process_frame
 	check(mv._planted_markers.is_empty(), "planted trees clear when none")
+	# custom hover tip: shows entity info, hides again
+	var dot: TextureButton = mv.markers[data.venues[0].id]
+	mv._show_tip(dot)
+	check(mv._tip.visible and mv._tip.get_node("L").text.contains(str(data.venues[0].name)),
+		"hover tip shows the entity name and info")
+	mv._hide_tip()
+	check(not mv._tip.visible, "hover tip hides on exit")
 	mv.queue_free()
