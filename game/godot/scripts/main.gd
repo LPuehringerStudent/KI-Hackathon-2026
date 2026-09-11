@@ -221,6 +221,7 @@ func _refresh() -> void:
 	day_bar.set_day(game.day, State.day_theme(game.day))
 	map_view.set_day_tint(game.day)
 	map_view.refresh_badges(game.get("purchases", {}))
+	map_view.update_purchases(game.get("purchases", {}))
 	map_view.update_shuttles(game.get("shuttles", []))
 	# Resolve each decision's origin ONCE — the old inner find_entity per
 	# marker × decision made refresh O(records × decisions × records) (~50 ms).
