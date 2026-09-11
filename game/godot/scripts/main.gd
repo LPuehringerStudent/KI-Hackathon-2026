@@ -139,6 +139,12 @@ func _show_menu() -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 18
 	rows.add_child(spacer)
+	var attribution := Label.new()
+	attribution.text = "Daten: Stadt Linz (CC BY 4.0) · Ars Electronica 2026 · Karte: © OpenStreetMap-Mitwirkende (ODbL)"
+	attribution.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	attribution.add_theme_font_size_override("font_size", 11)
+	attribution.add_theme_color_override("font_color", Color("9a9187"))
+	rows.add_child(attribution)
 	var version_label := Label.new()
 	version_label.text = _game_version()
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
