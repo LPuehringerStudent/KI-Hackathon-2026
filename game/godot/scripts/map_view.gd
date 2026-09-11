@@ -263,7 +263,7 @@ func _layer_value_at(lat: float, lon: float) -> String:
 			for tree: Dictionary in data.get("trees", []):
 				if _dist_m(lat, lon, float(tree.lat), float(tree.lon)) <= 100.0:
 					trees += 1
-			return "PM10 %g µg/m³ — %d Bäume im 100-m-Radius" % [pm, trees]
+			return "PM10 %.1f µg/m³ — %d Bäume im 100-m-Radius" % [pm, trees]
 		"versorgung":
 			var nearest := 1e9
 			for key: String in ["fountains", "toilets"]:
@@ -346,11 +346,13 @@ func _add_zoom_controls() -> void:
 	_bulk_bar.add_theme_constant_override("separation", 6)
 	_bulk_bar.visible = false
 	overlay.add_child(_bulk_bar)
+	var group := ButtonGroup.new()
 	for mode: String in LAYER_MODES:
 		var btn := Button.new()
 		btn.text = LAYER_LABELS[mode]
 		btn.name = "Layer_" + mode
 		btn.toggle_mode = true
+		btn.button_group = group  # exclusive: a filter is always accounted for
 		btn.button_pressed = mode == _layer_mode
 		btn.custom_minimum_size = Vector2(0, 28)
 		btn.focus_mode = Control.FOCUS_NONE

@@ -36,6 +36,11 @@ func _run() -> void:
 			if child is Label and child.text.begins_with("v"):
 				version_found = true
 	check(version_found, "version label visible on menu")
+	# scene-structure regression: header labels must resolve under the map slot
+	# (wrong parent paths orphan them silently and they stack at 0,0)
+	var title: Node = ui.get_node_or_null("RootSplit/MapSlot/Header/Title")
+	check(title != null and title.text.contains("LINZ"), "header title resolves under map slot")
+	check(ui.get_node_or_null("RootSplit/MapSlot/Sources") != null, "sources label resolves under map slot")
 	# Headless engine quirk: driving the menu -> start transition in `-s` mode
 	# crashes intermittently inside scene/gui (signals 6/11, racy — identical
 	# steps pass in isolation, see bisect notes in git history). Not an app bug;

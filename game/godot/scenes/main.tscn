@@ -42,14 +42,10 @@ offset_top = 18.0
 offset_right = -24.0
 offset_bottom = 62.0
 
-[node name="Title" type="Label" parent="Header"]
-text = "Bürgermeister:in fürs Festival"
+[node name="Title" type="Label" parent="RootSplit/MapSlot/Header"]
+text = "Bürgermeister:in fürs Festival  ·  LINZ 2026"
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
-
-[node name="Edition" type="Label" parent="Header"]
-text = "LINZ  /  2026"
-theme_override_colors/font_color = Color(0.14, 0.52, 0.45, 1)
 
 [node name="Sources" type="Label" parent="RootSplit/MapSlot"]
 layout_mode = 1
