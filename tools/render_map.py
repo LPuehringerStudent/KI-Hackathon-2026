@@ -32,7 +32,7 @@ SPRITES_DIR = ROOT / "game" / "godot" / "assets" / "sprites"
 DATA_JSON = ROOT / "game" / "godot" / "data"
 
 BOUNDS = (48.284, 48.318, 14.270, 14.320)  # lat_min, lat_max, lon_min, lon_max
-SIZE = 2048
+SIZE = 4096
 COS_A = math.cos(math.radians(30.0))
 SIN_A = math.sin(math.radians(30.0))
 TOP_MARGIN = 110    # px above the horizon for venue pillars
