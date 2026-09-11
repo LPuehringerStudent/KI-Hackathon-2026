@@ -32,8 +32,10 @@ STREET_MIN_HISTORY = 50
 GROWTH_CM_PER_YEAR = {"laubbaum": 2.5, "nadelbaum": 1.2, "obstbaum": 2.0}
 
 # Approximate center points for well-known Innenstadt streets (no source coords).
+# Where the festival export has a matching location (Hauptplatz, OK Platz), its
+# verified coordinates are used instead of the estimate.
 CURATED_STREETS = {
-    "Hauptplatz": (48.3058, 14.2858),
+    "Hauptplatz": (48.30549, 14.28668),  # festival export, verified
     "Landstraße": (48.3026, 14.2888),
     "Promenade": (48.3008, 14.2902),
     "Bischofstraße": (48.3037, 14.2897),
@@ -51,7 +53,7 @@ CURATED_STREETS = {
     "Mozartstraße": (48.3017, 14.2917),
     "Bahnhofplatz": (48.2903, 14.2917),
     "Ars-Electronica-Straße": (48.3092, 14.2830),
-    "OK-Platz": (48.3060, 14.2840),
+    "OK-Platz": (48.30241, 14.29098),  # festival export, verified
 }
 
 
@@ -81,24 +83,41 @@ def extract_venues():
         if l.get("public_for_hackathon") is True
         and str(l.get("coordinates_ok")) == "True"
     ]
-    cal_by_loc = {}
+    own_events = {}
     for slot in export["calendar"]:
         if slot.get("public_for_hackathon") is not True:
             continue
         link = slot.get("Linked Location") or ""
         m = re.search(r"([0-9a-f]{32})", link)
         if m:
-            cal_by_loc.setdefault(m.group(1), []).append(slot)
+            own_events.setdefault(m.group(1), []).append(slot)
+
+    by_id = {l["canonical_id"]: l for l in locations}
+
+    def total_events(cid, visited=None):
+        """Own slots + transitive rollup over Linked Child sub-rooms."""
+        if visited is None:
+            visited = set()
+        if cid in visited:
+            return 0
+        visited.add(cid)
+        loc = by_id.get(cid)
+        if loc is None:
+            return 0
+        n = len(own_events.get(cid, []))
+        for child in loc.get("Linked Child") or []:
+            n += total_events(child, visited)
+        return n
 
     venues = []
     for loc in locations:
         lat, lon = fnum(loc.get("Latitude")), fnum(loc.get("Longitude"))
         if lat is None or lon is None or not in_bounds(lat, lon):
             continue
-        if loc.get("Linked Parent"):  # sub-rooms (e.g. "Deep Space 8K") are not venues
+        if loc.get("Linked Parent"):  # sub-rooms roll up into their parent venue
             continue
         cid = loc["canonical_id"]
-        events = len(cal_by_loc.get(cid, []))
+        events = total_events(cid)
         if events < 5:  # curated set of significant festival venues
             continue
         venues.append({
@@ -224,12 +243,15 @@ def main():
         ],
         "notes": {
             "streets": "Source CSV has no coordinates; positions are approximate "
-                       "center points of well-known Innenstadt streets (curated).",
+                       "center points of well-known Innenstadt streets (curated), "
+                       "except Hauptplatz and OK-Platz, which use the festival "
+                       "export's verified venue coordinates.",
             "tree_age": "Estimated from trunk circumference via rough growth rates "
                         "(Laub 2.5, Nadel 1.2, other 2.0 cm/yr). Persona flavor only.",
             "venues": "Top-level festival locations (no Linked Parent) with "
-                      "coordinates_ok=True, public_for_hackathon=True, >=5 linked "
-                      "calendar slots; capped at 20 by event count.",
+                      "coordinates_ok=True, public_for_hackathon=True; events = own "
+                      "calendar slots + transitive rollup over Linked Child "
+                      "sub-rooms; >=5 total, capped at 20 by event count.",
         },
     })
 
