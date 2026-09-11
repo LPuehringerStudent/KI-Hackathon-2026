@@ -150,3 +150,59 @@ func test_real_data_mentor_pack() -> void:
 	check(premium.attendance < fresh.attendance and premium.money > fresh.money, "premium pricing: fewer visitors, more money")
 	var extended := _after(data, "venue", headline[0].id, "extend")
 	check(extended.attendance > fresh.attendance and extended.happiness < fresh.happiness, "curfew extension trades happiness for attendance")
+
+
+## Plays a named route on the real data. Each day is a list of [type, id-or-name, decision];
+## "pricing" steps use the festival entity, "talk" steps only consult a tree. Returns final meters.
+func _play_route(data: Dictionary, days: Array) -> Dictionary:
+	var by_name := {}
+	for key: String in ["venues", "streets", "toilets", "fountains"]:
+		for record: Dictionary in data[key]:
+			by_name[str(record.get("name", ""))] = str(record.id)
+	var game: Dictionary = GS.create()
+	for day_index in days.size():
+		for step: Array in days[day_index]:
+			var id: String = by_name.get(step[1], step[1])
+			if step[0] == "talk":
+				GS.consult(game, GS.find_entity(data, id, "tree"))
+				continue
+			var entity := GS.find_entity(data, "festival", "festival") if step[0] == "pricing" else GS.find_entity(data, id, step[0])
+			check(GS.decide(game, entity, step[2]), "route step %s %s %s must be accepted on day %d" % [step[0], step[1], step[2], day_index + 1])
+		if day_index < days.size() - 1:
+			GS.next_day(game)
+	return GS.compute_meters(game, data)
+
+
+## Every ending is reachable within a 3-day run with the committed air-quality cache, and the scripted
+## demo (docs/pitch/demo-script.md) lands on a strong-but-not-gold ending with gold still in reach.
+func test_real_data_endings() -> void:
+	var data := _load_data()
+	if data.is_empty() or not data.has("airquality"):
+		print("  SKIP test_real_data_endings: needs res://data/ with the air-quality cache")
+		return
+	var fair := ["pricing", "festival", "fair"]
+	var tree := ["talk", "baum_53e4b829ebce51b14361", "talk"]  # plane tree at the Mariendom; wc_18 = toilet "Promenade" (a street shares the name)
+	var demo_day_one := [["venue", "OK Platz", "shuttle"], ["street", "Hauptplatz", "pedestrian"], fair]
+	var routes := {
+		"DEMO -> Volksnahe Stadtplanung": [demo_day_one,
+			[fair, ["street", "Mozartstraße", "pedestrian"], ["toilet", "wc_18", "close"]],
+			[fair, tree, ["venue", "Ars Electronica Center", "extend"]]],
+		"SHOWCASE -> Goldene:r Bürgermeister:in": [demo_day_one,
+			[fair, ["street", "Mozartstraße", "pedestrian"], ["fountain", "Südbahnhof gegenüber RZK Gebäude", "relocate"],
+				["fountain", "Hauptplatz südliche Grüninsel", "close"], ["toilet", "wc_18", "close"]],
+			[fair, tree]],
+		"Effizienz-Tyrann:in": [[], [], [["tree", "baum_1b51840024c31e2584c5", "cut"], ["tree", "baum_22b431ea60149d6bee10", "cut"]]],
+		"Beliebt, aber pleite": [[["venue", "splace", "shuttle"], ["venue", "Kunstuniversität Linz, Hauptplatz 6 (Ostgebäude)", "shuttle"],
+			["venue", "JKU MED Campus (MED Campus I)", "shuttle"], ["venue", "Ars Electronica Center", "shuttle"]], [["toilet", "wc_m1", "relocate"]], []],
+		"Gastgeber:in der Stadt": [[["venue", "C. Bechstein Centrum Linz", "shuttle"], ["venue", "Kunstuniversität Linz, Hauptplatz 6 (Ostgebäude)", "shuttle"], fair], [fair], [fair]],
+		"Solide Verwaltung": [[["venue", "splace", "shuttle"], fair], [fair], [fair]],
+		"Stadt in Schieflage": [[["venue", "JKU MED Campus (MED Campus I)", "shuttle"], ["venue", "Ars Electronica Center", "shuttle"],
+			["venue", "PopUp Store", "shuttle"], ["venue", "Kunstuniversität Linz, Hauptplatz 6 (Ostgebäude)", "shuttle"], ["venue", "splace", "shuttle"]],
+			[["toilet", "wc_m2", "relocate"], ["toilet", "wc_m3", "relocate"], ["toilet", "wc_m4", "relocate"]], [["tree", "baum_1b51840024c31e2584c5", "cut"]]],
+		"Stadt im Gleichgewicht": [[], [], [tree]],
+	}
+	for label: String in routes:
+		var expected: String = label.get_slice(" -> ", 1) if label.contains(" -> ") else label
+		var meters := _play_route(data, routes[label])
+		var title := GS.verdict_title(meters)
+		check(title == expected, "%s: expected %s, got %s (%.1f / %.1f / %.1f)" % [label, expected, title, meters.attendance, meters.money, meters.happiness])

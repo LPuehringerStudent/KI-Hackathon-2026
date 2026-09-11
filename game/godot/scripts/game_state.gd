@@ -135,9 +135,12 @@ const AIR_MODIFIER := 10.0
 ## Verdict tiers on the final meters (0..100), checked in the order of verdict_title().
 ## Probe on the real extract: the best reachable weakest meter is ~68 (clean air), so a literal
 ## "all >= 80" gold tier would never show — gold is the best title plus a high average instead.
+## After the P1 audit the best Volksnahe runs average 68–69.4, so gold sits at 69: the scripted demo
+## (avg 68.4) lands on Volksnahe with a better ending still visibly within reach (see
+## test_real_data_endings).
 const VERDICT_HIGH := 66.0      # > : strong meter (existing endings)
 const VERDICT_LOW := 50.0       # < : weak meter (existing endings)
-const VERDICT_GOLD_AVERAGE := 70.0
+const VERDICT_GOLD_AVERAGE := 69.0
 const VERDICT_SOLID := 55.0     # >= on every meter
 const VERDICT_CRISIS := 35.0    # < on any meter
 
