@@ -1,0 +1,233 @@
+id,jahr,quartal,herkunft,herkunft_typ,iso2,ankuenfte,uebernachtungen
+herkunft_80e0baa7c48d2a1535ab,2024,1,Österreich,land,AT,60369,106042
+herkunft_75d61b8a26af7142ff5f,2024,2,Österreich,land,AT,85972,145231
+herkunft_7aa062c2b74008afbe0d,2024,3,Österreich,land,AT,65854,120977
+herkunft_3595f55d6d3d12921430,2024,4,Österreich,land,AT,76506,131387
+herkunft_13ea7a774a51af771d47,2024,1,darunter Wien,gruppe,,14741,24447
+herkunft_59ecf55f4772bb7aa558,2024,2,darunter Wien,gruppe,,22471,37292
+herkunft_bff2e0ca609683f0217d,2024,3,darunter Wien,gruppe,,20802,36461
+herkunft_dadd505633ebe97929b4,2024,4,darunter Wien,gruppe,,20948,36284
+herkunft_b11ead26f8d04a46ffd2,2024,1,Ausland,summe,,47465,98203
+herkunft_a7cb6f19048c2a5aff05,2024,2,Ausland,summe,,71812,132998
+herkunft_dbc9f9da8bd0024b64f3,2024,3,Ausland,summe,,97296,171715
+herkunft_0f694c2141d97a17cc71,2024,4,Ausland,summe,,61583,115008
+herkunft_c73f1fb0bd55166b1864,2024,1,Arab. Länder in Asien 1),gruppe,,52,102
+herkunft_9465023ff401255d0d13,2024,2,Arab. Länder in Asien 1),gruppe,,100,175
+herkunft_2623ecae3b7ae5046ba1,2024,3,Arab. Länder in Asien 1),gruppe,,272,472
+herkunft_7444fe01f0e5ed57ec37,2024,4,Arab. Länder in Asien 1),gruppe,,231,272
+herkunft_7b43a07ec1ad8c45c68b,2024,1,Australien,land,AU,221,591
+herkunft_a2ac5b6497e8f4d5d87f,2024,2,Australien,land,AU,411,774
+herkunft_a56ac931aed2f85f83ed,2024,3,Australien,land,AU,545,1023
+herkunft_b5e7ca288f9cd97e0dc5,2024,4,Australien,land,AU,492,896
+herkunft_f56caeea94d1b2dc4a57,2024,1,Belgien,land,BE,526,1055
+herkunft_8d61d8509e6ab4fb4a64,2024,2,Belgien,land,BE,785,1342
+herkunft_f4fd691598aaf77972d3,2024,3,Belgien,land,BE,1888,2764
+herkunft_dde338759375b7e09596,2024,4,Belgien,land,BE,713,1254
+herkunft_4faac1478037174b2d9d,2024,1,Brasilien,land,BR,125,310
+herkunft_3c2b87d6a16ecf4378e4,2024,2,Brasilien,land,BR,172,342
+herkunft_e9b971812e0904a56389,2024,3,Brasilien,land,BR,167,578
+herkunft_44867f4f913bfe5c9139,2024,4,Brasilien,land,BR,133,322
+herkunft_565937c236716155a4fd,2024,1,Bulgarien,land,BG,167,339
+herkunft_89936b05f2550c6d1db9,2024,2,Bulgarien,land,BG,360,1747
+herkunft_19d9349744975a199671,2024,3,Bulgarien,land,BG,466,1012
+herkunft_990efd2f7c80a90e4d60,2024,4,Bulgarien,land,BG,231,455
+herkunft_0817d50ac3b40c78863e,2024,1,China 2),gruppe,,993,1792
+herkunft_60bee90ead057dc3979e,2024,2,China 2),gruppe,,1801,2858
+herkunft_fb8e84ca7d6d229ce5fe,2024,3,China 2),gruppe,,3045,4756
+herkunft_f6338635229cb3636a37,2024,4,China 2),gruppe,,2552,3529
+herkunft_d784bbb492260c02e003,2024,1,Dänemark,land,DK,161,447
+herkunft_0fc58d29c5180522083c,2024,2,Dänemark,land,DK,234,485
+herkunft_92b712a4b374acd4fdc9,2024,3,Dänemark,land,DK,739,1235
+herkunft_c2d1220fafc79b501bf0,2024,4,Dänemark,land,DK,154,297
+herkunft_28818e43aed6f7833bd0,2024,1,Deutschland,land,DE,19287,36781
+herkunft_5258b9b92a742ccc1448,2024,2,Deutschland,land,DE,30673,52697
+herkunft_ce88b2a34f845dbf8d37,2024,3,Deutschland,land,DE,37503,63737
+herkunft_c67acf3d949c530f0242,2024,4,Deutschland,land,DE,24805,45762
+herkunft_c43facac426ec1703236,2024,1,Estland,land,EE,52,80
+herkunft_e597ef17e31f06af4e43,2024,2,Estland,land,EE,70,106
+herkunft_99917ad550de79af3eb8,2024,3,Estland,land,EE,162,230
+herkunft_b044c144c837dfaf6b63,2024,4,Estland,land,EE,47,204
+herkunft_aa84e8da1567c026651f,2024,1,Finnland,land,FI,181,329
+herkunft_f6b748fa449e08bac807,2024,2,Finnland,land,FI,274,479
+herkunft_ed34e670523caa5a795c,2024,3,Finnland,land,FI,296,474
+herkunft_3e6ea2c3d7587bb058d7,2024,4,Finnland,land,FI,240,561
+herkunft_6f1a417ce2fd6c37a2e9,2024,1,Frankreich (inkl. Monaco),gruppe,,1037,1764
+herkunft_fb0b3f2528c5dc5a947c,2024,2,Frankreich (inkl. Monaco),gruppe,,1642,2759
+herkunft_40f7c46afce957c782d6,2024,3,Frankreich (inkl. Monaco),gruppe,,3387,5312
+herkunft_402b4d7e3617ceb2206e,2024,4,Frankreich (inkl. Monaco),gruppe,,1443,3024
+herkunft_572cb61fedc6b558ddeb,2024,1,Griechenland,land,GR,182,346
+herkunft_15f1af66a1287454b4b0,2024,2,Griechenland,land,GR,160,313
+herkunft_489b09cf3bb613540d97,2024,3,Griechenland,land,GR,349,655
+herkunft_ab023a2b6ddf3db20082,2024,4,Griechenland,land,GR,146,339
+herkunft_a9324e4c9933dc6575de,2024,1,übrige GUS 3),gruppe,,152,411
+herkunft_4e2e78af69e9ff2359ff,2024,2,übrige GUS 3),gruppe,,80,162
+herkunft_43de6d9d5004dcb98094,2024,3,übrige GUS 3),gruppe,,201,346
+herkunft_8070868b2be3be1b6710,2024,4,übrige GUS 3),gruppe,,90,177
+herkunft_9a95bdcd6facaa823143,2024,1,Indien,land,IN,188,808
+herkunft_fafddd564c909923f66a,2024,2,Indien,land,IN,368,1236
+herkunft_23a9c0c5587bde71ee21,2024,3,Indien,land,IN,209,646
+herkunft_821aeb4dcc6a76054110,2024,4,Indien,land,IN,230,672
+herkunft_c4e0ed9d3e698f107e47,2024,1,Irland (Republik),land,IE,120,273
+herkunft_7ee3987c201f4cf783c8,2024,2,Irland (Republik),land,IE,341,550
+herkunft_1212c58cff28bdf6f33d,2024,3,Irland (Republik),land,IE,295,570
+herkunft_7ba655a178e1e3ecb62e,2024,4,Irland (Republik),land,IE,151,323
+herkunft_4cbe53b4bee128937e53,2024,1,Island,land,IS,44,156
+herkunft_639e3b38981ccb8dd2bc,2024,2,Island,land,IS,46,76
+herkunft_451a6884644d290824d9,2024,3,Island,land,IS,27,51
+herkunft_0234a0c293abab4ef7fb,2024,4,Island,land,IS,21,40
+herkunft_e95305e2256405ee8e4a,2024,1,Israel,land,IL,106,317
+herkunft_e87a45d9480018b8eb13,2024,2,Israel,land,IL,299,459
+herkunft_a1830147bc5bdac14707,2024,3,Israel,land,IL,496,857
+herkunft_f5293ff5fa4ffaa24d4c,2024,4,Israel,land,IL,179,278
+herkunft_3e112674db6fdb44c91d,2024,1,Italien,land,IT,2186,3828
+herkunft_b85a0aa1f4a522693189,2024,2,Italien,land,IT,2780,5490
+herkunft_1800a8940abb97a449ad,2024,3,Italien,land,IT,4203,6969
+herkunft_cfb98e74be3dc5bfab2f,2024,4,Italien,land,IT,2527,4134
+herkunft_6dfbffe4f5738fe90c20,2024,1,Japan,land,JP,249,629
+herkunft_6ac436167d6d75e67b1d,2024,2,Japan,land,JP,285,583
+herkunft_018b9ec1702c9dffedff,2024,3,Japan,land,JP,682,1757
+herkunft_f6a551ae90db10c403ee,2024,4,Japan,land,JP,299,672
+herkunft_0af772f93096c0d7633a,2024,1,ehem. Jugoslawien 4),gruppe,,567,1599
+herkunft_22409e3433b276f041e1,2024,2,ehem. Jugoslawien 4),gruppe,,718,1489
+herkunft_855dfbc65240931f6fd7,2024,3,ehem. Jugoslawien 4),gruppe,,496,1256
+herkunft_2a8b81c4be364b9bd9b0,2024,4,ehem. Jugoslawien 4),gruppe,,649,1278
+herkunft_194a6ff0264bbd0add30,2024,1,Kanada,land,CA,99,398
+herkunft_d79156966a97e6b213ce,2024,2,Kanada,land,CA,389,826
+herkunft_560a4600932be614cea3,2024,3,Kanada,land,CA,574,1293
+herkunft_1dc8840185ab217b2ec8,2024,4,Kanada,land,CA,223,579
+herkunft_16741a8fcbf1a3f947e0,2024,1,Kroatien,land,HR,432,1698
+herkunft_4c935dcb58ddeb335352,2024,2,Kroatien,land,HR,621,2064
+herkunft_b5da63c1bf1d960dbec5,2024,3,Kroatien,land,HR,513,1733
+herkunft_5cd57dff766889c03f61,2024,4,Kroatien,land,HR,606,1861
+herkunft_7af330f142d15e83c8a4,2024,1,Lettland,land,LV,63,226
+herkunft_41874fd72910b4ffc7cb,2024,2,Lettland,land,LV,82,115
+herkunft_c5a273f80cd80cdfa065,2024,3,Lettland,land,LV,102,164
+herkunft_ecd389994703784fb1b8,2024,4,Lettland,land,LV,86,321
+herkunft_575b83f9f4989d2e0255,2024,1,Litauen,land,LT,134,343
+herkunft_ac7c1bccf1c641248dc0,2024,2,Litauen,land,LT,125,175
+herkunft_27e64d597d0334846e69,2024,3,Litauen,land,LT,262,391
+herkunft_5b262a838f56288cbbf0,2024,4,Litauen,land,LT,123,264
+herkunft_d4b4818c3bc8d0b6abc8,2024,1,Luxemburg,land,LU,111,161
+herkunft_48bcaa18f39636f46cc2,2024,2,Luxemburg,land,LU,107,155
+herkunft_d40dd5975bb7327ed982,2024,3,Luxemburg,land,LU,268,494
+herkunft_5df63f2ae98ae6025bdc,2024,4,Luxemburg,land,LU,129,251
+herkunft_972c7adcc103430ba0ef,2024,1,Malta,land,MT,38,75
+herkunft_a54e13eaaedb15546c03,2024,2,Malta,land,MT,51,74
+herkunft_683a26803cc2fdbc6550,2024,3,Malta,land,MT,69,174
+herkunft_60726ae29ee77887c857,2024,4,Malta,land,MT,80,230
+herkunft_b726d607424a73e8881c,2024,1,Neuseeland,land,NZ,19,50
+herkunft_6730a58ae78f13303788,2024,2,Neuseeland,land,NZ,74,146
+herkunft_c1b9952b88e7a64632d3,2024,3,Neuseeland,land,NZ,88,245
+herkunft_5a58461f6a8a76ef26aa,2024,4,Neuseeland,land,NZ,21,95
+herkunft_003b01f5433cbe169f90,2024,1,Niederlande,land,NL,739,1393
+herkunft_ddaae49de252c06fa18c,2024,2,Niederlande,land,NL,2042,3192
+herkunft_94069ce82044e335d027,2024,3,Niederlande,land,NL,3783,6058
+herkunft_43afd5849eeca611fbe0,2024,4,Niederlande,land,NL,990,1780
+herkunft_31b683e68a9cc9345186,2024,1,Norwegen,land,NO,103,234
+herkunft_4c44c3871170b934d5fc,2024,2,Norwegen,land,NO,145,310
+herkunft_50a0e1ac22706f1ec630,2024,3,Norwegen,land,NO,311,541
+herkunft_a55e31289897858a9532,2024,4,Norwegen,land,NO,285,541
+herkunft_40875c617010454e8e9a,2024,1,Polen,land,PL,2527,6217
+herkunft_2cff157d35f1fec499b5,2024,2,Polen,land,PL,2355,5374
+herkunft_5a51d5f85a66645990f1,2024,3,Polen,land,PL,2556,5603
+herkunft_ee1dcad7f79b29b00398,2024,4,Polen,land,PL,1328,3669
+herkunft_a84ff7633d5200160f90,2024,1,Portugal,land,PT,140,406
+herkunft_d34d2baeb06d95f27044,2024,2,Portugal,land,PT,267,516
+herkunft_1cc0f931b5fed1d5ffe0,2024,3,Portugal,land,PT,204,407
+herkunft_ab90a4967af74d2718fe,2024,4,Portugal,land,PT,209,458
+herkunft_2f20ba1d665e8086dcc6,2024,1,Rumänien,land,RO,1300,2785
+herkunft_e9f26fd32969cb2b0171,2024,2,Rumänien,land,RO,1724,3275
+herkunft_ee7abdf9fa8cb614236b,2024,3,Rumänien,land,RO,2748,4351
+herkunft_cd3821803bd20d906e69,2024,4,Rumänien,land,RO,1564,2879
+herkunft_793b0327e57619442aaa,2024,1,Russland,land,RU,91,297
+herkunft_e631ef0bb498076762ba,2024,2,Russland,land,RU,108,236
+herkunft_de034099957002954ad6,2024,3,Russland,land,RU,112,192
+herkunft_ca92d0c71cda815f3c4e,2024,4,Russland,land,RU,125,318
+herkunft_f0524d656d8cb7bdd708,2024,1,Saudi-Arabien,land,SA,52,148
+herkunft_8fe53a1ef9374d03db3b,2024,2,Saudi-Arabien,land,SA,117,164
+herkunft_1ffebf87df970d530e72,2024,3,Saudi-Arabien,land,SA,465,871
+herkunft_ce936185a94665ab888e,2024,4,Saudi-Arabien,land,SA,97,167
+herkunft_a8cef41c2a96edc003a6,2024,1,Schweden,land,SE,147,337
+herkunft_64d7281598503253a71d,2024,2,Schweden,land,SE,446,847
+herkunft_df24d207e676c87d4494,2024,3,Schweden,land,SE,759,1203
+herkunft_fad79cfa7bced03157a1,2024,4,Schweden,land,SE,1118,1952
+herkunft_286da4bbab35d460f4db,2024,1,"Schweiz, Liechtenstein",gruppe,,1618,3144
+herkunft_a185835c4d487c413df0,2024,2,"Schweiz, Liechtenstein",gruppe,,2882,5236
+herkunft_f534f647d5109a7067d3,2024,3,"Schweiz, Liechtenstein",gruppe,,3739,6174
+herkunft_3bb3e05b89faacd60ba5,2024,4,"Schweiz, Liechtenstein",gruppe,,2318,3987
+herkunft_2c84964dd2c9b09e27b5,2024,1,Slowakei,land,SK,778,2711
+herkunft_4b72e99dcfde990a2692,2024,2,Slowakei,land,SK,869,2930
+herkunft_d51525dea9455ec75a9e,2024,3,Slowakei,land,SK,1336,3228
+herkunft_00faa60113adf3a3d6d5,2024,4,Slowakei,land,SK,739,2005
+herkunft_67f444e49464159b12de,2024,1,Slowenien,land,SI,440,925
+herkunft_9dd5378fc1fce4541f1d,2024,2,Slowenien,land,SI,623,1130
+herkunft_9da647ff932844c1ed5c,2024,3,Slowenien,land,SI,510,1170
+herkunft_1a8c2459d814d0e0ac6a,2024,4,Slowenien,land,SI,584,1111
+herkunft_1b1ca0ea108b644f05f1,2024,1,Spanien,land,ES,770,1476
+herkunft_81fd979b1e1a33526d46,2024,2,Spanien,land,ES,934,1692
+herkunft_e74ecbebc09b505cc090,2024,3,Spanien,land,ES,1955,3328
+herkunft_c9ea064dd7ca7b501cce,2024,4,Spanien,land,ES,695,1455
+herkunft_1fd64753ba393ce178a3,2024,1,Südafrika,land,ZA,21,105
+herkunft_88c09dbf45db771378d1,2024,2,Südafrika,land,ZA,60,161
+herkunft_43a1c5a584265a3f3477,2024,3,Südafrika,land,ZA,56,311
+herkunft_11d4b6b26a17e18a0246,2024,4,Südafrika,land,ZA,16,31
+herkunft_50cef912fae9737a0176,2024,1,Südkorea,land,KR,273,603
+herkunft_126525f18ce07936cb28,2024,2,Südkorea,land,KR,478,651
+herkunft_b1b05834aab23c866cb2,2024,3,Südkorea,land,KR,577,1152
+herkunft_3b214ea71456b2be0440,2024,4,Südkorea,land,KR,466,662
+herkunft_363f39ef9fdf862b4923,2024,1,Südostasien 5),gruppe,,582,905
+herkunft_03fd229f0da703c14617,2024,2,Südostasien 5),gruppe,,629,1131
+herkunft_99aec3f1039c3dac6231,2024,3,Südostasien 5),gruppe,,443,696
+herkunft_7fbf2f64b4f1a579eb78,2024,4,Südostasien 5),gruppe,,681,1114
+herkunft_2bab58e85fb55b3e0909,2024,1,Taiwan,land,TW,115,228
+herkunft_6a1ab26f0789282cc444,2024,2,Taiwan,land,TW,207,315
+herkunft_4fd45d7b1b995049b6e3,2024,3,Taiwan,land,TW,402,928
+herkunft_19daba08a9335e93b4a0,2024,4,Taiwan,land,TW,288,365
+herkunft_8074791e031f77f6f0a1,2024,1,Tschechische Republik,land,CZ,1788,3243
+herkunft_4d39957fa9f015d51527,2024,2,Tschechische Republik,land,CZ,2504,4052
+herkunft_b60e361d7afc9d4fdd85,2024,3,Tschechische Republik,land,CZ,3698,6064
+herkunft_59c4ea1536410bea7340,2024,4,Tschechische Republik,land,CZ,2875,5258
+herkunft_907cc1c7a2cb04f7b4a9,2024,1,Türkei,land,TR,273,665
+herkunft_dcc7f74381bb43d8befc,2024,2,Türkei,land,TR,342,821
+herkunft_a1c26360f6d42d82f130,2024,3,Türkei,land,TR,647,1380
+herkunft_5c0030612eb22905f102,2024,4,Türkei,land,TR,327,642
+herkunft_8290bf4e5bbdd43455c9,2024,1,Ukraine,land,UA,412,1037
+herkunft_e35553b2d325de823827,2024,2,Ukraine,land,UA,439,1148
+herkunft_e2a016930915a2812325,2024,3,Ukraine,land,UA,528,1335
+herkunft_4dbffb54762f757ebb0e,2024,4,Ukraine,land,UA,482,919
+herkunft_21a23ea2472fefcb5ebc,2024,1,Ungarn,land,HU,1548,4590
+herkunft_c292195f34e06af3e7f0,2024,2,Ungarn,land,HU,2217,6048
+herkunft_9fdcbf16f4d8685bb9e8,2024,3,Ungarn,land,HU,2985,6589
+herkunft_5212aa17d4b1c05315c5,2024,4,Ungarn,land,HU,1789,3789
+herkunft_574014086704113f9d54,2024,1,USA,land,US,928,2392
+herkunft_1ecbe0e8ad1769db4bd7,2024,2,USA,land,US,1941,4280
+herkunft_357e468161051b861fcc,2024,3,USA,land,US,2581,4868
+herkunft_64301007bd71a2e0e6ed,2024,4,USA,land,US,1382,3024
+herkunft_f92525adcf957cd63757,2024,1,Ver. Arabische Emirate,land,AE,92,283
+herkunft_e945d4312b0fbe56a8d1,2024,2,Ver. Arabische Emirate,land,AE,136,218
+herkunft_92a7570c70ebf4cf4461,2024,3,Ver. Arabische Emirate,land,AE,285,521
+herkunft_91171c7338da955d567b,2024,4,Ver. Arabische Emirate,land,AE,134,380
+herkunft_74cc9ab6f18f9b009147,2024,1,Vereinigtes Königreich,land,GB,965,2069
+herkunft_693fd01f970915e035bc,2024,2,Vereinigtes Königreich,land,GB,1344,2320
+herkunft_9bfaf0ac976a5b8104fc,2024,3,Vereinigtes Königreich,land,GB,2712,4288
+herkunft_19d365d78676b6b87d0d,2024,4,Vereinigtes Königreich,land,GB,1257,2411
+herkunft_1a230da3e2e8080058f2,2024,1,Zypern,land,CY,48,87
+herkunft_d7b84d4a626ff1ebffd4,2024,2,Zypern,land,CY,43,83
+herkunft_d52c18c2b69f8aebf7fd,2024,3,Zypern,land,CY,127,244
+herkunft_4f6207f47ac27ad61322,2024,4,Zypern,land,CY,13,25
+herkunft_eac153680f062cee5586,2024,1,Übriges Afrika,gruppe,,80,391
+herkunft_d09dc47db7e892731a59,2024,2,Übriges Afrika,gruppe,,137,682
+herkunft_b76d344a583cf5288f0b,2024,3,Übriges Afrika,gruppe,,206,501
+herkunft_cc4f2d93b29288847c93,2024,4,Übriges Afrika,gruppe,,125,317
+herkunft_144c3f60098b2d924f84,2024,1,Übriges Asien,gruppe,,74,169
+herkunft_351699fd2b49cc6dd7c4,2024,2,Übriges Asien,gruppe,,201,316
+herkunft_a04acbcfe03f4de7ea1e,2024,3,Übriges Asien,gruppe,,144,280
+herkunft_4d5363817bcd6b43bc20,2024,4,Übriges Asien,gruppe,,137,428
+herkunft_890586266de9f798a64c,2024,1,Zentral- und Südamerika 6),gruppe,,229,614
+herkunft_592fad05be88e47f4982,2024,2,Zentral- und Südamerika 6),gruppe,,316,559
+herkunft_4290d7d34f0978b19e6a,2024,3,Zentral- und Südamerika 6),gruppe,,479,961
+herkunft_35cd2689ef0d940fa858,2024,4,Zentral- und Südamerika 6),gruppe,,244,792
+herkunft_8830fa3c751b146576a8,2024,1,Übriges Ausland,gruppe,,3840,5841
+herkunft_1127d39c6c837cf38a9c,2024,2,Übriges Ausland,gruppe,,5258,7634
+herkunft_58dff991d68719eabfae,2024,3,Übriges Ausland,gruppe,,5644,9277
+herkunft_8e9ad978f53353fc6c8e,2024,4,Übriges Ausland,gruppe,,4714,6439
