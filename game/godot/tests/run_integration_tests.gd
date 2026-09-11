@@ -43,6 +43,8 @@ func _run() -> void:
 	ui = load("res://scenes/main.tscn").instantiate()
 	root.add_child(ui)
 	current_scene = ui
+	await process_frame  # let _ready show the menu
+	ui._start_game()  # press "Festival starten" (start menu)
 	fake = FakeVoices.new()
 	root.add_child(fake)
 	ui.dialogue.voices = fake
@@ -121,6 +123,8 @@ func _run() -> void:
 	restart.pressed.emit()
 	await scene_changed
 	ui = current_scene
+	await process_frame  # fresh scene shows the start menu again
+	ui._start_game()
 	ui.dialogue.voices = fake
 	await settle()
 	check(ui.game.day == 1 and ui.game.decisions.is_empty() and not ui.finished, "restart creates a fresh festival")
