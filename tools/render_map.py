@@ -28,6 +28,8 @@ CACHE = Path(__file__).resolve().parent / "cache" / "overpass_innenstadt_v2.json
 OUT_PNG = ROOT / "game" / "godot" / "assets" / "innenstadt_map.png"
 OUT_META = ROOT / "game" / "godot" / "data" / "map_meta.json"
 VENUES_JSON = ROOT / "game" / "godot" / "data" / "venues.json"
+SPRITES_DIR = ROOT / "game" / "godot" / "assets" / "sprites"
+DATA_JSON = ROOT / "game" / "godot" / "data"
 
 BOUNDS = (48.284, 48.318, 14.270, 14.320)  # lat_min, lat_max, lon_min, lon_max
 SIZE = 2048
@@ -194,6 +196,22 @@ def rings_px(el, iso, min_len=3):
     return out
 
 
+def load_sprites():
+    """Astra's 3D props (docs/track-c-brief.md), if delivered. Missing dir or
+    files simply fall back to the drawn shapes — output stays deterministic."""
+    sprites = {}
+    if SPRITES_DIR.is_dir():
+        for path in sorted(SPRITES_DIR.glob("prop_*.png")):
+            sprites[path.stem] = Image.open(path).convert("RGBA")
+    return sprites
+
+
+def paste_sprite(base, sprite, cx, ground_y):
+    """Paste with bottom-center anchor at (cx, ground_y)."""
+    w, h = sprite.size
+    base.paste(sprite, (int(cx - w / 2), int(ground_y - h)), sprite)
+
+
 def main():
     data = load()
     lat_min, lat_max, lon_min, lon_max = BOUNDS
@@ -233,6 +251,28 @@ def main():
     trees.sort(key=lambda t: t[0])
     trees = trees[:TREE_CAP]
 
+    venues = json.loads(VENUES_JSON.read_text("utf-8")) if VENUES_JSON.exists() else []
+
+    # Astra's sprites (if delivered) become ground objects in the same
+    # depth-sorted pass; without them the drawn fallbacks below are used.
+    sprites = load_sprites()
+    tree_sprites = [sprites[n] for n in sorted(sprites) if n.startswith("prop_tree")]
+    ground_objs = []  # (depth_sy, kind, px, extra)
+    for depth, px, r in trees:
+        ground_objs.append((depth, "tree", px, r))
+    if sprites:
+        for sprite_name, data_name in (("prop_fountain", "fountains"), ("prop_toilet", "toilets")):
+            data_file = DATA_JSON / f"{data_name}.json"
+            if sprite_name in sprites and data_file.exists():
+                for rec in json.loads(data_file.read_text("utf-8")):
+                    px = iso.pt(float(rec["lat"]), float(rec["lon"]))
+                    ground_objs.append((px[1], "prop", px, sprites[sprite_name]))
+        if "prop_stage" in sprites and VENUES_JSON.exists():
+            for v in venues:
+                px = iso.pt(float(v["lat"]), float(v["lon"]))
+                ground_objs.append((px[1], "prop", px, sprites["prop_stage"]))
+    ground_objs.sort(key=lambda o: o[0])
+
     img = Image.new("RGB", (SIZE, SIZE), C_GROUND)
     draw = ImageDraw.Draw(img, "RGBA")
 
@@ -251,24 +291,29 @@ def main():
         for ring in roads[kind]:
             draw.line(ring, fill=color, width=width, joint="curve")
 
-    venues = json.loads(VENUES_JSON.read_text("utf-8")) if VENUES_JSON.exists() else []
     for v in venues:
         px = iso.pt(float(v["lat"]), float(v["lon"]))
         for rx, alpha in ((38, 30), (26, 48), (14, 72)):
             draw.ellipse([px[0] - rx, px[1] - rx * 0.5, px[0] + rx, px[1] + rx * 0.5],
                          fill=(C_BEACON[0], C_BEACON[1], C_BEACON[2], alpha))
 
-    # depth-sorted world objects (far first): trees and buildings interleaved
-    ti = bi = 0
-    while ti < len(trees) or bi < len(buildings):
-        take_tree = bi >= len(buildings) or (ti < len(trees) and trees[ti][0] < buildings[bi][0])
-        if take_tree:
-            _, px, r = trees[ti]
-            ti += 1
-            draw.line([px[0], px[1], px[0], px[1] - r], fill=C_TRUNK, width=2)
-            draw.ellipse([px[0] - r, px[1] - 2 * r, px[0] + r, px[1]], fill=C_CANOPY)
-            draw.ellipse([px[0] - r * 0.6, px[1] - 1.9 * r, px[0] + r * 0.35, px[1] - 1.1 * r],
-                         fill=C_CANOPY_HI)
+    # depth-sorted world objects (far first): ground objects and buildings
+    gi = bi = 0
+    while gi < len(ground_objs) or bi < len(buildings):
+        take_obj = bi >= len(buildings) or (gi < len(ground_objs) and ground_objs[gi][0] < buildings[bi][0])
+        if take_obj:
+            _, kind, px, extra = ground_objs[gi]
+            gi += 1
+            if kind == "prop":
+                paste_sprite(img, extra, px[0], px[1])
+            elif tree_sprites:
+                paste_sprite(img, tree_sprites[hash(px) % len(tree_sprites)], px[0], px[1])
+            else:
+                r = extra
+                draw.line([px[0], px[1], px[0], px[1] - r], fill=C_TRUNK, width=2)
+                draw.ellipse([px[0] - r, px[1] - 2 * r, px[0] + r, px[1]], fill=C_CANOPY)
+                draw.ellipse([px[0] - r * 0.6, px[1] - 1.9 * r, px[0] + r * 0.35, px[1] - 1.1 * r],
+                             fill=C_CANOPY_HI)
         else:
             _, ground, h, roof = buildings[bi]
             bi += 1

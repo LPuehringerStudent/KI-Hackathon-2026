@@ -115,6 +115,45 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	_map_root.add_child(dot)
 	markers[id] = dot
 	_pop_in(dot)
+	if entity_type == "venue":
+		_add_pulse_ring(dot)
+
+
+## Expanding glow ring behind venue markers — makes festival venues findable
+## at a glance on the dense iso map. Ignores mouse; independent of state
+## modulate so set_entity_state keeps working.
+func _add_pulse_ring(dot: Control) -> void:
+	var ring := TextureRect.new()
+	ring.texture = _make_ring()
+	ring.size = Vector2(MARKER_SIZE, MARKER_SIZE)
+	ring.position = Vector2.ZERO
+	ring.pivot_offset = ring.size / 2.0
+	ring.modulate = Color(1.0, 0.62, 0.25, 0.0)
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.add_child(ring)
+	var tween := ring.create_tween().set_loops()
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(ring, "scale", Vector2(2.6, 2.6), 1.6).from(Vector2(0.7, 0.7))
+	tween.parallel().tween_property(ring, "modulate:a", 0.0, 1.6).from(0.75)
+	tween.tween_interval(0.7)
+
+
+func _make_ring() -> ImageTexture:
+	var key := "__ring"
+	if _dot_cache.has(key):
+		return _dot_cache[key]
+	var size := MARKER_SIZE * 2
+	var img := Image.create_empty(size, size, false, Image.FORMAT_RGBA8)
+	var center := Vector2(size, size) / 2.0
+	var r := MARKER_SIZE * 0.85
+	for x in size:
+		for y in size:
+			var d := Vector2(x, y).distance_to(center)
+			if r - 1.6 <= d and d <= r:
+				img.set_pixel(x, y, Color(1.0, 0.72, 0.35, 0.9))
+	var tex := ImageTexture.create_from_image(img)
+	_dot_cache[key] = tex
+	return tex
 
 
 func _pop_in(dot: TextureButton) -> void:
