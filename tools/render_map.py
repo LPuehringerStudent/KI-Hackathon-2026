@@ -221,6 +221,21 @@ def paste_sprite(base, sprite, cx, ground_y):
     base.paste(sprite, (int(cx - w / 2), int(ground_y - h)), sprite)
 
 
+def point_in_ring(p, ring):
+    """Ray-casting point-in-polygon (pixel ring)."""
+    x, y = p
+    inside = False
+    n = len(ring)
+    j = n - 1
+    for i in range(n):
+        xi, yi = ring[i]
+        xj, yj = ring[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
 def main():
     data = load()
     lat_min, lat_max, lon_min, lon_max = BOUNDS
@@ -256,6 +271,11 @@ def main():
             r = 2.2 + (hash(el.get("id")) % 10) / 6.0
             trees.append((px[1], px, r))
 
+    # trees standing in water are OSM edge cases (quay promenades etc.) —
+    # drop them so the miniature never plants trees in the Danube
+    water_rings = fills["water"]
+    if water_rings:
+        trees = [t for t in trees if not any(point_in_ring(t[1], w) for w in water_rings)]
     buildings.sort(key=lambda b: b[0])
     trees.sort(key=lambda t: t[0])
     trees = trees[:TREE_CAP]

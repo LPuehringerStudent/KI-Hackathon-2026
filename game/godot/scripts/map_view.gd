@@ -79,15 +79,17 @@ func _ready() -> void:
 	_add_layer_controls()
 	_add_zoom_controls()
 	_tip = Label.new()
-	_tip.add_theme_font_size_override("font_size", 12)
+	_tip.add_theme_font_size_override("font_size", 11)
 	_tip.add_theme_color_override("font_color", Color.WHITE)
+	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip.custom_minimum_size = Vector2(240, 0)  # cap width; wraps instead
 	var tip_bg := StyleBoxFlat.new()
 	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
 	tip_bg.set_corner_radius_all(4)
-	tip_bg.content_margin_left = 8.0
-	tip_bg.content_margin_right = 8.0
-	tip_bg.content_margin_top = 5.0
-	tip_bg.content_margin_bottom = 5.0
+	tip_bg.content_margin_left = 6.0
+	tip_bg.content_margin_right = 6.0
+	tip_bg.content_margin_top = 4.0
+	tip_bg.content_margin_bottom = 4.0
 	_tip.add_theme_stylebox_override("normal", tip_bg)
 	_tip.visible = false
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
