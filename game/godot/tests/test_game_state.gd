@@ -56,12 +56,12 @@ func test_fresh_state_meters_in_range() -> void:
 
 func test_fresh_state_expected_values() -> void:
 	var m: Dictionary = GS.compute_meters(GS.create(), _data())
-	# 20 base + 25 fountains + 25 toilets + 20 * (12 m crown / 200) shade
-	check(is_equal_approx(m.happiness, 71.2), "fresh happiness should be 71.2, got %s" % m.happiness)
+	# 10 base + 25 fountains + 25 toilets + 20 * (12 m crown / 200) shade
+	check(is_equal_approx(m.happiness, 61.2), "fresh happiness should be 61.2, got %s" % m.happiness)
 	# Single isolated venue, no shuttle: ISOLATED_REACH.
-	check(is_equal_approx(m.attendance, 40.0), "fresh attendance should be 40, got %s" % m.attendance)
-	# (15000 + 0.4 * 10000) / 25000
-	check(is_equal_approx(m.money, 76.0), "fresh money should be 76, got %s" % m.money)
+	check(is_equal_approx(m.attendance, 30.0), "fresh attendance should be 30, got %s" % m.attendance)
+	# (12000 + 0.3 * 12000) / 24000
+	check(is_equal_approx(m.money, 65.0), "fresh money should be 65, got %s" % m.money)
 
 
 func test_cutting_tree_lowers_happiness() -> void:
@@ -71,8 +71,8 @@ func test_cutting_tree_lowers_happiness() -> void:
 	state.decisions.append({ "entity_id": "t1", "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 200.0 })
 	var m: Dictionary = GS.compute_meters(state, data)
 	check(m.happiness < fresh.happiness, "cut should lower happiness: %s -> %s" % [fresh.happiness, m.happiness])
-	# 20 + 25 + 25 + 0 shade - 2 (cut) - 6 (within 50 m of venue)
-	check(is_equal_approx(m.happiness, 62.0), "happiness after cut should be 62, got %s" % m.happiness)
+	# 10 + 25 + 25 + 0 shade - 2 (cut) - 6 (within 50 m of venue)
+	check(is_equal_approx(m.happiness, 52.0), "happiness after cut should be 52, got %s" % m.happiness)
 
 
 func test_cost_decisions_lower_money() -> void:
@@ -107,8 +107,8 @@ func test_decision_ids_are_scoped_by_entity_type() -> void:
 	var state: Dictionary = GS.create()
 	state.decisions.append(_decision("f1", "fountain", "close", 0.0))
 	var m: Dictionary = GS.compute_meters(state, data)
-	# Fountain closed (-25) but the toilet with the same id stays open: 20 + 25 + 1.2
-	check(is_equal_approx(m.happiness, 46.2), "only the fountain should close, got happiness %s" % m.happiness)
+	# Fountain closed (-25) but the toilet with the same id stays open: 10 + 25 + 1.2
+	check(is_equal_approx(m.happiness, 36.2), "only the fountain should close, got happiness %s" % m.happiness)
 
 
 func test_shuttle_near_venue_raises_attendance() -> void:
@@ -118,21 +118,21 @@ func test_shuttle_near_venue_raises_attendance() -> void:
 	state.shuttles.append({ "lat": VENUE_LAT, "lon": VENUE_LON })
 	var m: Dictionary = GS.compute_meters(state, data)
 	check(m.attendance > fresh.attendance, "shuttle should raise attendance: %s -> %s" % [fresh.attendance, m.attendance])
-	check(is_equal_approx(m.attendance, 100.0), "fully reachable venue should give 100, got %s" % m.attendance)
+	check(is_equal_approx(m.attendance, 80.0), "shuttle-served venue should give SHUTTLE_REACH (80), got %s" % m.attendance)
 
 
 func test_shuttle_out_of_radius_does_not_count() -> void:
 	var state: Dictionary = GS.create()
 	state.shuttles.append({ "lat": VENUE_LAT + 0.0045, "lon": VENUE_LON })  # ~500 m away
 	var m: Dictionary = GS.compute_meters(state, _data())
-	check(is_equal_approx(m.attendance, 40.0), "far shuttle should not help, got %s" % m.attendance)
+	check(is_equal_approx(m.attendance, 30.0), "far shuttle should not help, got %s" % m.attendance)
 
 
 func test_clustered_venues_are_reachable() -> void:
 	var data := _data()
 	data.venues.append({ "id": "v2", "name": "Lentos", "lat": VENUE_LAT + 0.0009, "lon": VENUE_LON, "events": 5, "event_weight": 5 })
 	var m: Dictionary = GS.compute_meters(GS.create(), data)
-	check(is_equal_approx(m.attendance, 70.0), "clustered venues should get CLUSTER_REACH (70), got %s" % m.attendance)
+	check(is_equal_approx(m.attendance, 55.0), "clustered venues should get CLUSTER_REACH (55), got %s" % m.attendance)
 
 
 func test_empty_data_does_not_crash() -> void:
@@ -189,7 +189,7 @@ func test_trim_halves_shade_without_penalty() -> void:
 	state.decisions.append(_decision("t1", "tree", "trim", 150.0))
 	var m: Dictionary = GS.compute_meters(state, _data())
 	# shade 20 * (6 m / 200) = 0.6 instead of 1.2
-	check(is_equal_approx(m.happiness, 70.6), "trimmed tree should give half shade, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, 60.6), "trimmed tree should give half shade, got %s" % m.happiness)
 
 
 func test_cutting_distant_tree_costs_base_penalty() -> void:
@@ -206,10 +206,10 @@ func test_keep_listen_bonus_is_capped() -> void:
 	var data := _data()
 	var state: Dictionary = GS.create()
 	state.decisions.append(_decision("t1", "tree", "keep", 0.0))
-	check(is_equal_approx(GS.compute_meters(state, data).happiness, 72.2), "one keep adds LISTEN_BONUS")
+	check(is_equal_approx(GS.compute_meters(state, data).happiness, 62.2), "one keep adds LISTEN_BONUS")
 	for i in 10:
 		state.decisions.append(_decision("far%d" % i, "tree", "keep", 0.0))
-	check(is_equal_approx(GS.compute_meters(state, data).happiness, 71.2 + GS.LISTEN_BONUS_MAX), "listen bonus capped")
+	check(is_equal_approx(GS.compute_meters(state, data).happiness, 61.2 + GS.LISTEN_BONUS_MAX), "listen bonus capped")
 
 
 func test_latest_decision_per_entity_is_in_effect() -> void:
@@ -219,7 +219,7 @@ func test_latest_decision_per_entity_is_in_effect() -> void:
 	state.decisions.append(_decision("f1", "fountain", "keep", 0.0))
 	var m: Dictionary = GS.compute_meters(state, data)
 	# reopened (+25 back) and heard (+1)
-	check(is_equal_approx(m.happiness, 72.2), "keep after close should reopen the fountain, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, 62.2), "keep after close should reopen the fountain, got %s" % m.happiness)
 
 
 func test_pedestrian_street_near_venue_raises_attendance_until_reopened() -> void:
@@ -227,6 +227,6 @@ func test_pedestrian_street_near_venue_raises_attendance_until_reopened() -> voi
 	data.streets.append({ "id": "s1", "name": "Landstraße", "history": "", "lat": VENUE_LAT, "lon": VENUE_LON + 0.001 })
 	var state: Dictionary = GS.create()
 	state.decisions.append(_decision("s1", "street", "pedestrian", 300.0))
-	check(is_equal_approx(GS.compute_meters(state, data).attendance, 55.0), "isolated 40 + pedestrian 15")
+	check(is_equal_approx(GS.compute_meters(state, data).attendance, 45.0), "isolated 30 + pedestrian 15")
 	state.decisions.append(_decision("s1", "street", "open", 0.0))
-	check(is_equal_approx(GS.compute_meters(state, data).attendance, 40.0), "reopening removes the bonus")
+	check(is_equal_approx(GS.compute_meters(state, data).attendance, 30.0), "reopening removes the bonus")

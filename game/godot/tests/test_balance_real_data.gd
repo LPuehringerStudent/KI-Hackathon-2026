@@ -46,7 +46,9 @@ func test_real_data_balance() -> void:
 
 	for venue: Dictionary in data.venues:
 		var m := _after(data, "venue", venue.id, "shuttle")
-		check(m.attendance - fresh.attendance >= 1.0, "shuttle at %s should add >= 1 attendance" % venue.name)
+		# >= 0.5, not 1: gains scale with event weight, and the smallest isolated venue (Powerplayground,
+		# weight 5 of 267) gains (SHUTTLE_REACH - ISOLATED_REACH) * 5/267 = 0.94.
+		check(m.attendance - fresh.attendance >= 0.5, "shuttle at %s should add >= 0.5 attendance" % venue.name)
 		check(m.money < fresh.money, "shuttle at %s should cost money" % venue.name)
 
 	var best_relocation := 0.0
@@ -67,3 +69,44 @@ func test_real_data_balance() -> void:
 	for street: Dictionary in data.streets:
 		best_street = maxf(best_street, _after(data, "street", street.id, "pedestrian").attendance - fresh.attendance)
 	check(best_street >= 1.0, "some pedestrian street should add >= 1 attendance, best %.1f" % best_street)
+
+
+func _meters_on_day_three(state: Dictionary, data: Dictionary) -> Dictionary:
+	var s := state.duplicate(true)
+	GS.next_day(s)
+	GS.next_day(s)
+	return GS.compute_meters(s, data)
+
+
+## Balance against main.gd's verdict thresholds (read-only use of Track C's verdict_title).
+func test_real_data_verdicts() -> void:
+	var data := _load_data()
+	if data.is_empty():
+		print("  SKIP test_real_data_verdicts: no extracted data in %s yet" % DATA_DIR)
+		return
+	var verdict_title: Callable = preload("res://scripts/main.gd").verdict_title
+
+	# Doing nothing is judged neutral, whatever the Hitzetag weather.
+	for air: Variant in [null, { "pm10": 6.7 }, { "pm10": 35.0 }, { "pm10": 50.0 }]:
+		var d := data.duplicate()
+		d.erase("airquality")
+		if air != null:
+			d["airquality"] = air
+		var title: String = verdict_title.call(_meters_on_day_three(GS.create(), d))
+		check(title == "Stadt im Gleichgewicht", "untouched city with air %s should be neutral, got %s" % [air, title])
+
+	# No single decision wins the best title (it used to take one shuttle).
+	var singles: Array = []
+	for venue: Dictionary in data.venues:
+		singles.append(["venue", venue.id, "shuttle"])
+	for street: Dictionary in data.streets:
+		singles.append(["street", street.id, "pedestrian"])
+	for type: String in ["fountain", "toilet"]:
+		for service: Dictionary in data[type + "s"]:
+			singles.append([type, service.id, "relocate"])
+	singles.append(["tree", data.trees[0].id, "keep"])
+	for single: Array in singles:
+		var state: Dictionary = GS.create()
+		GS.decide(state, GS.find_entity(data, single[1], single[0]), single[2])
+		var title: String = verdict_title.call(_meters_on_day_three(state, data))
+		check(title != "Volksnahe Stadtplanung", "a single %s on %s %s already wins the best title" % [single[2], single[0], single[1]])

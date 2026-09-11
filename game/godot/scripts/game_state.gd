@@ -9,7 +9,7 @@ extends RefCounted
 ## Entity:   a Data record plus "type" ("venue" | "tree" | "fountain" | "toilet" | "street"),
 ##           as returned by find_entity() — the same type string map_view's entity_clicked emits.
 
-const CONFIG := { "start_budget": 15000.0, "visitor_spend": 35.0, "walk_radius": 300.0, "shuttle_radius": 250.0 }
+const CONFIG := { "start_budget": 12000.0, "visitor_spend": 35.0, "walk_radius": 300.0, "shuttle_radius": 250.0 }
 
 const LAST_DAY := 3
 
@@ -34,7 +34,7 @@ const DECISIONS := {
 	"fountain": SERVICE_DECISIONS,
 	"toilet": SERVICE_DECISIONS,
 	"venue": [
-		{ "id": "shuttle", "label": "Shuttle-Haltestelle einrichten", "cost": 1200.0, "adds_shuttle": true },
+		{ "id": "shuttle", "label": "Shuttle-Haltestelle einrichten", "cost": 1800.0, "adds_shuttle": true },
 	],
 	"street": [
 		{ "id": "pedestrian", "label": "Für Fußgänger sperren", "cost": 300.0, "adds_shuttle": false },
@@ -43,15 +43,18 @@ const DECISIONS := {
 }
 
 ## Tuning constants — balanced against the real Innenstadt extract (20 venues, 400 trees,
-## 38 fountains, 41 toilets) so every decision moves a meter without cliffs.
+## 38 fountains, 41 toilets) so every decision moves a meter without cliffs, and against
+## main.gd's verdict thresholds (> 66 / < 50): an untouched city ends "Stadt im Gleichgewicht"
+## on day 3 at any air quality, and "Volksnahe Stadtplanung" needs several mixed decisions
+## (simulated: 4 at neutral air, 3 with clean air) instead of one shuttle.
 
 ## Visitor income at 100 % attendance and the reference spend of 35 € per visitor.
-const MAX_VISITOR_INCOME := 10000.0
+const MAX_VISITOR_INCOME := 12000.0
 const REFERENCE_SPEND := 35.0
 const EARTH_RADIUS_M := 6371000.0
 
 ## Happiness = base + weight × (0..1 component) per term, minus cut penalties.
-const HAPPINESS_BASE := 20.0
+const HAPPINESS_BASE := 10.0
 const FOUNTAIN_WEIGHT := 25.0
 const TOILET_WEIGHT := 25.0
 const SHADE_WEIGHT := 20.0
@@ -69,9 +72,9 @@ const LISTEN_BONUS := 1.0
 const LISTEN_BONUS_MAX := 5.0
 
 ## Attendance = event-weighted share of demand realised, by how well each venue is connected.
-const SHUTTLE_REACH := 1.0
-const CLUSTER_REACH := 0.7
-const ISOLATED_REACH := 0.4
+const SHUTTLE_REACH := 0.8
+const CLUSTER_REACH := 0.55
+const ISOLATED_REACH := 0.3
 const VENUE_CLUSTER_RADIUS_M := 200.0
 const PEDESTRIAN_REACH_BONUS := 0.15
 const PEDESTRIAN_RADIUS_M := 250.0
