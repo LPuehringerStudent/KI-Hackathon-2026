@@ -339,7 +339,7 @@ func _add_zoom_controls() -> void:
 	add_child(overlay)
 	var box := VBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-46, 70)
+	box.position = Vector2(-46, 8)
 	box.add_theme_constant_override("separation", 4)
 	overlay.add_child(box)
 	for spec in [["+", "zoom_in"], ["−", "zoom_out"]]:
@@ -352,7 +352,7 @@ func _add_zoom_controls() -> void:
 		box.add_child(btn)
 	var layers := HBoxContainer.new()
 	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	layers.position = Vector2(8, 70)
+	layers.position = Vector2(8, 8)
 	layers.add_theme_constant_override("separation", 4)
 	overlay.add_child(layers)
 	_bulk_bar = HBoxContainer.new()
@@ -488,7 +488,7 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	else:
 		marker_size = TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
 		dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], int(marker_size))
-	dot.tooltip_text = str(entity.get("name", id))
+	dot.set_meta("ename", str(entity.get("name", id)))
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
 	dot.set_meta("msize", marker_size)
 	dot.set_meta("etype", entity_type)
@@ -535,7 +535,7 @@ func _info_line(entity: Dictionary, entity_type: String) -> String:
 func _show_tip(dot: TextureButton) -> void:
 	if _tip == null:
 		return
-	var text := str(dot.tooltip_text)
+	var text := str(dot.get_meta("ename", ""))
 	var info := str(dot.get_meta("info", ""))
 	if not info.is_empty():
 		text += "\n" + info

@@ -33,28 +33,3 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 theme_override_constants/separation = 18
-
-[node name="Header" type="HBoxContainer" parent="RootSplit/MapSlot"]
-layout_mode = 1
-anchor_right = 1.0
-offset_left = 24.0
-offset_top = 18.0
-offset_right = -24.0
-offset_bottom = 62.0
-
-[node name="Title" type="Label" parent="RootSplit/MapSlot/Header"]
-text = "Bürgermeister:in fürs Festival  ·  LINZ 2026"
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
-
-[node name="Sources" type="Label" parent="RootSplit/MapSlot"]
-layout_mode = 1
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -30.0
-offset_right = -24.0
-offset_bottom = -6.0
-text = "Daten: Stadt Linz (CC BY 4.0) · Ars Electronica 2026 · Karte: © OpenStreetMap-Mitwirkende (ODbL)"
-theme_override_font_sizes/font_size = 12
