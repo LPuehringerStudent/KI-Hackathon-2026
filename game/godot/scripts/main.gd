@@ -90,6 +90,18 @@ func _show_menu() -> void:
 	menu.name = "StartMenu"
 	menu.color = Color("f3f5f4")
 	add_child(menu)
+	# Astra's miniature backdrop (Track C art); solid color fallback if absent
+	var bg_path := "res://assets/sprites/ui_menu_background.png"
+	if ResourceLoader.exists(bg_path):
+		menu.color = Color(0, 0, 0, 0)
+		var bg := TextureRect.new()
+		bg.texture = load(bg_path)
+		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		menu.add_child(bg)
+		menu.move_child(bg, 0)
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var center := CenterContainer.new()
 	menu.add_child(center)

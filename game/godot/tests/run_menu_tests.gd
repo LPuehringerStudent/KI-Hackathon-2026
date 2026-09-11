@@ -20,9 +20,15 @@ func _run() -> void:
 	check(ui.menu.visible and not ui.started, "startup menu visible")
 	check(ui.menu.get_node_or_null("CenterContainer") == null, "menu is runtime native UI")
 	var start: Button = null
-	for child: Node in ui.menu.get_child(0).get_child(0).get_children():
-		if child is Button and child.text == "Festival starten":
-			start = child
+	var rows: VBoxContainer = null
+	for child: Node in ui.menu.get_children():
+		if child is CenterContainer:
+			rows = child.get_child(0)
+	check(rows != null, "menu rows found behind backdrop")
+	if rows != null:
+		for child: Node in rows.get_children():
+			if child is Button and child.text == "Festival starten":
+				start = child
 	check(start != null, "start button present in menu")
 	# Headless engine quirk: driving the menu -> start transition in `-s` mode
 	# crashes intermittently inside scene/gui (signals 6/11, racy — identical
