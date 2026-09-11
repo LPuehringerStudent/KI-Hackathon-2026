@@ -71,4 +71,14 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.update_shuttles([])
 	await process_frame
 	check(mv._shuttle_markers.is_empty(), "shuttle markers clear when none")
+	# mentor-pack purchase sprites (fallback dots while Astra's v3 is pending)
+	mv.update_purchases({ data.venues[0].id: { "foodtruck": 2, "security": 1 } })
+	await process_frame
+	check(mv._purchase_markers.size() == 2, "food+security sprites appear at stocked venue")
+	mv.update_purchases({ "unknown": { "foodtruck": 1 } })
+	await process_frame
+	check(mv._purchase_markers.is_empty(), "purchase sprites ignore unknown venues")
+	mv.update_purchases({})
+	await process_frame
+	check(mv._purchase_markers.is_empty(), "purchase sprites clear when none")
 	mv.queue_free()

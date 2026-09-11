@@ -37,6 +37,7 @@ var _map_rect: TextureRect
 var _dot_cache := {}
 var _badges := {}
 var _shuttle_markers: Array = []
+var _purchase_markers: Array = []
 
 
 func _ready() -> void:
@@ -217,6 +218,41 @@ func _make_dot(color: Color, size := MARKER_SIZE) -> ImageTexture:
 	var tex := ImageTexture.create_from_image(img)
 	_dot_cache[key] = tex
 	return tex
+
+
+## Mentor-pack purchase sprites: food truck / security appear at venues with
+## units > 0 (badges show counts; sprites show presence). Same fallback logic
+## as shuttles. Wired from main.gd::_refresh alongside refresh_badges.
+func update_purchases(purchases: Dictionary) -> void:
+	for m: Node in _purchase_markers:
+		m.queue_free()
+	_purchase_markers.clear()
+	for venue_id: String in purchases:
+		if not markers.has(venue_id):
+			continue
+		var counts: Dictionary = purchases[venue_id]
+		var dot: TextureButton = markers[venue_id]
+		var base := dot.position + Vector2(dot.texture_normal.get_width(), dot.texture_normal.get_height()) / 2.0
+		var slot := 0
+		for kind: String in ["foodtruck", "security"]:
+			if int(counts.get(kind, 0)) <= 0:
+				continue
+			var tex := _load_sprite("prop_" + kind)
+			var marker: Control
+			if tex != null:
+				var rect := TextureRect.new()
+				rect.texture = tex
+				rect.position = base + Vector2(-18 + slot * 14, -tex.get_height() - 6)
+				marker = rect
+			else:
+				var fb := TextureRect.new()
+				fb.texture = _make_dot(Color("#e58e3f") if kind == "foodtruck" else Color("#4a6fa5"), 10)
+				fb.position = base + Vector2(-18 + slot * 14, -16)
+				marker = fb
+			marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_map_root.add_child(marker)
+			_purchase_markers.append(marker)
+			slot += 1
 
 
 ## Dynamic shuttle markers: purchased shuttles appear on the map.

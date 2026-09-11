@@ -280,6 +280,29 @@ def main():
             for v in venues:
                 px = iso.pt(float(v["lat"]), float(v["lon"]))
                 ground_objs.append((px[1], "prop", px, sprites["prop_stage"]))
+        # crowd blobs at venues (baked festival atmosphere, scaled by demand)
+        if "prop_crowd" in sprites:
+            for v in venues:
+                base = iso.pt(float(v["lat"]), float(v["lon"]))
+                n = 1 + int(v.get("event_weight", 5)) // 8
+                for i in range(n):
+                    jx = (hash((v["id"], i, "x")) % 17) - 8
+                    jy = (hash((v["id"], i, "y")) % 9) - 4
+                    px = (base[0] + jx, base[1] + jy)
+                    ground_objs.append((px[1], "prop", px, sprites["prop_crowd"]))
+        # market stalls along pedestrian streets
+        if "prop_stall" in sprites:
+            for ring in roads["pedestrian"]:
+                for i, px in enumerate(ring):
+                    if i % 12 == 5:  # deterministic spacing along the street
+                        ground_objs.append((px[1], "prop", px, sprites["prop_stall"]))
+        # boats on the largest water body
+        if "prop_boat" in sprites and fills["water"]:
+            biggest = max(fills["water"], key=lambda r: abs(signed_area(r)))
+            n = len(biggest)
+            for frac in (0.3, 0.65):
+                p = biggest[int(n * frac)]
+                ground_objs.append((p[1], "prop", p, sprites["prop_boat"]))
     ground_objs.sort(key=lambda o: o[0])
 
     img = Image.new("RGB", (SIZE, SIZE), C_GROUND)
