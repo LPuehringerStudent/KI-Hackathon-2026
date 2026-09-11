@@ -324,7 +324,7 @@ func _add_zoom_controls() -> void:
 	add_child(overlay)
 	var box := VBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-46, 8)
+	box.position = Vector2(-46, 70)
 	box.add_theme_constant_override("separation", 4)
 	overlay.add_child(box)
 	for spec in [["+", "zoom_in"], ["−", "zoom_out"]]:
@@ -337,7 +337,7 @@ func _add_zoom_controls() -> void:
 		box.add_child(btn)
 	var layers := HBoxContainer.new()
 	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	layers.position = Vector2(8, 8)
+	layers.position = Vector2(8, 70)
 	layers.add_theme_constant_override("separation", 4)
 	overlay.add_child(layers)
 	_bulk_bar = HBoxContainer.new()
