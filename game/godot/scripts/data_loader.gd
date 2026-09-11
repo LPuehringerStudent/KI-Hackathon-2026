@@ -13,6 +13,10 @@ func load_all(path := DATA_PATH) -> Dictionary:
 			push_error("data_loader: missing or invalid " + name + ".json")
 			return {}
 		result[name] = records
+	# Optional datasets — present only when generated; consumers must handle absence.
+	var airquality = _load_json(path.path_join("airquality.json"))
+	if airquality != null:
+		result["airquality"] = airquality
 	return result
 
 
