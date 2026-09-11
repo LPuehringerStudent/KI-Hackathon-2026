@@ -1,0 +1,21 @@
+{
+ "bounds": {
+  "lat_min": 48.284,
+  "lat_max": 48.318,
+  "lon_min": 14.27,
+  "lon_max": 14.32
+ },
+ "extracted_at": "2026-09-11T09:35:56.627644+00:00",
+ "sources": [
+  "data/festival/notion_export.json (Ars Electronica, schema v2)",
+  "data/linz/baumkataster/Baumkataster.csv (CC BY 4.0, Export 2026-07-01)",
+  "data/linz/trinkbrunnen/Trinkbrunnen.csv (CC BY 4.0, 2023)",
+  "data/linz/wc-anlagen/WC-Anlagen.csv (CC BY 4.0, 2023)",
+  "data/linz/strassennamen/Strassennamen-aktuell.csv (CC BY 4.0, 2025-03-07)"
+ ],
+ "notes": {
+  "streets": "Source CSV has no coordinates; positions are approximate center points of well-known Innenstadt streets (curated).",
+  "tree_age": "Estimated from trunk circumference via rough growth rates (Laub 2.5, Nadel 1.2, other 2.0 cm/yr). Persona flavor only.",
+  "venues": "Top-level festival locations (no Linked Parent) with coordinates_ok=True, public_for_hackathon=True, >=5 linked calendar slots; capped at 20 by event count."
+ }
+}

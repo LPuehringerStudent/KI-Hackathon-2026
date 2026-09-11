@@ -1,0 +1,122 @@
+[
+ {
+  "id": "34238ddb450c813fbbffff132d6d8408",
+  "name": "Lentos Kunstmuseum",
+  "lat": 48.30863,
+  "lon": 14.28884,
+  "events": 40,
+  "event_weight": 20
+ },
+ {
+  "id": "36638ddb450c80588feaea943786965f",
+  "name": "C. Bechstein Centrum Linz",
+  "lat": 48.30384,
+  "lon": 14.29201,
+  "events": 38,
+  "event_weight": 20
+ },
+ {
+  "id": "34238ddb450c81ac8432eab6e4831002",
+  "name": "Hauptplatz Linz",
+  "lat": 48.30549,
+  "lon": 14.28668,
+  "events": 28,
+  "event_weight": 20
+ },
+ {
+  "id": "34238ddb450c8156a0b2e87f10c43d2e",
+  "name": "Mariendom",
+  "lat": 48.30043,
+  "lon": 14.28618,
+  "events": 19,
+  "event_weight": 19
+ },
+ {
+  "id": "34238ddb450c81939959c300c9dcbf08",
+  "name": "Francisco Carolinum Linz",
+  "lat": 48.30603,
+  "lon": 14.29371,
+  "events": 15,
+  "event_weight": 15
+ },
+ {
+  "id": "e8238ddb450c83cf931481594c432903",
+  "name": "splace",
+  "lat": 48.30671,
+  "lon": 14.28639,
+  "events": 15,
+  "event_weight": 15
+ },
+ {
+  "id": "34238ddb450c81388c73f87a46369f19",
+  "name": "Stadtwerkstatt",
+  "lat": 48.3101,
+  "lon": 14.28461,
+  "events": 14,
+  "event_weight": 14
+ },
+ {
+  "id": "34238ddb450c809ab5beeb28249c21e2",
+  "name": "OK Platz",
+  "lat": 48.30241,
+  "lon": 14.29098,
+  "events": 12,
+  "event_weight": 12
+ },
+ {
+  "id": "34238ddb450c809d80c0dc96ac1129e6",
+  "name": "Posthof – Zeitkultur am Hafen",
+  "lat": 48.3117,
+  "lon": 14.31151,
+  "events": 11,
+  "event_weight": 11
+ },
+ {
+  "id": "34238ddb450c8161b52ecd1c41c405fa",
+  "name": "Ars Electronica Center",
+  "lat": 48.30962,
+  "lon": 14.28445,
+  "events": 7,
+  "event_weight": 7
+ },
+ {
+  "id": "34238ddb450c81909335d75307926d08",
+  "name": "Atelierhaus Salzamt",
+  "lat": 48.30642,
+  "lon": 14.28343,
+  "events": 5,
+  "event_weight": 5
+ },
+ {
+  "id": "34238ddb450c817b9154dc6462cf41fc",
+  "name": "Kunstuniversität Linz",
+  "lat": 48.30658,
+  "lon": 14.28573,
+  "events": 5,
+  "event_weight": 5
+ },
+ {
+  "id": "34238ddb450c811d9acafb1be4f23432",
+  "name": "Powerplayground",
+  "lat": 48.29719,
+  "lon": 14.30033,
+  "events": 5,
+  "event_weight": 5
+ },
+ {
+  "id": "39938ddb450c80258e94f2802fc21936",
+  "name": "PopUp Store",
+  "lat": 48.30555,
+  "lon": 14.28739,
+  "events": 5,
+  "event_weight": 5
+ },
+ {
+  "id": "3bb38ddb450c8048b251c19ffd45f823",
+  "name": "Priesterseminar",
+  "lat": 48.30258,
+  "lon": 14.29172,
+  "events": 5,
+  "event_weight": 5
+ }
+]
