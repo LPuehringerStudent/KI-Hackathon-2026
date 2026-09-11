@@ -300,9 +300,11 @@ static func _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 
 
 func _on_layer_hover(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and _layer_readout != null:
-		var latlon := pixel_to_latlon(event.position)
-		_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
+	if event is InputEventMouseMotion:
+		_hide_tip()  # any motion over empty map dismisses a stuck marker bubble
+		if _layer_readout != null:
+			var latlon := pixel_to_latlon(event.position)
+			_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
 
 
 func _add_layer_controls() -> void:
