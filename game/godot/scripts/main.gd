@@ -46,6 +46,7 @@ func _start_game() -> void:
 	$RootSplit/PanelSlot.add_child(day_bar)
 	$RootSplit/PanelSlot.add_child(chat)
 	day_bar.advance_requested.connect(advance_day)
+	day_bar.pricing_selected.connect(apply_pricing)
 	chat.message_submitted.connect(send_message)
 	chat.decision_selected.connect(apply_decision)
 	data = get_node("/root/Data").load_all()
@@ -189,14 +190,36 @@ func apply_decision(id: String) -> void:
 		chat.set_status("Diese Entscheidung ist nicht verfuegbar.")
 		return
 	_generation += 1
-	_resolved[_key(selected)] = true
+	# Venues stay open: food trucks and security are repeatable, curfew is a toggle.
+	var stays_open := str(selected.get("type", "")) == "venue"
+	if not stays_open:
+		_resolved[_key(selected)] = true
+		chat.set_resolved(true)
 	chat.set_busy(false)
-	chat.set_resolved(true)
 	for decision: Dictionary in State.available_decisions(selected):
 		if decision.id == id:
 			chat.add_message("Entscheidung", "%s / %d EUR" % [decision.label, int(decision.cost)])
-	chat.set_status("Entscheidung festgehalten.")
+	chat.set_status(_venue_status(selected) if stays_open else "Entscheidung festgehalten.")
 	_refresh()
+
+
+func apply_pricing(id: String) -> void:
+	if finished or game.is_empty():
+		return
+	if State.decide(game, State.find_entity(data, "festival", "festival"), id):
+		for decision: Dictionary in State.available_decisions(State.find_entity(data, "festival", "festival")):
+			if decision.id == id:
+				chat.set_status("Tag %d: %s" % [game.day, decision.label])
+	_refresh()
+
+
+func _venue_status(venue: Dictionary) -> String:
+	var stock := State.stock_status(game, venue)
+	if stock.is_empty():
+		return "Entscheidung festgehalten."
+	return "Foodtrucks %d/%d  ·  Security %d/%d" % [
+		mini(stock.demand, stock.baseline + stock.foodtruck), stock.demand,
+		mini(stock.demand, stock.baseline + stock.security), stock.demand]
 
 
 func advance_day() -> void:
@@ -220,6 +243,7 @@ func _refresh() -> void:
 	meters.set_meters(State.compute_meters(game, data))
 	day_bar.set_day(game.day, State.day_theme(game.day))
 	map_view.set_day_tint(game.day)
+	day_bar.set_pricing(State.pricing_for_day(game, game.day))
 	map_view.refresh_badges(game.get("purchases", {}))
 	map_view.update_purchases(game.get("purchases", {}))
 	map_view.update_shuttles(game.get("shuttles", []))
@@ -228,7 +252,7 @@ func _refresh() -> void:
 	var origins: Array = []
 	for decision: Dictionary in game.decisions:
 		var origin := State.find_entity(data, decision.entity_id, decision.entity_type)
-		if not origin.is_empty():
+		if origin.has("lat") and origin.has("lon"):  # the festival pricing entity has no position
 			origins.append(origin)
 	for kind: String in ["venue", "tree", "fountain", "toilet", "street"]:
 		for record: Dictionary in data.get(kind + "s", []):

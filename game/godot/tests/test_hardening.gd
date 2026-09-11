@@ -10,7 +10,7 @@ const VENUE_LAT := 48.306
 const VENUE_LON := 14.284
 
 
-## Same fixture as test_game_state.gd: fresh meters attendance 30 / money 65 / happiness 61.2.
+## Same fixture as test_game_state.gd (no headline venues, so mentor-pack terms are neutral).
 func _data() -> Dictionary:
 	return {
 		"venues": [
@@ -38,7 +38,7 @@ func _same_meters(a: Variant, b: Variant) -> bool:
 
 func _expect_fixture_meters(data: Dictionary, label: String, state: Dictionary = GS.create()) -> void:
 	var m: Variant = GS.compute_meters(state, data)
-	check(_same_meters(m, GS.compute_meters(GS.create(), _data())), "%s: expected fixture meters 30/65/61.2, got %s" % [label, m])
+	check(_same_meters(m, GS.compute_meters(GS.create(), _data())), "%s: expected the unmodified fixture meters, got %s" % [label, m])
 
 
 func test_invalid_records_are_ignored() -> void:
@@ -63,7 +63,7 @@ func test_null_or_missing_collections_count_as_empty() -> void:
 		var data := { "venues": null, "trees": null, "fountains": null, "toilets": null, "streets": null } if label == "null arrays" else {}
 		var m: Variant = GS.compute_meters(GS.create(), data)
 		check(_same_meters(m, expected), "%s should equal empty data, got %s" % [label, m])
-	check(is_equal_approx(expected.money, 50.0) and expected.attendance == 0.0, "empty data: money 50, attendance 0, got %s" % expected)
+	check(is_equal_approx(expected.money, (100.0 * (GS.CONFIG.start_budget - 0.0 + 0.0 * GS.MAX_VISITOR_INCOME) / (GS.CONFIG.start_budget + GS.MAX_VISITOR_INCOME))) and expected.attendance == 0.0, "empty data: budget-only money, attendance 0, got %s" % expected)
 
 
 func test_empty_state_scores_like_a_fresh_game() -> void:
@@ -76,8 +76,9 @@ func test_malformed_decision_records_do_not_corrupt_meters() -> void:
 	state.decisions.append("close f1")
 	state.decisions.append({ "entity_id": "x", "entity_type": "tree", "decision_id": "keep" })  # no cost
 	var m: Dictionary = GS.compute_meters(state, _data())
-	check(is_equal_approx(m.money, 65.0), "missing costs count as 0, money should stay 65, got %s" % m.money)
-	check(is_equal_approx(m.happiness, 62.2), "only the valid keep counts (+1), got %s" % m.happiness)
+	var fresh: Dictionary = GS.compute_meters(GS.create(), _data())
+	check(is_equal_approx(m.money, fresh.money), "missing costs count as 0, money unchanged, got %s" % m.money)
+	check(is_equal_approx(m.happiness, fresh.happiness + GS.LISTEN_BONUS), "only the valid keep counts, got %s" % m.happiness)
 
 
 func test_numeric_ids_match_their_string_form() -> void:
@@ -85,8 +86,9 @@ func test_numeric_ids_match_their_string_form() -> void:
 	data.trees[0].id = 42
 	var state: Dictionary = GS.create()
 	state.decisions.append({ "entity_id": 42, "entity_type": "tree", "decision_id": "cut", "day": 1, "cost": 400 })
-	# 10 + 25 + 25 - 2 - 6 (tree 42 cut next to the venue)
-	check(is_equal_approx(GS.compute_meters(state, data).happiness, 52.0), "int ids should work, got %s" % GS.compute_meters(state, data).happiness)
+	# tree 42 cut next to the venue: no shade, both cut penalties
+	var expected := GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT - GS.CUT_PENALTY - GS.CUT_NEAR_VENUE_PENALTY
+	check(is_equal_approx(GS.compute_meters(state, data).happiness, expected), "int ids should work, got %s" % GS.compute_meters(state, data).happiness)
 	var entity := GS.find_entity(data, "42", "tree")
 	check(entity.get("type") == "tree", "find_entity should find an int id by its string form")
 
@@ -126,7 +128,7 @@ func test_click_spam_on_one_entity_charges_once() -> void:
 		if GS.decide(state, toilet, "relocate"):
 			accepted += 1
 	check(accepted == 1 and state.decisions.size() == 1, "50 identical clicks should record once, got %d" % accepted)
-	check(is_equal_approx(state.budget, 11200.0), "and charge 800 once, budget %s" % state.budget)
+	check(is_equal_approx(state.budget, GS.CONFIG.start_budget - 800.0), "and charge 800 once, budget %s" % state.budget)
 
 
 func test_decision_after_day_change_records_new_day() -> void:

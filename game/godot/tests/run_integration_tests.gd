@@ -1,5 +1,7 @@
 extends SceneTree
 
+const State := preload("res://scripts/game_state.gd")
+
 class FakeVoices extends Node:
 	var last_error := ""
 	var offline := true
@@ -83,7 +85,7 @@ func _run() -> void:
 	ui.apply_decision("shuttle")
 	ui.apply_decision("shuttle")
 	check(ui.game.decisions.size() == 1 and ui.game.shuttles.size() == 1, "offline decision and duplicate protection")
-	check(ui.map_view.markers[other.id].disabled, "resolved marker disabled")
+	check(not ui.map_view.markers[other.id].disabled and not ui._resolved.has("venue:" + str(other.id)), "venues stay open after a decision (repeatable purchases)")
 	fake.offline = false
 	ui.select_entity(venue.id, "venue")
 	await settle()
@@ -105,11 +107,19 @@ func _run() -> void:
 	ui.apply_decision("relocate")
 	await settle()
 	check(ui.game.decisions.size() == 3 and ui.game.decisions[-1].day == 2, "day two decision works during pending voice")
+	check(ui.map_view.markers[toilet.id].disabled, "resolved marker disabled")
 	ui.advance_day()
 	ui.select_entity(tree.id, "tree")
 	await settle()
 	ui.apply_decision("keep")
 	check(ui.game.day == 3 and ui.game.decisions[-1].decision_id == "keep", "day three tree kept")
+	ui.select_entity(venue.id, "venue")
+	await settle()
+	ui.apply_decision("foodtruck")
+	ui.apply_decision("foodtruck")
+	check(ui.game.purchases.get(str(venue.id), {}).get("foodtruck") == 2 and not ui._resolved.has("venue:" + str(venue.id)), "two food trucks bought through the chat, venue still open")
+	ui.day_bar.pricing_buttons.premium.pressed.emit()
+	check(State.pricing_for_day(ui.game, 3) == "premium" and ui.day_bar.pricing_buttons.premium.button_pressed and not ui.day_bar.pricing_buttons.standard.button_pressed, "day-bar pricing applies to today")
 	ui.advance_day()
 	check(ui.finished and ui.verdict.visible, "final verdict visible")
 	before = ui.game.duplicate(true)
