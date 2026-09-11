@@ -32,11 +32,20 @@ func _ready() -> void:
 	_scroll = $Scroll
 	_map_root = $Scroll/MapRoot
 	var map_rect: TextureRect = $Scroll/MapRoot/Map
-	var img := Image.load_from_file(MAP_TEXTURE_PATH)
-	if img == null:
+	# ResourceLoader first: required for export builds (res:// PNGs are imported
+	# at export time). ResourceLoader.exists() guards the headless `-s` case,
+	# where load() on an unimported resource stalls instead of returning null.
+	var tex: Texture2D = null
+	if ResourceLoader.exists(MAP_TEXTURE_PATH):
+		tex = load(MAP_TEXTURE_PATH)
+	if tex == null:
+		var img := Image.load_from_file(MAP_TEXTURE_PATH)
+		if img != null:
+			tex = ImageTexture.create_from_image(img)
+	if tex == null:
 		push_error("map_view: cannot load " + MAP_TEXTURE_PATH)
 	else:
-		map_rect.texture = ImageTexture.create_from_image(img)
+		map_rect.texture = tex
 	refresh()
 
 
@@ -62,16 +71,17 @@ func _load_game_data() -> Dictionary:
 	return node.load_all()
 
 
-## WGS84 -> pixel coords. MUST mirror tools/render_map.py project():
-## equirectangular corrected for lat 48.3, scale = width / max(w_km, h_km).
+## WGS84 -> pixel coords. Mirrors tools/render_map.py project(); the projection
+## constants come from map_meta.json (written by render_map.py) with the
+## hardcoded values as fallback for stale meta files.
 func latlon_to_pixel(lat: float, lon: float) -> Vector2:
-	var km_per_deg_lon := 111.32 * cos(deg_to_rad(48.3))
-	var km_per_deg_lat := 110.57
+	var km_per_deg_lon := float(_meta.get("km_per_deg_lon", 111.32 * cos(deg_to_rad(48.3))))
+	var km_per_deg_lat := float(_meta.get("km_per_deg_lat", 110.57))
 	var x := (lon - float(_meta.lon_min)) * km_per_deg_lon
 	var y := (float(_meta.lat_max) - lat) * km_per_deg_lat
 	var w_km := (float(_meta.lon_max) - float(_meta.lon_min)) * km_per_deg_lon
 	var h_km := (float(_meta.lat_max) - float(_meta.lat_min)) * km_per_deg_lat
-	var scale := float(_meta.width) / maxf(w_km, h_km)
+	var scale := float(_meta.get("scale_px_per_km", float(_meta.width) / maxf(w_km, h_km)))
 	return Vector2(x * scale, y * scale)
 
 
