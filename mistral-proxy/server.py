@@ -8,6 +8,7 @@ http://127.0.0.1:8377/v1.
 """
 
 import argparse
+import hashlib
 import json
 import threading
 import time
@@ -19,6 +20,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 KEYS_FILE = HERE / "keys.json"
 USAGE_FILE = HERE / "usage.jsonl"
+CACHE_FILE = HERE / "cache.jsonl"
+CACHE_MAX_ENTRIES = 5000
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8377
@@ -26,7 +29,8 @@ DEFAULT_MODEL = "mistralai/mistral-medium-3-5"
 DEFAULT_BUDGET = 19.0  # safety cap, $ per key; keys carry a $20 budget
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-STATE = {"lock": threading.Lock(), "keys": [], "spend": {}, "requests": {}, "next": 0}
+STATE = {"lock": threading.Lock(), "keys": [], "spend": {}, "requests": {}, "next": 0,
+         "cache": {}, "cache_hits": 0}
 
 
 def log(msg):
@@ -58,6 +62,15 @@ def load_state():
                 STATE["requests"][rec["key"]] = STATE["requests"].get(rec["key"], 0) + 1
             except (KeyError, json.JSONDecodeError):
                 continue
+    # Replay response cache (requests flagged with "cache": true).
+    if CACHE_FILE.exists():
+        for line in CACHE_FILE.read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+                STATE["cache"][rec["k"]] = rec["response"]
+            except (KeyError, json.JSONDecodeError):
+                continue
+    log(f"cache: {len(STATE['cache'])} entries loaded")
     log(f"{len(STATE['keys'])} keys loaded, spend replayed from usage.jsonl")
 
 
@@ -84,6 +97,27 @@ def record_usage(key, cost_usd):
     log(f"{mask(key)}: +${cost_usd:.6f} (total ${spend:.4f}, ~${remaining:.2f} left)")
     if remaining <= 0:
         log(f"WARNING: {mask(key)} reached its budget cap — proxy will skip it")
+
+
+def cache_key(model, upstream):
+    return hashlib.sha256(
+        json.dumps({"m": model, "u": upstream}, sort_keys=True).encode()
+    ).hexdigest()
+
+
+def cache_lookup(key):
+    with STATE["lock"]:
+        return STATE["cache"].get(key)
+
+
+def cache_store(key, response):
+    with STATE["lock"]:
+        STATE["cache"][key] = response
+        if len(STATE["cache"]) > CACHE_MAX_ENTRIES:
+            for old_key in list(STATE["cache"])[: CACHE_MAX_ENTRIES // 2]:
+                del STATE["cache"][old_key]
+    with CACHE_FILE.open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"k": key, "response": response}) + "\n")
 
 
 def send_json(handler, status, payload):
@@ -116,7 +150,9 @@ class Handler(BaseHTTPRequestHandler):
                     }
                     for k in STATE["keys"]
                 ]
-            send_json(self, 200, {"model": DEFAULT_MODEL, "keys": keys})
+            send_json(self, 200, {"model": DEFAULT_MODEL, "keys": keys,
+                                  "cache_entries": len(STATE["cache"]),
+                                  "cache_hits": STATE["cache_hits"]})
         else:
             send_json(self, 404, {"error": "unknown endpoint; try /health or /status"})
 
@@ -142,8 +178,8 @@ class Handler(BaseHTTPRequestHandler):
             send_json(self, 400, {"error": f"model '{model}' blocked; only mistralai/* is allowed"})
             return
 
-        key = pick_key()
-        if key is None:
+        or_key = pick_key()  # OpenRouter key — never clobber with the cache key
+        if or_key is None:
             send_json(self, 429, {"error": "all key budgets exhausted — check /status and add keys to keys.json"})
             return
 
@@ -155,11 +191,22 @@ class Handler(BaseHTTPRequestHandler):
             if opt in body:
                 upstream[opt] = body[opt]
 
+        want_cache = bool(body.get("cache"))
+        ckey = cache_key(model, upstream) if want_cache else None
+        if ckey is not None:
+            hit = cache_lookup(ckey)
+            if hit is not None:
+                with STATE["lock"]:
+                    STATE["cache_hits"] += 1
+                log(f"cache hit ({STATE['cache_hits']} total)")
+                send_json(self, 200, hit)
+                return
+
         req = urllib.request.Request(
             OPENROUTER_URL,
             data=json.dumps(upstream).encode("utf-8"),
             headers={
-                "Authorization": f"Bearer {key}",
+                "Authorization": f"Bearer {or_key}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "https://github.com/LPuehringerStudent/KI-Hackathon-2026",
                 "X-Title": "KI-Hackathon-2026 mistral-proxy",
@@ -170,11 +217,11 @@ class Handler(BaseHTTPRequestHandler):
                 data = json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             detail = e.read().decode("utf-8", errors="replace")
-            log(f"OpenRouter error {e.code} for {mask(key)}: {detail[:300]}")
+            log(f"OpenRouter error {e.code} for {mask(or_key)}: {detail[:300]}")
             if e.code in (401, 403):
                 with STATE["lock"]:
-                    STATE["spend"][key] = STATE["budget"]
-                log(f"disabling {mask(key)} — check that the key was pasted correctly")
+                    STATE["spend"][or_key] = STATE["budget"]
+                log(f"disabling {mask(or_key)} — check that the key was pasted correctly")
             send_json(self, e.code, {"error": f"OpenRouter returned {e.code}", "detail": detail})
             return
         except urllib.error.URLError as e:
@@ -184,7 +231,9 @@ class Handler(BaseHTTPRequestHandler):
         usage = data.get("usage") or {}
         cost = ((usage.get("prompt_tokens", 0) * 0.0000015)
                 + (usage.get("completion_tokens", 0) * 0.0000075))
-        record_usage(key, cost)
+        record_usage(or_key, cost)
+        if want_cache:
+            cache_store(ckey, data)
         send_json(self, 200, data)
 
 

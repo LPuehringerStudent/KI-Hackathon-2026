@@ -51,6 +51,14 @@ req = urllib.request.Request(
 print(json.loads(urllib.request.urlopen(req).read())["choices"][0]["message"]["content"])
 ```
 
+### Response cache (game dialogue)
+
+Requests with `"cache": true` are served from a persistent disk cache
+(`cache.jsonl`) when the exact same request (model + messages + options) was
+seen before — repeat dialogue is instant, free, and demo-consistent. The game
+client sets this automatically. Cache stats appear in `GET /status`
+(`cache_entries`, `cache_hits`); hits cost nothing and are not logged as usage.
+
 Rules the proxy enforces:
 
 - Only `mistralai/*` models are allowed (so nobody burns budget on a flagship model by accident)

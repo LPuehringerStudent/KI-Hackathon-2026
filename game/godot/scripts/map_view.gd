@@ -203,16 +203,18 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 func _add_pulse_ring(dot: Control) -> void:
 	var ring := TextureRect.new()
 	ring.texture = _make_ring()
-	ring.size = Vector2(MARKER_SIZE, MARKER_SIZE)
-	ring.position = Vector2.ZERO
+	# native texture size, centered on the dot (no squish), scale around center
+	ring.size = ring.texture.get_size()
+	ring.position = -ring.size / 2.0 + Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
+	ring.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	ring.pivot_offset = ring.size / 2.0
 	ring.modulate = Color(1.0, 0.62, 0.25, 0.0)
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dot.add_child(ring)
 	var tween := ring.create_tween().set_loops()
 	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(ring, "scale", Vector2(2.6, 2.6), 1.6).from(Vector2(0.7, 0.7))
-	tween.parallel().tween_property(ring, "modulate:a", 0.0, 1.6).from(0.75)
+	tween.tween_property(ring, "scale", Vector2(2.2, 2.2), 1.6).from(Vector2(0.8, 0.8))
+	tween.parallel().tween_property(ring, "modulate:a", 0.0, 1.6).from(0.55)
 	tween.tween_interval(0.7)
 
 
