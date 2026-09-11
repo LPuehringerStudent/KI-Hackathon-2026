@@ -1,0 +1,54 @@
+extends SceneTree
+## Headless test runner: godot --headless --path game/godot -s res://tests/run_tests.gd
+## Exits 0 when all checks pass, 1 otherwise.
+## Note: checks run deferred — autoloads are only added to the tree after
+## this script's _init() returns.
+
+var failures := 0
+
+
+func check(cond: bool, label: String) -> void:
+	if cond:
+		print("PASS: " + label)
+	else:
+		failures += 1
+		printerr("FAIL: " + label)
+
+
+func _init() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	var data: Dictionary = get_root().get_node("Data").load_all()
+	check(data.has("venues") and data.venues.size() >= 8 and data.venues.size() <= 20,
+		"venues loaded with plausible count (%d)" % data.get("venues", []).size())
+	check(data.get("trees", []).size() == 400, "trees capped at 400")
+	check(data.trees[0].has("species") and data.trees[0].has("crown_m"),
+		"tree records expose species + crown_m")
+	check(data.get("fountains", []).size() > 0 and data.get("toilets", []).size() > 0,
+		"service points loaded")
+	check(data.get("streets", []).size() >= 5, "streets loaded")
+	check(data.has("meta") and data.meta.has("bounds"), "meta with bounds loaded")
+	check(data.venues[0].has("event_weight"), "venues expose event_weight")
+	await _check_map_view(data)
+	quit(1 if failures > 0 else 0)
+
+
+func _check_map_view(data: Dictionary) -> void:
+	var mv = preload("res://scenes/map_view.tscn").instantiate()
+	get_root().add_child(mv)
+	await process_frame
+	check(mv.markers.size() > 400, "map_view created markers (%d)" % mv.markers.size())
+	check(mv.has_signal("entity_clicked"), "map_view exposes entity_clicked signal")
+	var mm = JSON.parse_string(FileAccess.get_file_as_string("res://data/map_meta.json"))
+	var sample: Vector2 = mv.latlon_to_pixel(float(mm.lat_min), float(mm.lon_min))
+	check(sample.x >= -0.5 and sample.y <= float(mm.height) + 0.5,
+		"latlon_to_pixel maps bounds corner into image")
+	mv.set_entity_state(data.venues[0].id, "affected")
+	mv.set_entity_state(data.venues[0].id, "resolved")
+	mv.focus_entity(data.venues[0].id)
+	mv.set_entity_state("unknown-id", "affected")
+	mv.focus_entity("unknown-id")
+	check(true, "set_entity_state/focus_entity tolerate known and unknown ids")
+	mv.queue_free()

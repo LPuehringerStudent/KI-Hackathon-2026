@@ -13,7 +13,11 @@ config_version=5
 config/name="Buergermeisterin fuers Festival"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7")
-config/icon="res://icon.svg"
+
+
+[autoload]
+
+Data="*res://scripts/data_loader.gd"
 
 [display]
 
