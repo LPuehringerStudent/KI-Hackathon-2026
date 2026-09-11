@@ -91,4 +91,11 @@ func _check_map_view(data: Dictionary) -> void:
 	await process_frame
 	var restored: Vector2 = mv.markers[data.venues[0].id].position
 	check(restored.distance_to(before) < 0.5, "zoom 1.0 restores positions (~0.01px float32 drift)")
+	check(mv._map_rect.modulate == Color.WHITE, "gameplay lighting constant (no per-day tint)")
+	mv.play_day_transition(10.0)
+	for i in 60:
+		if not mv.transition_busy:
+			break
+		await process_frame
+	check(not mv.transition_busy, "day transition completes and clears busy flag")
 	mv.queue_free()

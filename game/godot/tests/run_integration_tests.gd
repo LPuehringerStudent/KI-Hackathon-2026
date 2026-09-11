@@ -34,7 +34,9 @@ func settle() -> void:
 	var deadline := Time.get_ticks_msec() + 3000
 	while Time.get_ticks_msec() < deadline:
 		var active = current_scene
-		if active != null and not active._voice_busy and not active.selected.is_empty():
+		# transition_busy: the day change is deferred behind the day/night
+		# animation — never assert state while it runs
+		if active != null and not active._voice_busy and not active.map_view.transition_busy and not active.selected.is_empty():
 			if active.finished or active._resolved.has(active._key(active.selected)) or not active.dialogue_state.is_empty():
 				return
 		await process_frame
@@ -98,7 +100,7 @@ func _run() -> void:
 	await settle()
 	fake.reply = "Ja. [[ENTSCHEID:cut]]"
 	ui.send_message("Faelle den Baum.")
-	ui.advance_day()
+	ui.advance_day(true)
 	await settle()
 	check(ui.game.day == 2 and ui.game.decisions.size() == 2, "day change discards late decision")
 	fake.offline = true
@@ -108,7 +110,7 @@ func _run() -> void:
 	await settle()
 	check(ui.game.decisions.size() == 3 and ui.game.decisions[-1].day == 2, "day two decision works during pending voice")
 	check(ui.map_view.markers[toilet.id].disabled, "resolved marker disabled")
-	ui.advance_day()
+	ui.advance_day(true)
 	ui.select_entity(tree.id, "tree")
 	await settle()
 	ui.apply_decision("keep")
@@ -120,7 +122,8 @@ func _run() -> void:
 	check(ui.game.purchases.get(str(venue.id), {}).get("foodtruck") == 2 and not ui._resolved.has("venue:" + str(venue.id)), "two food trucks bought through the chat, venue still open")
 	ui.day_bar.pricing_buttons.premium.pressed.emit()
 	check(State.pricing_for_day(ui.game, 3) == "premium" and ui.day_bar.pricing_buttons.premium.button_pressed and not ui.day_bar.pricing_buttons.standard.button_pressed, "day-bar pricing applies to today")
-	ui.advance_day()
+	ui.advance_day(true)
+	await settle()
 	check(ui.finished and ui.verdict.visible, "final verdict visible")
 	var score_found := false
 	for child: Node in ui.verdict.get_child(0).get_child(0).get_children():
@@ -129,7 +132,7 @@ func _run() -> void:
 	check(score_found, "verdict shows a 0-100 Gesamtnote")
 	before = ui.game.duplicate(true)
 	ui.apply_decision("cut")
-	ui.advance_day()
+	ui.advance_day(true)
 	ui.select_entity(venue.id, "venue")
 	check(ui.game == before, "finished game cannot mutate")
 	for value in [ui.meters.bars.attendance.value, ui.meters.bars.money.value, ui.meters.bars.happiness.value]:

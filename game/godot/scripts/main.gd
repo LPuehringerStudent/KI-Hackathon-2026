@@ -222,19 +222,27 @@ func _venue_status(venue: Dictionary) -> String:
 		mini(stock.demand, stock.baseline + stock.security), stock.demand]
 
 
-func advance_day() -> void:
-	if finished or game.is_empty():
+## Synchronous entry point: plays the day/night transition, then the
+## callback applies the day change. No coroutines (Godot 4.7 forbids
+## fire-and-forget awaits; tweens complete via signal callback instead).
+func advance_day(instant := false) -> void:
+	if finished or game.is_empty() or map_view.transition_busy:
 		return
 	_generation += 1
+	day_bar.set_enabled(false)
+	map_view.play_day_transition(10.0 if instant else 1.0, _after_transition)
+
+
+func _after_transition() -> void:
 	if game.day == 3:
 		finished = true
 		chat.set_busy(false)
 		chat.set_resolved(true)
-		day_bar.set_enabled(false)
 		_show_verdict()
 		return
 	State.next_day(game)
 	_refresh()
+	day_bar.set_enabled(true)
 	if not selected.is_empty() and not _resolved.has(_key(selected)):
 		select_entity(str(selected.id), str(selected.type))
 
