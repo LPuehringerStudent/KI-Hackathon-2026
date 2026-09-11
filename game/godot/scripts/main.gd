@@ -2,6 +2,10 @@ extends Control
 
 const State := preload("res://scripts/game_state.gd")
 const Dialogue := preload("res://scripts/dialogue.gd")
+
+## Visible on the start menu and the verdict screen so feedback can always
+## name its build. Bump on every merged feature batch; git-tag main to match.
+const VERSION := "1.4.0"
 const UITheme := preload("res://scripts/ui_theme.gd")
 const MapScene := preload("res://scenes/map_view.tscn")
 const MetersScene := preload("res://scenes/meters.tscn")
@@ -125,6 +129,12 @@ func _show_menu() -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 18
 	rows.add_child(spacer)
+	var version_label := Label.new()
+	version_label.text = "v" + VERSION
+	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	version_label.add_theme_font_size_override("font_size", 12)
+	version_label.add_theme_color_override("font_color", Color("9a9187"))
+	rows.add_child(version_label)
 	var start := Button.new()
 	start.text = "Festival starten"
 	start.custom_minimum_size = Vector2(0, 52)
@@ -340,6 +350,12 @@ func _show_verdict() -> void:
 	score.add_theme_font_size_override("font_size", 46)
 	score.add_theme_color_override("font_color", Color("238573"))
 	rows.add_child(score)
+	var build := Label.new()
+	build.text = "v" + VERSION
+	build.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	build.add_theme_font_size_override("font_size", 12)
+	build.add_theme_color_override("font_color", Color("9a9187"))
+	rows.add_child(build)
 	var title := Label.new()
 	title.text = verdict_title(results)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
