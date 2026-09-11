@@ -77,7 +77,7 @@ func test_decision_shape_and_costs() -> void:
 			costs["%s/%s" % [type, d.id]] = d.cost
 	check(costs.get("tree/keep") == 0.0 and costs.get("tree/trim") == 150.0 and costs.get("tree/cut") == 400.0, "tree costs: %s" % costs)
 	check(costs.get("fountain/relocate") == 800.0 and costs.get("fountain/close") == 0.0, "service costs: %s" % costs)
-	check(costs.get("venue/shuttle") == 1200.0, "shuttle cost: %s" % costs)
+	check(costs.get("venue/shuttle") == 1800.0, "shuttle cost: %s" % costs)
 	check(costs.get("street/pedestrian") == 300.0 and costs.get("street/open") == 0.0, "street costs: %s" % costs)
 	var shuttle: Dictionary = GS.available_decisions({ "id": "x", "type": "venue" })[0]
 	check(shuttle.adds_shuttle == true, "venue shuttle adds a shuttle")
@@ -109,7 +109,7 @@ func test_decide_records_decision_and_spends_budget() -> void:
 	check(state.decisions.size() == 1, "one decision recorded")
 	check(state.decisions[0] == { "entity_id": "t1", "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 400.0 },
 		"record: %s" % [state.decisions[0] if state.decisions.size() > 0 else null])
-	check(is_equal_approx(state.budget, 14600.0), "budget should be 14600, got %s" % state.budget)
+	check(is_equal_approx(state.budget, 11600.0), "budget should be 11600, got %s" % state.budget)
 
 
 func test_decide_same_decision_twice_is_rejected() -> void:
@@ -118,7 +118,7 @@ func test_decide_same_decision_twice_is_rejected() -> void:
 	check(GS.decide(state, fountain, "relocate") == true, "first relocate should succeed")
 	check(GS.decide(state, fountain, "relocate") == false, "second identical relocate should be rejected")
 	check(state.decisions.size() == 1, "rejected decision must not be recorded")
-	check(is_equal_approx(state.budget, 14200.0), "rejected decision must not spend, budget %s" % state.budget)
+	check(is_equal_approx(state.budget, 11200.0), "rejected decision must not spend, budget %s" % state.budget)
 
 
 func test_decide_rejects_unknown_decision_and_untyped_entity() -> void:
@@ -149,8 +149,8 @@ func test_decide_and_money_meter_count_costs_once() -> void:
 	var state: Dictionary = GS.create()
 	GS.decide(state, GS.find_entity(data, "v1", "venue"), "shuttle")
 	var m: Dictionary = GS.compute_meters(state, data)
-	# attendance 100 -> income 10000; net = 15000 - 1200 + 10000 = 23800; 23800 / 25000
-	check(is_equal_approx(m.money, 95.2), "money should be 95.2 (cost counted once), got %s" % m.money)
+	# attendance 80 -> income 9600; net = 12000 - 1800 + 9600 = 19800; 19800 / 24000
+	check(is_equal_approx(m.money, 82.5), "money should be 82.5 (cost counted once), got %s" % m.money)
 
 
 func test_changing_a_decision_is_allowed_and_costs_again() -> void:
@@ -159,7 +159,7 @@ func test_changing_a_decision_is_allowed_and_costs_again() -> void:
 	check(GS.decide(state, toilet, "relocate"), "relocate")
 	check(GS.decide(state, toilet, "keep"), "keep after relocate")
 	check(GS.decide(state, toilet, "relocate"), "relocate again once no longer in effect")
-	check(state.decisions.size() == 3 and is_equal_approx(state.budget, 13400.0), "every change is recorded and paid, budget %s" % state.budget)
+	check(state.decisions.size() == 3 and is_equal_approx(state.budget, 10400.0), "every change is recorded and paid, budget %s" % state.budget)
 
 
 func test_felled_tree_accepts_no_further_decisions() -> void:
