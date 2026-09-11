@@ -1,0 +1,10 @@
+{
+ "width": 2048,
+ "height": 2048,
+ "lat_min": 48.284,
+ "lat_max": 48.318,
+ "lon_min": 14.27,
+ "lon_max": 14.32,
+ "projection": "equirectangular corrected for lat 48.3 (see project())",
+ "source": "OpenStreetMap via Overpass (ODbL), rendered by tools/render_map.py"
+}
