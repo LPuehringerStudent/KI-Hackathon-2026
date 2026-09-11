@@ -23,6 +23,12 @@ func _run() -> void:
 	root.add_child(day)
 	day.set_day(3, {"title": "Tag 3", "focus": "Schatten", "hint": ""})
 	check(day.get_node("Rows/Next").text == "Abschluss", "day three offers verdict")
+	var picked := []
+	day.pricing_selected.connect(func(id: String) -> void: picked.append(id))
+	day.set_pricing("premium")
+	check(day.pricing_buttons.premium.button_pressed and not day.pricing_buttons.fair.button_pressed and picked.is_empty(), "set_pricing highlights without emitting")
+	day.pricing_buttons.fair.pressed.emit()
+	check(picked == ["fair"], "pricing button emits its decision id")
 	var chat = load("res://scenes/chat_panel.tscn").instantiate()
 	root.add_child(chat)
 	chat.set_anchors_preset(Control.PRESET_TOP_LEFT)

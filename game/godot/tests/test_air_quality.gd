@@ -8,7 +8,7 @@ const VENUE_LAT := 48.306
 const VENUE_LON := 14.284
 
 
-## Same fixture as test_game_state.gd: fresh happiness 61.2.
+## Same fixture as test_game_state.gd; _fresh() is its day-1 happiness derived from the constants.
 func _data(air: Variant = null) -> Dictionary:
 	var data := {
 		"venues": [
@@ -28,6 +28,10 @@ func _data(air: Variant = null) -> Dictionary:
 	return data
 
 
+func _fresh() -> float:
+	return (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M)
+
+
 func _air(pm10: Variant) -> Dictionary:
 	return { "station": "S184 Stadtpark", "measured_at": "2026-09-11T08:30:00+00:00", "pm10": pm10, "pm25": 4.7, "source": "test" }
 
@@ -44,13 +48,13 @@ func _happiness(day: int, data: Dictionary) -> float:
 
 
 func test_clean_air_adds_ten_on_day_three() -> void:
-	check(is_equal_approx(_happiness(3, _data(_air(6.7))), 71.2), "PM10 6.7 on day 3 should give 61.2 + 10, got %s" % _happiness(3, _data(_air(6.7))))
+	check(is_equal_approx(_happiness(3, _data(_air(6.7))), minf(100.0, _fresh() + GS.AIR_MODIFIER)), "PM10 6.7 on day 3 should add AIR_MODIFIER, got %s" % _happiness(3, _data(_air(6.7))))
 
 
 func test_modifier_only_applies_on_day_three() -> void:
 	for day: int in [1, 2]:
-		check(is_equal_approx(_happiness(day, _data(_air(6.7))), 61.2), "day %d must ignore air quality, got %s" % [day, _happiness(day, _data(_air(6.7)))])
-		check(is_equal_approx(_happiness(day, _data(_air(90.0))), 61.2), "day %d must ignore bad air too" % day)
+		check(is_equal_approx(_happiness(day, _data(_air(6.7))), _fresh()), "day %d must ignore air quality, got %s" % [day, _happiness(day, _data(_air(6.7)))])
+		check(is_equal_approx(_happiness(day, _data(_air(90.0))), _fresh()), "day %d must ignore bad air too" % day)
 
 
 func test_modifier_curve() -> void:
@@ -77,7 +81,7 @@ func test_missing_or_malformed_air_quality_is_neutral() -> void:
 	for label: String in cases:
 		var state := _state_on_day(3)
 		check(GS.air_quality_modifier(state, cases[label]) == 0.0, "%s should give modifier 0" % label)
-		check(is_equal_approx(GS.compute_meters(state, cases[label]).happiness, 61.2), "%s should leave happiness at 61.2" % label)
+		check(is_equal_approx(GS.compute_meters(state, cases[label]).happiness, _fresh()), "%s should leave happiness unchanged" % label)
 
 
 func test_bonus_adds_on_top_of_a_full_score() -> void:
@@ -85,9 +89,10 @@ func test_bonus_adds_on_top_of_a_full_score() -> void:
 	var state := _state_on_day(3)
 	for i in 5:
 		state.decisions.append({ "entity_id": "far%d" % i, "entity_type": "tree", "decision_id": "keep", "day": 3, "cost": 0.0 })
-	data.trees[0].crown_m = 400.0  # full shade: 10 + 25 + 25 + 20 + 5 listen = 85, +10 air
+	data.trees[0].crown_m = 400.0  # full shade
+	var full := GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT + GS.LISTEN_BONUS_MAX
 	var m: Dictionary = GS.compute_meters(state, data)
-	check(is_equal_approx(m.happiness, 95.0), "full score plus clean air should be 95, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, minf(100.0, full + GS.AIR_MODIFIER)), "full score plus clean air (clamped), got %s" % m.happiness)
 
 
 func test_bad_air_can_push_happiness_down_but_not_below_zero() -> void:
@@ -96,9 +101,12 @@ func test_bad_air_can_push_happiness_down_but_not_below_zero() -> void:
 	data.toilets.clear()
 	var state := _state_on_day(3)
 	state.decisions.append({ "entity_id": "t1", "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 400.0 })
-	# 10 base + 20 * (12/200) shade - 10 air = 1.2 before the cut
-	check(is_equal_approx(GS.compute_meters(_state_on_day(3), data).happiness, 1.2), "bad air on day 3 should subtract 10")
-	# 10 - 8 cut - 10 air = -8 -> clamped
+	# base + shade - air before the cut (fountains/toilets removed)
+	var before := GS.HAPPINESS_BASE + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M - GS.AIR_MODIFIER
+	check(is_equal_approx(GS.compute_meters(_state_on_day(3), data).happiness, clampf(before, 0.0, 100.0)), "bad air on day 3 should subtract AIR_MODIFIER")
+	for i in 10:  # enough felled trees next to the venue to go far below zero
+		data.trees.append({ "id": "c%d" % i, "lat": VENUE_LAT, "lon": VENUE_LON + 0.0001, "species": "Acer", "height_m": 9.0, "crown_m": 1.0, "age_estimate": null })
+		state.decisions.append({ "entity_id": "c%d" % i, "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 400.0 })
 	check(GS.compute_meters(state, data).happiness == 0.0, "happiness must clamp at 0")
 
 

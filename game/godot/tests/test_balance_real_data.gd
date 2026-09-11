@@ -110,3 +110,27 @@ func test_real_data_verdicts() -> void:
 		GS.decide(state, GS.find_entity(data, single[1], single[0]), single[2])
 		var title: String = verdict_title.call(_meters_on_day_three(state, data))
 		check(title != "Volksnahe Stadtplanung", "a single %s on %s %s already wins the best title" % [single[2], single[0], single[1]])
+
+
+## Mentor pack on real data: purchases at headline venues and pricing must visibly matter.
+func test_real_data_mentor_pack() -> void:
+	var data := _load_data()
+	if data.is_empty():
+		print("  SKIP test_real_data_mentor_pack: no extracted data in %s yet" % DATA_DIR)
+		return
+	var fresh: Dictionary = GS.compute_meters(GS.create(), data)
+	var headline: Array = data.venues.filter(func(v): return float(v.get("events", 0)) >= GS.HEADLINE_MIN_EVENTS)
+	check(headline.size() >= 3, "expected several headline venues, got %d" % headline.size())
+	for venue: Dictionary in headline:
+		for kind: String in ["foodtruck", "security"]:
+			var m := _after(data, "venue", venue.id, kind)
+			var moved: float = maxf(m.happiness - fresh.happiness, m.attendance - fresh.attendance)
+			check(moved >= 0.3, "one %s at %s should move a meter by >= 0.3, got %.2f" % [kind, venue.name, moved])
+			check(m.money < fresh.money, "a %s at %s should cost money" % [kind, venue.name])
+	var festival := GS.find_entity(data, "festival", "festival")
+	var fair := _after(data, "festival", "festival", "fair")
+	var premium := _after(data, "festival", "festival", "premium")
+	check(fair.attendance > fresh.attendance and fair.money < fresh.money, "fair pricing: more visitors, less money")
+	check(premium.attendance < fresh.attendance and premium.money > fresh.money, "premium pricing: fewer visitors, more money")
+	var extended := _after(data, "venue", headline[0].id, "extend")
+	check(extended.attendance > fresh.attendance and extended.happiness < fresh.happiness, "curfew extension trades happiness for attendance")
