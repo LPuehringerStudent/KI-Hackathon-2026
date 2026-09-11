@@ -9,7 +9,7 @@ extends RefCounted
 ## Entity:   a Data record plus "type" ("venue" | "tree" | "fountain" | "toilet" | "street"),
 ##           as returned by find_entity() — the same type string map_view's entity_clicked emits.
 
-const CONFIG := { "start_budget": 50000.0, "visitor_spend": 35.0, "walk_radius": 300.0, "shuttle_radius": 250.0 }
+const CONFIG := { "start_budget": 15000.0, "visitor_spend": 35.0, "walk_radius": 300.0, "shuttle_radius": 250.0 }
 
 const LAST_DAY := 3
 
@@ -42,18 +42,39 @@ const DECISIONS := {
 	],
 }
 
+## Tuning constants — balanced against the real Innenstadt extract (15 venues, 400 trees,
+## 38 fountains, 41 toilets) so every decision moves a meter without cliffs.
+
 ## Visitor income at 100 % attendance and the reference spend of 35 € per visitor.
-const MAX_VISITOR_INCOME := 20000.0
+const MAX_VISITOR_INCOME := 10000.0
 const REFERENCE_SPEND := 35.0
 const EARTH_RADIUS_M := 6371000.0
 
-## Share of venue event_weight that must be covered for the service bonus.
-const COVERAGE_THRESHOLD := 0.7
+## Happiness = base + weight × (0..1 component) per term, minus cut penalties.
+const HAPPINESS_BASE := 20.0
+const FOUNTAIN_WEIGHT := 25.0
+const TOILET_WEIGHT := 25.0
+const SHADE_WEIGHT := 20.0
 const SHADE_RADIUS_M := 150.0
-## Total uncut crown diameter near venues that counts as full shade.
+## Total crown diameter near venues that counts as full shade.
 const SHADE_FULL_CROWN_M := 200.0
+## A trimmed tree still gives this share of its shade.
+const TRIM_SHADE_FACTOR := 0.5
+## Every felled tree costs happiness; more when it stood at a venue.
+const CUT_PENALTY := 2.0
+const CUT_NEAR_VENUE_PENALTY := 6.0
 const CUT_PENALTY_RADIUS_M := 50.0
+## "keep" after negotiating: people feel heard. Per decision, capped.
+const LISTEN_BONUS := 1.0
+const LISTEN_BONUS_MAX := 5.0
+
+## Attendance = event-weighted share of demand realised, by how well each venue is connected.
+const SHUTTLE_REACH := 1.0
+const CLUSTER_REACH := 0.7
+const ISOLATED_REACH := 0.4
 const VENUE_CLUSTER_RADIUS_M := 200.0
+const PEDESTRIAN_REACH_BONUS := 0.15
+const PEDESTRIAN_RADIUS_M := 250.0
 
 
 static func create() -> Dictionary:
@@ -78,15 +99,17 @@ static func available_decisions(entity: Dictionary) -> Array:
 	return DECISIONS.get(entity.get("type", ""), []).duplicate(true)
 
 
-## Records the decision and spends its cost. Returns false (state unchanged) if the decision
-## isn't available for the entity or this exact entity+decision was already taken.
+## Records the decision and spends its cost. An entity's latest decision is the one in effect
+## (e.g. "keep" reopens a closed toilet), but every decision's cost is spent.
+## Returns false (state unchanged) if the decision isn't available for the entity, is already
+## in effect for it, or the entity is a felled tree.
 static func decide(state: Dictionary, entity: Dictionary, decision_id: String) -> bool:
 	var matches := available_decisions(entity).filter(func(d): return d.id == decision_id)
 	if matches.is_empty():
 		return false
-	for taken: Dictionary in state.decisions:
-		if taken.entity_type == entity.type and taken.entity_id == entity.id and taken.decision_id == decision_id:
-			return false
+	var current: String = _latest_decisions(state).get(_key(entity.type, entity.id), "")
+	if current == decision_id or current == "cut":
+		return false
 	var decision: Dictionary = matches[0]
 	state.decisions.append({
 		"entity_id": entity.id,
@@ -112,33 +135,24 @@ static func day_theme(day: int) -> Dictionary:
 
 static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	var venues: Array = data.get("venues", [])
-	var trees: Array = data.get("trees", [])
-	var closed_fountains := _decided_ids(state, "fountain", "close")
-	var closed_toilets := _decided_ids(state, "toilet", "close")
-	var cut_trees := _decided_ids(state, "tree", "cut")
+	var latest := _latest_decisions(state)
+	var fountains := _effective_services(data.get("fountains", []), "fountain", state, latest, venues)
+	var toilets := _effective_services(data.get("toilets", []), "toilet", state, latest, venues)
+	var pedestrian_streets: Array = data.get("streets", []).filter(
+		func(s): return latest.get(_key("street", s.id)) == "pedestrian")
 
-	var open_fountains: Array = data.get("fountains", []).filter(func(f): return not closed_fountains.has(f.id))
-	var open_toilets: Array = data.get("toilets", []).filter(func(t): return not closed_toilets.has(t.id))
-	var uncut_trees: Array = trees.filter(func(t): return not cut_trees.has(t.id))
+	var happiness := HAPPINESS_BASE
+	happiness += FOUNTAIN_WEIGHT * _coverage_score(venues, fountains, CONFIG.walk_radius)
+	happiness += TOILET_WEIGHT * _coverage_score(venues, toilets, CONFIG.walk_radius)
+	happiness += SHADE_WEIGHT * _shade_score(venues, data.get("trees", []), latest)
+	happiness -= _cut_penalty(venues, data.get("trees", []), latest)
+	happiness += minf(LISTEN_BONUS_MAX, LISTEN_BONUS * latest.values().count("keep"))
 
-	var happiness := 50.0
-	if _coverage_score(venues, open_fountains, CONFIG.walk_radius) >= COVERAGE_THRESHOLD:
-		happiness += 20.0
-	if _coverage_score(venues, open_toilets, CONFIG.walk_radius) >= COVERAGE_THRESHOLD:
-		happiness += 20.0
-	var uncut_share := 1.0 if trees.is_empty() else float(uncut_trees.size()) / trees.size()
-	if uncut_share > 0.8:
-		happiness += 15.0
-	happiness += 15.0 * _shade_score(venues, uncut_trees)
-	for tree: Dictionary in trees:
-		if cut_trees.has(tree.id) and _near_any(tree, venues, CUT_PENALTY_RADIUS_M):
-			happiness -= 10.0
-
-	var attendance := 40.0 + 60.0 * _reachability(state, venues)
+	var attendance := clampf(100.0 * _reachability(state, venues, pedestrian_streets), 0.0, 100.0)
 
 	return {
-		"attendance": clampf(attendance, 0.0, 100.0),
-		"money": clampf(_money_score(state, clampf(attendance, 0.0, 100.0)), 0.0, 100.0),
+		"attendance": attendance,
+		"money": clampf(_money_score(state, attendance), 0.0, 100.0),
 		"happiness": clampf(happiness, 0.0, 100.0),
 	}
 
@@ -155,26 +169,80 @@ static func _coverage_score(venues: Array, services: Array, radius: float) -> fl
 	return covered / total if total > 0.0 else 0.0
 
 
-## 0..1: uncut crown diameter within SHADE_RADIUS_M of any venue, SHADE_FULL_CROWN_M = full.
-static func _shade_score(venues: Array, uncut_trees: Array) -> float:
+## Open services of one type at their effective positions. Closed ones are dropped; relocated ones
+## move (in decision order) to the highest-weight venue left without that service in walk_radius,
+## but only if that raises coverage — so a relocation never lowers it.
+static func _effective_services(records: Array, type: String, state: Dictionary, latest: Dictionary, venues: Array) -> Array:
+	var services: Array = records.filter(func(r): return latest.get(_key(type, r.id)) != "close")
+	var moved := {}
+	for decision: Dictionary in state.decisions:
+		var key := _key(decision.entity_type, decision.entity_id)
+		if decision.entity_type != type or latest.get(key) != "relocate" or moved.has(key):
+			continue
+		moved[key] = true
+		var index := services.find_custom(func(s): return s.id == decision.entity_id)
+		if index == -1:
+			continue
+		var others := services.duplicate()
+		others.remove_at(index)
+		var target := _heaviest_uncovered_venue(venues, others, CONFIG.walk_radius)
+		if target.is_empty():
+			continue
+		var moved_services := services.duplicate()
+		moved_services[index] = { "id": decision.entity_id, "lat": target.lat, "lon": target.lon }
+		if _coverage_score(venues, moved_services, CONFIG.walk_radius) > _coverage_score(venues, services, CONFIG.walk_radius):
+			services = moved_services
+	return services
+
+
+static func _heaviest_uncovered_venue(venues: Array, services: Array, radius: float) -> Dictionary:
+	var best := {}
+	for venue: Dictionary in venues:
+		if not _near_any(venue, services, radius) and (best.is_empty() or venue.event_weight > best.event_weight):
+			best = venue
+	return best
+
+
+## 0..1: crown diameter within SHADE_RADIUS_M of any venue (felled trees 0, trimmed
+## TRIM_SHADE_FACTOR), SHADE_FULL_CROWN_M = full.
+static func _shade_score(venues: Array, trees: Array, latest: Dictionary) -> float:
 	var crown := 0.0
-	for tree: Dictionary in uncut_trees:
-		if tree.get("crown_m") != null and _near_any(tree, venues, SHADE_RADIUS_M):
-			crown += float(tree.crown_m)
+	for tree: Dictionary in trees:
+		var decision: String = latest.get(_key("tree", tree.id), "")
+		if decision == "cut" or tree.get("crown_m") == null or not _near_any(tree, venues, SHADE_RADIUS_M):
+			continue
+		crown += float(tree.crown_m) * (TRIM_SHADE_FACTOR if decision == "trim" else 1.0)
 	return minf(1.0, crown / SHADE_FULL_CROWN_M)
 
 
-## Share (0..1) of event_weight at venues with a shuttle within shuttle_radius
-## or another venue within VENUE_CLUSTER_RADIUS_M.
-static func _reachability(state: Dictionary, venues: Array) -> float:
+static func _cut_penalty(venues: Array, trees: Array, latest: Dictionary) -> float:
+	var penalty := 0.0
+	for tree: Dictionary in trees:
+		if latest.get(_key("tree", tree.id)) == "cut":
+			penalty += CUT_PENALTY
+			if _near_any(tree, venues, CUT_PENALTY_RADIUS_M):
+				penalty += CUT_NEAR_VENUE_PENALTY
+	return penalty
+
+
+## 0..1: event-weighted reach factor. A shuttle within shuttle_radius gives SHUTTLE_REACH; otherwise
+## CLUSTER_REACH with another venue within VENUE_CLUSTER_RADIUS_M, else ISOLATED_REACH — plus
+## PEDESTRIAN_REACH_BONUS near a pedestrianised street.
+static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: Array) -> float:
 	var total := 0.0
-	var reachable := 0.0
+	var reached := 0.0
 	for venue: Dictionary in venues:
 		var weight := float(venue.event_weight)
+		var reach := ISOLATED_REACH
+		if _near_any(venue, state.shuttles, CONFIG.shuttle_radius):
+			reach = SHUTTLE_REACH
+		elif _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M):
+			reach = CLUSTER_REACH
+		if _near_any(venue, pedestrian_streets, PEDESTRIAN_RADIUS_M):
+			reach += PEDESTRIAN_REACH_BONUS
 		total += weight
-		if _near_any(venue, state.shuttles, CONFIG.shuttle_radius) or _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M):
-			reachable += weight
-	return reachable / total if total > 0.0 else 0.0
+		reached += weight * minf(1.0, reach)
+	return reached / total if total > 0.0 else 0.0
 
 
 ## Net money as 0..100 (unclamped). Costs come from the decision log, not state.budget,
@@ -188,13 +256,16 @@ static func _money_score(state: Dictionary, attendance: float) -> float:
 	return 100.0 * net / (CONFIG.start_budget + MAX_VISITOR_INCOME)
 
 
-## Set of entity ids of the given type that have the given decision.
-static func _decided_ids(state: Dictionary, entity_type: String, decision_id: String) -> Dictionary:
-	var ids := {}
+## The decision in effect per entity: { "<type>:<id>": decision_id }, later decisions win.
+static func _latest_decisions(state: Dictionary) -> Dictionary:
+	var latest := {}
 	for decision: Dictionary in state.decisions:
-		if decision.entity_type == entity_type and decision.decision_id == decision_id:
-			ids[decision.entity_id] = true
-	return ids
+		latest[_key(decision.entity_type, decision.entity_id)] = decision.decision_id
+	return latest
+
+
+static func _key(entity_type: String, entity_id: String) -> String:
+	return entity_type + ":" + entity_id
 
 
 ## True if any of `others` (dicts with lat/lon) is within radius of point, ignoring point itself.

@@ -109,7 +109,7 @@ func test_decide_records_decision_and_spends_budget() -> void:
 	check(state.decisions.size() == 1, "one decision recorded")
 	check(state.decisions[0] == { "entity_id": "t1", "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 400.0 },
 		"record: %s" % [state.decisions[0] if state.decisions.size() > 0 else null])
-	check(is_equal_approx(state.budget, 49600.0), "budget should be 49600, got %s" % state.budget)
+	check(is_equal_approx(state.budget, 14600.0), "budget should be 14600, got %s" % state.budget)
 
 
 func test_decide_same_decision_twice_is_rejected() -> void:
@@ -118,7 +118,7 @@ func test_decide_same_decision_twice_is_rejected() -> void:
 	check(GS.decide(state, fountain, "relocate") == true, "first relocate should succeed")
 	check(GS.decide(state, fountain, "relocate") == false, "second identical relocate should be rejected")
 	check(state.decisions.size() == 1, "rejected decision must not be recorded")
-	check(is_equal_approx(state.budget, 49200.0), "rejected decision must not spend, budget %s" % state.budget)
+	check(is_equal_approx(state.budget, 14200.0), "rejected decision must not spend, budget %s" % state.budget)
 
 
 func test_decide_rejects_unknown_decision_and_untyped_entity() -> void:
@@ -149,5 +149,23 @@ func test_decide_and_money_meter_count_costs_once() -> void:
 	var state: Dictionary = GS.create()
 	GS.decide(state, GS.find_entity(data, "v1", "venue"), "shuttle")
 	var m: Dictionary = GS.compute_meters(state, data)
-	# attendance 100 -> income 20000; net = 50000 - 1200 + 20000 = 68800; 68800 / 70000
-	check(absf(m.money - 98.2857) < 0.01, "money should be ~98.29 (cost counted once), got %s" % m.money)
+	# attendance 100 -> income 10000; net = 15000 - 1200 + 10000 = 23800; 23800 / 25000
+	check(is_equal_approx(m.money, 95.2), "money should be 95.2 (cost counted once), got %s" % m.money)
+
+
+func test_changing_a_decision_is_allowed_and_costs_again() -> void:
+	var state: Dictionary = GS.create()
+	var toilet: Dictionary = GS.find_entity(_data(), "wc1", "toilet")
+	check(GS.decide(state, toilet, "relocate"), "relocate")
+	check(GS.decide(state, toilet, "keep"), "keep after relocate")
+	check(GS.decide(state, toilet, "relocate"), "relocate again once no longer in effect")
+	check(state.decisions.size() == 3 and is_equal_approx(state.budget, 13400.0), "every change is recorded and paid, budget %s" % state.budget)
+
+
+func test_felled_tree_accepts_no_further_decisions() -> void:
+	var state: Dictionary = GS.create()
+	var tree: Dictionary = GS.find_entity(_data(), "t1", "tree")
+	check(GS.decide(state, tree, "cut"), "cut")
+	check(not GS.decide(state, tree, "keep"), "a felled tree cannot be kept")
+	check(not GS.decide(state, tree, "trim"), "a felled tree cannot be trimmed")
+	check(state.decisions.size() == 1, "rejected decisions not recorded")
