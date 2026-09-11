@@ -19,7 +19,7 @@ OUT = Path(__file__).resolve().parent.parent / "game" / "godot" / "data" / "vers
 def main():
     try:
         version = subprocess.run(
-            ["git", "describe", "--tags", "--always", "--dirty"],
+            ["git", "describe", "--tags", "--always"],
             capture_output=True, text=True, timeout=10,
         ).stdout.strip()
     except Exception:
