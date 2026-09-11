@@ -9,6 +9,7 @@ var _resolved := false
 
 
 func _ready() -> void:
+	$Rows/Composer/Send.theme_type_variation = "PrimaryButton"
 	$Rows.minimum_size_changed.connect(func() -> void: custom_minimum_size.y = $Rows.get_combined_minimum_size().y)
 	$Rows/Composer/Send.pressed.connect(_submit)
 	$Rows/Composer/Input.text_submitted.connect(func(_text: String) -> void: _submit())
@@ -29,7 +30,7 @@ func _ready() -> void:
 	$Rows.remove_child(title)
 	var header := HBoxContainer.new()
 	header.name = "Header"
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # tscn flag was FILL-only
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	$Rows.add_child(header)
 	$Rows.move_child(header, 0)
@@ -88,6 +89,8 @@ func add_message(speaker: String, text: String) -> void:
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	message.size_flags_horizontal = SIZE_EXPAND_FILL
 	message.text = speaker + "\n" + text
+	var bubble := preload("res://scripts/ui_theme.gd").surface(Color("e5f2ed") if speaker == "Du" else Color("ffffff"), Color("d4e3dc"), 12)
+	message.add_theme_stylebox_override("normal", bubble)
 	message.add_theme_color_override("default_color", Color("42685f") if speaker == "Du" else Color("263b35"))
 	$Rows/Messages/History.add_child(message)
 	_scroll_bottom.call_deferred()
@@ -96,6 +99,7 @@ func add_message(speaker: String, text: String) -> void:
 func set_busy(value: bool) -> void:
 	_busy = value
 	$Rows/Typing.text = "Antwort kommt ..." if value else ""
+	$Rows/Typing.visible = value
 	$Rows/Composer/Input.editable = not value and not entity.is_empty() and not _resolved
 	$Rows/Composer/Send.disabled = value or entity.is_empty() or _resolved
 	for button: Button in $Rows/DecisionsScroll/Decisions.get_children():
