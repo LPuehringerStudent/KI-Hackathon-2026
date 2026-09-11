@@ -51,4 +51,16 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.set_entity_state("unknown-id", "affected")
 	mv.focus_entity("unknown-id")
 	check(true, "set_entity_state/focus_entity tolerate known and unknown ids")
+	# mentor-pack purchase badges (contract: Opus round 6/6.1)
+	mv.refresh_badges({ data.venues[0].id: { "foodtruck": 2, "security": 1 } })
+	await process_frame
+	check(mv._badges.size() == 1 and mv._badges.has(data.venues[0].id),
+		"badge appears for stocked venue only")
+	check(mv._badges[data.venues[0].id].text == "2 · 1", "badge shows unit counts")
+	mv.refresh_badges({ "unknown-venue": { "foodtruck": 1 } })
+	await process_frame
+	check(mv._badges.is_empty(), "badges ignore unknown venue ids")
+	mv.refresh_badges({})
+	await process_frame
+	check(mv._badges.is_empty(), "badges clear on empty purchases")
 	mv.queue_free()
