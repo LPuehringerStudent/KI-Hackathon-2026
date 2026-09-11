@@ -10,9 +10,9 @@ Project by Team [Teamname] for the KI-Hackathon at the Grand Garage, Tabakfabrik
 
 | Name | GitHub | Role |
 |------|--------|------|
-|      |        |      |
-|      |        |      |
-|      |        |      |
+|Laurenz  |LPuehringerStudent|      |
+|Ayan|ayan2310|      |
+|David|David-Fruehwirth|      |
 
 ## Quick start
 
