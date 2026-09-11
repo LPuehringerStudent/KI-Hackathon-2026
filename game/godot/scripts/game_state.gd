@@ -90,12 +90,16 @@ static func create() -> Dictionary:
 
 
 ## Copy of the Data record `id` in data["<type>s"] with "type" added, or {} if not found.
+## Ids compare by string form, so a numeric JSON id 42 is found as "42".
 static func find_entity(data: Dictionary, id: String, type: String) -> Dictionary:
 	if not DECISIONS.has(type):
 		return {}
-	for record: Dictionary in data.get(type + "s", []):
-		if record.get("id") == id:
-			var entity := record.duplicate(true)
+	var records: Variant = data.get(type + "s")
+	if not (records is Array):
+		return {}
+	for record: Variant in records:
+		if record is Dictionary and record.has("id") and str(record.id) == id:
+			var entity: Dictionary = record.duplicate(true)
 			entity["type"] = type
 			return entity
 	return {}
@@ -110,8 +114,11 @@ static func available_decisions(entity: Dictionary) -> Array:
 ## Records the decision and spends its cost. An entity's latest decision is the one in effect
 ## (e.g. "keep" reopens a closed toilet), but every decision's cost is spent.
 ## Returns false (state unchanged) if the decision isn't available for the entity, is already
-## in effect for it, or the entity is a felled tree.
+## in effect for it, the entity is a felled tree, or state/entity are malformed (no id, or no
+## position for a shuttle) — everything is validated before the state is touched.
 static func decide(state: Dictionary, entity: Dictionary, decision_id: String) -> bool:
+	if not _is_valid_state(state) or not entity.has("id"):
+		return false
 	var matches := available_decisions(entity).filter(func(d): return d.id == decision_id)
 	if matches.is_empty():
 		return false
@@ -119,6 +126,8 @@ static func decide(state: Dictionary, entity: Dictionary, decision_id: String) -
 	if current == decision_id or current == "cut":
 		return false
 	var decision: Dictionary = matches[0]
+	if decision.adds_shuttle and not _has_position(entity):
+		return false
 	state.decisions.append({
 		"entity_id": entity.id,
 		"entity_type": entity.type,
@@ -132,8 +141,10 @@ static func decide(state: Dictionary, entity: Dictionary, decision_id: String) -
 	return true
 
 
+## No-op for a state without a numeric day.
 static func next_day(state: Dictionary) -> void:
-	state.day = mini(LAST_DAY, state.day + 1)
+	if _is_number(state.get("day")):
+		state.day = mini(LAST_DAY, int(state.day) + 1)
 
 
 ## { title, focus, hint } — days outside 1..LAST_DAY clamp to the nearest day.
@@ -141,19 +152,23 @@ static func day_theme(day: int) -> Dictionary:
 	return DAY_THEMES[clampi(day, 1, LAST_DAY)].duplicate()
 
 
+## Records without an id or a finite lat/lon (and venues without a numeric event_weight) are
+## ignored, as are malformed decision records — bad data degrades the score, never corrupts it.
 static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
-	var venues: Array = data.get("venues", [])
+	var venues := _records(data, "venues").filter(
+		func(v): return _is_number(v.get("event_weight")) and float(v.event_weight) >= 0.0)
+	var trees := _records(data, "trees")
 	var latest := _latest_decisions(state)
-	var fountains := _effective_services(data.get("fountains", []), "fountain", state, latest, venues)
-	var toilets := _effective_services(data.get("toilets", []), "toilet", state, latest, venues)
-	var pedestrian_streets: Array = data.get("streets", []).filter(
+	var fountains := _effective_services(_records(data, "fountains"), "fountain", state, latest, venues)
+	var toilets := _effective_services(_records(data, "toilets"), "toilet", state, latest, venues)
+	var pedestrian_streets := _records(data, "streets").filter(
 		func(s): return latest.get(_key("street", s.id)) == "pedestrian")
 
 	var happiness := HAPPINESS_BASE
 	happiness += FOUNTAIN_WEIGHT * _coverage_score(venues, fountains, CONFIG.walk_radius)
 	happiness += TOILET_WEIGHT * _coverage_score(venues, toilets, CONFIG.walk_radius)
-	happiness += SHADE_WEIGHT * _shade_score(venues, data.get("trees", []), latest)
-	happiness -= _cut_penalty(venues, data.get("trees", []), latest)
+	happiness += SHADE_WEIGHT * _shade_score(venues, trees, latest)
+	happiness -= _cut_penalty(venues, trees, latest)
 	happiness += minf(LISTEN_BONUS_MAX, LISTEN_BONUS * latest.values().count("keep"))
 	happiness += air_quality_modifier(state, data)
 
@@ -197,12 +212,12 @@ static func _coverage_score(venues: Array, services: Array, radius: float) -> fl
 static func _effective_services(records: Array, type: String, state: Dictionary, latest: Dictionary, venues: Array) -> Array:
 	var services: Array = records.filter(func(r): return latest.get(_key(type, r.id)) != "close")
 	var moved := {}
-	for decision: Dictionary in state.decisions:
+	for decision: Dictionary in _decisions(state):
 		var key := _key(decision.entity_type, decision.entity_id)
 		if decision.entity_type != type or latest.get(key) != "relocate" or moved.has(key):
 			continue
 		moved[key] = true
-		var index := services.find_custom(func(s): return s.id == decision.entity_id)
+		var index := services.find_custom(func(s): return str(s.id) == str(decision.entity_id))
 		if index == -1:
 			continue
 		var others := services.duplicate()
@@ -231,7 +246,7 @@ static func _shade_score(venues: Array, trees: Array, latest: Dictionary) -> flo
 	var crown := 0.0
 	for tree: Dictionary in trees:
 		var decision: String = latest.get(_key("tree", tree.id), "")
-		if decision == "cut" or tree.get("crown_m") == null or not _near_any(tree, venues, SHADE_RADIUS_M):
+		if decision == "cut" or not _is_number(tree.get("crown_m")) or not _near_any(tree, venues, SHADE_RADIUS_M):
 			continue
 		crown += float(tree.crown_m) * (TRIM_SHADE_FACTOR if decision == "trim" else 1.0)
 	return minf(1.0, crown / SHADE_FULL_CROWN_M)
@@ -253,10 +268,11 @@ static func _cut_penalty(venues: Array, trees: Array, latest: Dictionary) -> flo
 static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: Array) -> float:
 	var total := 0.0
 	var reached := 0.0
+	var shuttles := _positions(state.get("shuttles"))
 	for venue: Dictionary in venues:
 		var weight := float(venue.event_weight)
 		var reach := ISOLATED_REACH
-		if _near_any(venue, state.shuttles, CONFIG.shuttle_radius):
+		if _near_any(venue, shuttles, CONFIG.shuttle_radius):
 			reach = SHUTTLE_REACH
 		elif _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M):
 			reach = CLUSTER_REACH
@@ -271,8 +287,8 @@ static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: 
 ## so they are counted once even though decide() also deducts them from budget.
 static func _money_score(state: Dictionary, attendance: float) -> float:
 	var costs := 0.0
-	for decision: Dictionary in state.decisions:
-		costs += float(decision.cost)
+	for decision: Dictionary in _decisions(state):
+		costs += float(decision.cost) if _is_number(decision.get("cost")) else 0.0
 	var income: float = attendance / 100.0 * MAX_VISITOR_INCOME * CONFIG.visitor_spend / REFERENCE_SPEND
 	var net: float = CONFIG.start_budget - costs + income
 	return 100.0 * net / (CONFIG.start_budget + MAX_VISITOR_INCOME)
@@ -281,13 +297,47 @@ static func _money_score(state: Dictionary, attendance: float) -> float:
 ## The decision in effect per entity: { "<type>:<id>": decision_id }, later decisions win.
 static func _latest_decisions(state: Dictionary) -> Dictionary:
 	var latest := {}
-	for decision: Dictionary in state.decisions:
+	for decision: Dictionary in _decisions(state):
 		latest[_key(decision.entity_type, decision.entity_id)] = decision.decision_id
 	return latest
 
 
-static func _key(entity_type: String, entity_id: String) -> String:
-	return entity_type + ":" + entity_id
+## "<type>:<id>" — ids by string form, so numeric JSON ids and their strings match.
+static func _key(entity_type: Variant, entity_id: Variant) -> String:
+	return str(entity_type) + ":" + str(entity_id)
+
+
+## Well-formed decision records of the state (dicts with entity_type, entity_id and decision_id).
+static func _decisions(state: Dictionary) -> Array:
+	var decisions: Variant = state.get("decisions")
+	if not (decisions is Array):
+		return []
+	return decisions.filter(func(d): return d is Dictionary and d.has("entity_type") and d.has("entity_id") and d.has("decision_id"))
+
+
+## Scorable records of one data collection: dicts with an id and a finite lat/lon.
+static func _records(data: Dictionary, key: String) -> Array:
+	return _positions(data.get(key)).filter(func(r): return r.has("id"))
+
+
+## Dicts with a finite lat/lon from a value that should be an Array (anything else -> []).
+static func _positions(value: Variant) -> Array:
+	if not (value is Array):
+		return []
+	return value.filter(func(r): return r is Dictionary and _has_position(r))
+
+
+static func _has_position(record: Dictionary) -> bool:
+	return _is_number(record.get("lat")) and _is_number(record.get("lon"))
+
+
+static func _is_number(value: Variant) -> bool:
+	return (value is float or value is int) and is_finite(float(value))
+
+
+static func _is_valid_state(state: Dictionary) -> bool:
+	return state.get("decisions") is Array and state.get("shuttles") is Array \
+		and _is_number(state.get("day")) and _is_number(state.get("budget"))
 
 
 ## True if any of `others` (dicts with lat/lon) is within radius of point, ignoring point itself.
