@@ -6,7 +6,10 @@ with the real game logic (`GameState`) on the committed data — if a meter diff
 
 Meters are shown as **Besucher:innen / Geld / Zufriedenheit** (rounded, 0–100).
 Values assume the committed air-quality cache (S184 Stadtpark, PM10 6.7 → **+10 happiness on
-day 3**). Balance as of #41 (mentor pack) + #46 (verdict tiers); UI as of #45 (live budget, Gesamtnote).
+day 3**). Balance as of #64 (P1: previews, no "keep", planting) + #67 (gold at average 69); both routes below are
+also played by `test_real_data_endings`, so if the suites are green the numbers hold.
+
+**Do not re-run `tools/fetch_airquality.py` before the pitch** — the top endings need the cached clean-air reading.
 
 ## 0. Setup
 
@@ -20,59 +23,56 @@ day 3**). Balance as of #41 (mentor pack) + #46 (verdict tiers); UI as of #45 (l
 ## 1. Start menu
 
 - [ ] Title "Bürgermeister:in fürs Festival", buttons **Festival starten**, **So funktioniert das Spiel**, **Beenden**.
-- [ ] "So funktioniert das Spiel" toggles the help text.
-- [ ] **Festival starten** → map + panels appear; the chat opens **Ars Electronica Center** automatically.
-- [ ] Meters: **45 / 75 / 65**, below them **Budget: 14.000 €**. Day bar: "Tag 1 — Anreise", "Mobilität", "Wo sollen Shuttle fahren?". Pricing row "Ticketpreise heute" with **Standard** highlighted.
+- [ ] **Festival starten** → map + panels; the chat opens **Ars Electronica Center** automatically.
+- [ ] Meters **45 / 75 / 65**, **Budget: 14.000 €**, "Tag 1 — Anreise", pricing row with **Standard** highlighted.
+- [ ] Every decision chip shows its impact, e.g. AEC: "Shuttle-Haltestelle einrichten ≈ +3.4 Bes · −1.800 €".
 
-## 2. Day 1 — shuttle at the Ars Electronica Center
+## 2. Demo route (ends "Volksnahe Stadtplanung")
 
-- [ ] The AEC persona greets you (live voice, or a canned line with status "Offline-Stimme").
-- [ ] Chips at AEC: Shuttle-Haltestelle einrichten / 1800 EUR, Sperrstunde verlängern / 600, Sperrstunde einhalten / 0, Foodtruck bestellen / 500, Security-Team buchen / 400.
-- [ ] Press **Shuttle-Haltestelle einrichten** (or type "Richte bitte einen Shuttle ein." with live voices).
-- [ ] Chat logs "Entscheidung — Shuttle-Haltestelle einrichten / 1800 EUR"; status "Foodtrucks 2/4 · Security 2/4".
-- [ ] Meters: **49 / 69 / 65** (attendance +3.4, money −5.3), **Budget: 12.200 €**.
-- [ ] A shuttle marker appears at the AEC; the AEC stays clickable (venues never lock).
-- [ ] Pressing the shuttle chip again → status "Diese Entscheidung ist nicht verfuegbar.", meters unchanged.
-- [ ] **Variant B (for the "Solide Verwaltung" ending):** click **OK Platz**, press the shuttle chip → **58 / 67 / 65**, **Budget: 10.400 €**.
+Hover a marker to read its name; street markers are grey. **Each day press "Faire Preise" first** — the day bar
+resets to Standard on a new day and the meters dip until you do.
 
-## 3. Day 2 — relocate a toilet
+| # | Day | Click | Chip preview (approx.) | Meters after (Bes / Geld / Zuf) | Budget |
+|---|---|---|---|---|---|
+| 1 | 1 | **OK Platz** → *Shuttle-Haltestelle einrichten* | ≈ +9.1 Bes · −1.800 € | 54 / 72 / 65 | 12.200 € |
+| 2 | 1 | street **Hauptplatz** → *Für Fußgänger sperren* | ≈ −1.0 Zuf · +2.8 Bes · −300 € | 57 / 72 / 64 | 11.900 € |
+| 3 | 1 | day bar **Faire Preise** | — | 63 / 67 / 64 | 11.900 € |
+| 4 | 2 | **Nächster Tag →**, then **Faire Preise** | — | 63 / 67 / 64 | 11.900 € |
+| 5 | 2 | street **Mozartstraße** → *Für Fußgänger sperren* | ≈ −1.0 Zuf · +3.6 Bes · −300 € | 67 / 68 / 63 | 11.600 € |
+| 6 | 2 | purple toilet **Promenade** → *Schließen* | ≈ −0.8 Zuf · +300 € | 67 / 69 / 62 | 11.900 € |
+| 7 | 3 | **Nächster Tag →**, then **Faire Preise** (clean air +10 Zuf) | — | 67 / 69 / 72 | 11.900 € |
+| 8 | 3 | green tree next to the **Mariendom** (chat title "Platanus hispanica") — talk, **don't cut** | chips: Zurückschneiden / Fällen | 67 / 69 / 72 | 11.900 € |
+| 9 | 3 | **Ars Electronica Center** → *Sperrstunde verlängern* | ≈ −3.0 Zuf · +2.0 Bes · −600 € | 69 / 68 / 69 | 11.300 € |
 
-- [ ] Press **Nächster Tag →** → "Tag 2 — Höhepunkt", "Sanitär & Wasser". Meters unchanged.
-- [ ] Click the purple toilet marker **"Stadtpark Huemerstraße"** (hover: the tooltip shows the toilet's name).
-- [ ] Press **Verlegen / 800 EUR**.
-- [ ] Meters: **49 / 66 / 67**, Budget 11.400 € (variant B: **58 / 64 / 67**, 9.600 €) — happiness +2.4 because the toilet moves to the C. Bechstein Centrum, the biggest venue without one.
-- [ ] Chat shows "Entscheidung festgehalten."; the toilet marker turns grey and is disabled (services lock after one decision).
+- [ ] Toilet "Promenade" stays clickable after closing (a *Wieder öffnen / 100 €* chip appears); the tree locks only if you trim or cut it.
+- [ ] Pressing a chip that is no longer possible shows "Diese Entscheidung ist nicht verfuegbar." and changes nothing.
 
-## 4. Day 3 — the plane tree at the Mariendom
+## 3. Verdict (demo route)
 
-- [ ] Press **Nächster Tag →** → "Tag 3 — Hitzetag", "Schatten & Bäume".
-- [ ] Happiness jumps by **+10** from clean air: **49 / 66 / 77** (variant B: **58 / 64 / 77**).
-- [ ] Click the green tree marker right next to the **Mariendom** (≈50 m; tooltip `baum_53e4b829…`) — the chat title reads **"Platanus hispanica"**.
-- [ ] **Keep:** press **Stehen lassen / 0 EUR** → **49 / 66 / 78** (listen bonus +1). Variant B: **58 / 64 / 78**.
-- [ ] **Or cut (second run):** press **Fällen / 400 EUR** → **49 / 65 / 68** (−9.7: shade lost, tree at a venue). Variant B: **58 / 62 / 68**.
+- [ ] **Abschluss** → "Drei Tage Linz", **Gesamtnote: 68 / 100**, title **Volksnahe Stadtplanung**.
+- [ ] Subtitle: *"Die Platane nahe Mariendom durfte bleiben. / Ein Shuttle fuhr zum OK Platz. / Am Hitzetag galten faire Preise."*
+- [ ] Final meters 69 / 68 / 69, "8 Entscheidungen / Restbudget: 11300 EUR".
+- [ ] After the verdict, map clicks, chips and the day bar change nothing.
 
-## 5. Verdict
+## 4. Showcase variant (ends "Goldene:r Bürgermeister:in")
 
-- [ ] Press **Abschluss** → overlay "Drei Tage Linz", big **"Gesamtnote: N / 100"** (mean of the three meters), the title, the three final meters and "N Entscheidungen / Restbudget: … EUR".
+Same as §2, but on **day 2** after step 6 also:
+- fountain **"Südbahnhof gegenüber RZK Gebäude"** → *Verlegen* (≈ +3.2 Zuf · −800 €) → 67 / 65 / 66, 10.800 €
+- fountain **"Hauptplatz südliche Grüninsel"** → *Schließen* (≈ −0.8 Zuf · +300 €)
+- (order with the toilet doesn't matter) → after all three: 67 / 67 / 64, 11.400 €
 
-| Run | Final meters | Gesamtnote | Title | Restbudget |
-|---|---|---|---|---|
-| A + keep | 49 / 66 / 78 | 64 | **Stadt im Gleichgewicht** | 11 400 EUR |
-| A + cut | 49 / 65 / 68 | 60 | **Stadt im Gleichgewicht** | 11 000 EUR |
-| B + keep | 58 / 64 / 78 | 67 | **Solide Verwaltung** | 9 600 EUR |
-| B + cut | 58 / 62 / 68 | 63 (mean 62.51) | **Solide Verwaltung** | 9 200 EUR |
+and on **day 3** skip step 9 (no curfew extension): 67 / 67 / 74 → **Gesamtnote 69 / 100**, **Goldene:r Bürgermeister:in**, "9 Entscheidungen / Restbudget: 11400 EUR".
 
-- [ ] After the verdict, clicks on the map, chips and the day bar change nothing.
+## 5. Restart
 
-## 6. Restart
+- [ ] **Neues Festival** → start menu → **Festival starten** → day 1, 45 / 75 / 65, Budget 14.000 €, no decisions, Standard pricing.
 
-- [ ] **Neues Festival** → start menu again → **Festival starten** → day 1, **45 / 75 / 65**, Budget 14.000 €, no decisions, pricing back on **Standard**.
+## 6. Optional checks
 
-## 7. Optional extras (mentor pack)
-
-- [ ] Fresh game, AEC **Foodtruck bestellen** once → **46 / 73 / 66**, status "Foodtrucks 3/4 · Security 2/4", venue badge shows the unit counts.
-- [ ] Fresh game, day bar **Premium** on day 1 → **40 / 83 / 65**; **Standard** again restores 45 / 75 / 65.
-- [ ] A 6th food truck at the same venue is refused (max 5 per venue).
+- [ ] Planting: AEC → *Baum pflanzen* (≈ +1.4 Zuf · −300 €) three times; a fourth is refused; young trees appear next to the AEC.
+- [ ] Headline purchases: AEC → *Foodtruck bestellen* ≈ +0.8 Zuf · +0.5 Bes · −500 €; status "Foodtrucks 3/4 · Security 2/4".
+- [ ] Cutting the Mariendom plane tree instead: chip shows ≈ −13.7 Zuf · −400 € (attendance gain from the cleared space is below 0.5, so hidden); subtitle then reads "Die Platane nahe Mariendom wurde gefällt."
+- [ ] Other endings (fast): cut the two trees `baum_1b51840024c31e2584c5` and `baum_22b431ea60149d6bee10` on day 3 → **Effizienz-Tyrann:in**; shuttle at splace + fair prices all three days → **Solide Verwaltung**.
 
 ## Report template
 
@@ -81,6 +81,6 @@ Build: binary | editor     Voices: live | offline     Tester:
 Step | expected | seen | screenshot
 ```
 
-Anything that differs, crashes, or reads oddly in German → issue with label `playtest`, and tell Opus
-(Track B) for meters/endings. **Balance feedback ("feels too easy / pointless / expensive") is the
-input for the next tuning pass — please write down how it felt, not just the numbers.**
+Anything that differs, crashes, or reads oddly in German → issue with label `playtest`, and tell Opus (Track B)
+for meters/endings. **Balance feedback ("feels too easy / pointless / expensive") is the input for the next
+tuning pass — write down how it felt, not just the numbers.**

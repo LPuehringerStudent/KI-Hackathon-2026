@@ -1,6 +1,6 @@
 # Demo-Skript (3 Minuten, Deutsch)
 
-Route B aus `docs/playtest-checklist.md` — alle Zahlen dort nachgerechnet.
+Demo-Route aus `docs/playtest-checklist.md` §2 — alle Zahlen dort nachgerechnet und von `test_real_data_endings` geprüft.
 Anzeige: **Besucher:innen / Geld / Zufriedenheit**. Luftgüte-Cache: PM10 6,7 (+10 am Hitzetag).
 
 **Vorher (Pit Crew):** Binary starten (`./build/buergermeister.x86_64`) *oder* Editor + F5.
@@ -10,24 +10,27 @@ das Spiel läuft trotzdem vollständig. Bildschirm auf 1600×900 oder größer.
 | Zeit | Aktion | Sprechtext |
 |---|---|---|
 | 0:00 | Startmenü sichtbar | „Stellt euch vor, ihr seid Bürgermeister:in von Linz — und morgen beginnt das Ars Electronica Festival. Tausende kommen. Die Stadt muss das tragen." |
-| 0:15 | **Festival starten** | „Das ist Linz als Miniatur, gebaut aus offenen Daten: jeder grüne Punkt ein echter Baum aus dem Baumkataster, jede Toilette, jeder Brunnen ist echt. Oben rechts unsere drei Werte." *(45 / 75 / 65)* |
-| 0:35 | Chat zeigt das **Ars Electronica Center** | „Und die Stadt redet mit uns. Das AEC meldet sich — die Stimme kennt ihre echten Daten, zum Beispiel 244 Veranstaltungen in ihren Räumen." |
-| 0:50 | **Shuttle-Haltestelle einrichten** | „Tag eins, Anreise. Ein Shuttle zum AEC." *(49 / 69 / 65)* |
-| 1:00 | **OK Platz** anklicken → Shuttle | „Und einer zum OK Platz — dort hängen Ursulinenhof und OK Linz gleich mit dran. Mehr Besucher:innen, aber das Budget schrumpft." *(58 / 67 / 65, Budget 10.400 €)* |
-| 1:15 | **Nächster Tag →** | „Tag zwei, Höhepunkt: Sanitär und Wasser." |
-| 1:20 | Toilette **Stadtpark Huemerstraße** → **Verlegen** | „Diese Toilette steht dort, wo gerade niemand feiert. Wir verlegen sie — das Modell schickt sie zur größten Spielstätte ohne WC." *(58 / 64 / 67)* |
-| 1:40 | **Nächster Tag →** | „Tag drei: Hitzetag. Die Luftgüte-Messstation im Stadtpark meldet saubere Luft — das hebt die Stimmung." *(58 / 64 / 77)* |
-| 1:55 | Baum neben dem **Mariendom** anklicken | „Und jetzt spricht eine Platane am Mariendom. Ihre Krone spendet Schatten genau dort, wo die Leute stehen." |
-| 2:10 | (optional eine Frage tippen, dann) **Stehen lassen** | „Wir lassen sie stehen. Fällen hätte 400 Euro gekostet — und zehn Punkte Zufriedenheit." *(58 / 64 / 78)* |
-| 2:30 | **Abschluss** | „Gesamtnote 67 von 100 — das Urteil: **Solide Verwaltung**. Nicht golden — dafür hätten wir klüger mit dem Geld umgehen müssen." *(Restbudget 9.600 €)* |
-| 2:45 | Urteil stehen lassen | „Echte Daten, ein ehrliches Modell, und eine Stadt, die zurückredet. Danke!" |
+| 0:15 | **Festival starten** | „Linz als Miniatur, gebaut aus offenen Daten: jeder Baum, jede Toilette, jeder Brunnen ist echt. Oben rechts unsere drei Werte — und jede Entscheidung zeigt vorher, was sie kostet und bringt." *(45 / 75 / 65)* |
+| 0:35 | **OK Platz** → *Shuttle* | „Tag eins, Anreise. Ein Shuttle zum OK Platz — Ursulinenhof und OK Linz hängen gleich mit dran: plus neun Besucher:innen, minus 1.800 Euro." *(54 / 72 / 65)* |
+| 0:50 | Straße **Hauptplatz** → *Für Fußgänger sperren*, dann **Faire Preise** | „Der Hauptplatz wird Fußgängerzone. Und faire Ticketpreise: mehr Leute, dafür weniger Geld." *(63 / 67 / 64)* |
+| 1:05 | **Nächster Tag →**, **Faire Preise** | „Tag zwei, Höhepunkt." |
+| 1:10 | **Mozartstraße** → *Fußgänger*; Toilette **Promenade** → *Schließen* | „Noch eine Fußgängerzone — und diese Toilette ist doppelt versorgt, die schließen wir: 300 Euro zurück, ein bisschen Unmut." *(67 / 69 / 62)* |
+| 1:35 | **Nächster Tag →**, **Faire Preise** | „Tag drei: Hitzetag. Die Messstation im Stadtpark meldet saubere Luft — das hebt die Stimmung." *(67 / 69 / 72)* |
+| 1:50 | Baum neben dem **Mariendom** anklicken | „Und jetzt spricht eine Platane am Mariendom. Fällen würde etwas Platz schaffen — aber fast vierzehn Punkte Zufriedenheit kosten. Wir hören ihr zu und lassen sie stehen." |
+| 2:15 | **Ars Electronica Center** → *Sperrstunde verlängern* | „Die Nacht ist kühler — das AEC bleibt länger offen. Mehr Publikum, etwas weniger Ruhe." *(69 / 68 / 69)* |
+| 2:30 | **Abschluss** | „Gesamtnote 68 — **Volksnahe Stadtplanung**. Und das Spiel erzählt, was wir getan haben: *Die Platane nahe Mariendom durfte bleiben.* Golden wäre möglich gewesen: Brunnen klug verlegen, Sperrstunde lassen." |
+| 2:50 | Urteil stehen lassen | „Echte Daten, ein ehrliches Modell, und eine Stadt, die zurückredet. Danke!" |
+
+Showcase für Fragen (60 s extra, Checkliste §4): Brunnen *„Südbahnhof gegenüber RZK Gebäude"* verlegen,
+*„Hauptplatz südliche Grüninsel"* schließen, keine Sperrstunde → **Goldene:r Bürgermeister:in**, Gesamtnote 69.
 
 ## Wenn etwas schiefgeht
 
 - **Stimme hängt / Proxy weg:** weiterreden, Entscheidungs-Buttons nutzen — Status „Offline-Stimme" ist ok.
 - **Binary startet nicht:** Editor öffnen, F5. Vorab prüfen: `./build/buergermeister.x86_64 --headless -- --smoke-test` → `SMOKE OK`.
 - **Werte weichen ab (> ±1):** nicht improvisieren — Zahlen weglassen, Richtung erzählen („mehr Besucher:innen, weniger Geld").
-- **Falscher Klick:** Bäume und Toiletten sind nach einer Entscheidung gesperrt; Spielstätten bleiben offen. Notfalls **Abschluss** → **Neues Festival**.
+- **Falscher Klick:** Bäume sperren nach Zurückschneiden/Fällen, Toiletten nach dem Verlegen; geschlossene lassen sich *wieder öffnen*. Die Vorschau auf jedem Button zeigt vorher, was passiert. Notfalls **Abschluss** → **Neues Festival**.
+- **Preise vergessen:** Jeden Tag zuerst **Faire Preise** drücken — der Tag beginnt auf Standard.
 
 ## Kurzfassung für Fragen
 
