@@ -48,7 +48,10 @@ func _run() -> void:
 	ui.dialogue.voices = fake
 	await settle()
 	check(ui.game.day == 1 and not ui.dialogue_state.opening.is_empty(), "day one starts with offline opening")
-	check(ui.map_view.markers.size() == 512, "all real markers loaded")
+	var entity_count := 0
+	for key in ["venues", "trees", "fountains", "toilets", "streets"]:
+		entity_count += ui.data[key].size()
+	check(ui.map_view.markers.size() == entity_count, "all real markers loaded")
 	var venue: Dictionary = ui.data.venues[0]
 	var other: Dictionary = ui.data.venues[1]
 	ui.map_view.focus_entity(venue.id)

@@ -53,8 +53,8 @@ chmod +x game/godot/build/buergermeister.x86_64
 ```
 
 The Linux executable embeds its data pack. No Python or proxy is required for
-offline play. Keep the map import mode at **Keep File**: the map loader reads the
-original PNG. Tests are excluded from the export.
+offline play. Keep the committed texture import settings: the map loader uses
+Godot's imported resource in the export. Tests are excluded from the export.
 
 Implementation details, dependency branches, verification results, and remaining
 demo checks are in [docs/track-c-handoff.md](docs/track-c-handoff.md).

@@ -1,5 +1,9 @@
 # Track C Handoff
 
+Current integration status: the playable offline flow passes, but the corrected
+Track A extract exposes one Track B balance guard failure (wc_m20, -6.1 happiness
+against a five-point limit). Reported on PR #20; do not merge until resolved.
+
 ## Ownership and source of truth
 
 Track C owns scaffold #1, HTTP client #8, dialogue #9, panels #10, and integration
@@ -32,10 +36,10 @@ link in AGENTS.md. Main was fetched, not modified or directly committed to.
 
 | Branch | Commit | Existing PR | Content |
 | --- | --- | --- | --- |
-| feature/map-view | b34b6fd | #19 | Map and inherited data loader/scaffold |
+| feature/map-view | 92f0b15 | #19 | Export-safe map and metadata projection |
 | feature/data-loader | 023046f | #18 | Data singleton, inherited via map branch |
-| feature/extract-innenstadt | f80c478 | #14 | Generated local datasets |
-| feature/bake-map | eb4d556 | #16 | Baked PNG and exact transform metadata |
+| feature/extract-innenstadt | 8871fb6 | #14 | Corrected parent-venue event rollup and street positions |
+| feature/bake-map | c7e192c | #16 | Baked PNG, texture import, projection constants |
 | feature/meter-tuning | 6daeb46 | #20 | Scoring, decisions, and tests inherited from #15/#17 |
 
 These are integration dependencies, not a claim that their upstream PRs have
@@ -50,8 +54,8 @@ checks are available as run_data_tests.gd.
 
 ### Data observations
 
-- Actual game extract: 15 venues, 400 trees, 38 fountains, 41 toilets, 18 streets;
-  512 markers in total.
+- Current game extract: 20 venues, 400 trees, 38 fountains, 41 toilets, 18 streets;
+  517 markers in total. The initial snapshot had 15 venues and 512 markers.
 - Raw street CSV has no coordinates. Track A's extract includes explicitly
   documented curated approximate positions; Track C does not fabricate positions.
 - Tree age is an estimate from Track A, not a measured age. Persona prompts label
@@ -94,8 +98,8 @@ never execute intents. Main applies accepted intents through GameState.
 
 Four local fallback lines exist for each of five entity types. They rotate on
 failure, never create an intent, and do not invent entity-specific measurements.
-These initial lines were authored locally because the proxy could not start;
-they are not claimed to be Mistral-generated.
+These initial lines were authored locally. A later proxy generation attempt returned
+invalid JSON, so no unvalidated Mistral output was accepted.
 
 tools/gen_fallback_voices.py health-checks the proxy, requests four lines per type
 with max_tokens=500, validates all results, then writes the JSON only after every
@@ -135,11 +139,10 @@ gives Beliebt, aber pleite; attendance >66 gives Gastgeber:in der Stadt; otherwi
 Stadt im Gleichgewicht.
 
 The Linux x86_64 release embeds its pack. JSON is included and tests excluded.
-The raw PNG uses importer=keep because Track A calls Image.load_from_file.
-An ordinary texture import omitted the raw PNG in the first export; a packed-game
-run caught this, and Keep File fixed it without changing Track A's script.
-Godot documents this mode in its
-[import process guide](https://docs.godotengine.org/en/4.3/tutorials/assets_pipeline/import_process.html).
+The original map loader required the raw PNG; a packed-game run caught its omission
+and Keep File initially fixed it. The final integration includes Track A's later
+ResourceLoader-based fix and matching texture import instead. Projection constants
+now also come from map_meta.json. No Track C map-script workaround remains.
 
 ## Tooling and Mistral status
 
@@ -153,12 +156,11 @@ was unavailable in the existing MCP server because its engine path was not set.
 No runtime or editor addon was added, respecting the no-addons constraint.
 Engine import, tests, screenshots, and export were verified through the CLI.
 
-Proxy health failed. Startup with the real Python executable confirmed that
-mistral-proxy/keys.json is missing. No secrets were read or requested through chat.
-No Mistral offload or live-model verification succeeded. Ready-to-delegate work:
-fallback variants, short handoff summaries, and PR/commit prose. Architecture,
-parsing, code integration, and debugging stayed on the main agent.
-The user explicitly chose offline verification for this delivery, with keys later.
+Proxy health passes with locally configured keys. Direct Mistral and Godot autoload
+smoke tests pass. The small fallback-generation task was delegated to Mistral, but
+invalid JSON was rejected and the existing fallback file was preserved. Short
+handoff and PR prose remain suitable proxy tasks. Architecture, parsing, code
+integration, and debugging stayed on the main agent.
 
 The proxy usage log contains credentials in its records. It is explicitly ignored
 alongside keys.json and never used as prompt input or included in commits.
@@ -171,11 +173,12 @@ Run the commands in README from the repository root. Tested with Godot
 | Check | Result |
 | --- | --- |
 | Headless import and main-scene launch | Exit 0 |
-| Core and synchronous Track C suites | 40 tests passed |
-| Track A data/map checks | Passed; 512 markers |
+| Initial core and Track C suites | 40 tests passed on original extract |
+| Current core and Track C suites | 39 passed, 1 Track B balance guard failed on corrected extract |
+| Track A data/map checks | Passed; 517 markers |
 | Actual HTTP fixture | Success, errors, timeout, malformed data, recovery, queue passed |
 | Native panel checks | Meter bounds, final-day label, composer, decisions, plain text passed |
-| Three-day integration | Offline and simulated-online intents, stale replies, duplicate guards, verdict passed |
+| Three-day integration | Native clicks, offline and simulated-online intents, stale replies, duplicate guards, verdict and restart passed |
 | Desktop captures | 1600x900 and 1280x720 nonblank; measured panel overlaps 0 |
 | Smaller window | Requested 1024x768; 16:9 canvas capture was 1024x576, overlaps 0 |
 | Packed-game screenshot | Map and chat rendered from exported pack, overlaps 0 |
@@ -186,8 +189,10 @@ game/godot/build. Neither generated builds nor engine downloads are committed.
 
 ## Remaining human checks
 
-- Configure local proxy keys and run a real Mistral exchange; regenerate/review
-  fallback lines if desired. Fixture results are not a live-model result.
+- Resolve Track B's wc_m20 balance guard with the corrected extraction. Evidence:
+  https://github.com/LPuehringerStudent/KI-Hackathon-2026/pull/20#issuecomment-5633110806
+- Review the live Mistral exchange and regenerate fallback lines if desired. Direct
+  and Godot smoke tests pass; generator output was rejected as invalid JSON.
 - Check the release visually on the pitch laptop. WSL headless launch does not
   establish that machine's graphics, input, or screen layout.
 - Review dependency PRs and the documented upstream budget/coordinate assumptions.
