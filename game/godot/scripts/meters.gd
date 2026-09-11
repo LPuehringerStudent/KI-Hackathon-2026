@@ -4,6 +4,7 @@ const LABELS := {"attendance": "Besucher:innen", "money": "Geld", "happiness": "
 const COLORS := {"attendance": Color("cb5755"), "money": Color("a87821"), "happiness": Color("238573")}
 var bars := {}
 var values := {}
+var _budget_label: Label
 
 
 func _ready() -> void:
@@ -34,7 +35,29 @@ func _ready() -> void:
 		bar.add_theme_stylebox_override("background", background)
 		row.add_child(bar)
 		bars[key] = bar
+	_budget_label = Label.new()
+	_budget_label.add_theme_font_size_override("font_size", 13)
+	_budget_label.add_theme_color_override("font_color", Color("6b6257"))
+	$Rows.add_child(_budget_label)
+	set_budget(null)
 	set_meters({})
+
+
+## Shows the remaining city budget; null hides the label.
+func set_budget(budget) -> void:
+	if budget == null:
+		_budget_label.text = ""
+	else:
+		_budget_label.text = "Budget: " + _fmt_eur(int(budget))
+
+
+static func _fmt_eur(v: int) -> String:
+	var s := str(abs(v))
+	var out := ""
+	while s.length() > 3:
+		out = "." + s.right(3) + out
+		s = s.left(s.length() - 3)
+	return s + out + " €"
 
 
 func set_meters(m: Dictionary) -> void:
