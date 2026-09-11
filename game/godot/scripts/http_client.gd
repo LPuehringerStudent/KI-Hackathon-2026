@@ -17,7 +17,9 @@ func ask(messages: Array, max_tokens := 400) -> String:
 	request.timeout = _timeout()
 	request.body_size_limit = 262144
 	add_child(request)
-	var payload := JSON.stringify({"messages": messages, "max_tokens": clampi(max_tokens, 1, 2000), "model": MODEL})
+	# "cache": true lets the proxy serve repeat dialogues from its persistent
+	# cache (instant + free + demo-consistent); see mistral-proxy/README.
+	var payload := JSON.stringify({"messages": messages, "max_tokens": clampi(max_tokens, 1, 2000), "model": MODEL, "cache": true})
 	var error := request.request(_endpoint(), ["Content-Type: application/json"], HTTPClient.METHOD_POST, payload)
 	var reply := ""
 	if error == OK:
