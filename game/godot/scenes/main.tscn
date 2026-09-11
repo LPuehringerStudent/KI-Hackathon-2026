@@ -34,7 +34,7 @@ custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Header" type="HBoxContainer" parent="MapSlot"]
+[node name="Header" type="HBoxContainer" parent="RootSplit/MapSlot"]
 layout_mode = 1
 anchor_right = 1.0
 offset_left = 24.0
@@ -51,7 +51,7 @@ theme_override_font_sizes/font_size = 28
 text = "LINZ  /  2026"
 theme_override_colors/font_color = Color(0.14, 0.52, 0.45, 1)
 
-[node name="Sources" type="Label" parent="MapSlot"]
+[node name="Sources" type="Label" parent="RootSplit/MapSlot"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
