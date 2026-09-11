@@ -1,0 +1,306 @@
+[
+ {
+  "id": "brunnen_bop01",
+  "name": "Südbahnhof gegenüber RZK Gebäude",
+  "lat": 48.299954,
+  "lon": 14.300819,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_bop02",
+  "name": "Südbahnhof neben Lustenauerstr. 39",
+  "lat": 48.301413,
+  "lon": 14.300036,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_bop03",
+  "name": "Promenade vor Eingang Cafe Traxlmayr",
+  "lat": 48.304274,
+  "lon": 14.287232,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_bop04",
+  "name": "Minoritenplatz bei Klosterstr. 18",
+  "lat": 48.304447,
+  "lon": 14.285341,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_bop07",
+  "name": "Gegenüber Lessingstr. 25",
+  "lat": 48.30238,
+  "lon": 14.27918,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_bop12",
+  "name": "Spittelwiese",
+  "lat": 48.302642,
+  "lon": 14.288088,
+  "kind": "Zierbrunnen Trinkwasserentnahme möglich",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb05",
+  "name": "Spielplatz Ing. Sternstr.",
+  "lat": 48.297925,
+  "lon": 14.315097,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb06",
+  "name": "Spielplatz Cremeristr.",
+  "lat": 48.297096,
+  "lon": 14.31391,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb07",
+  "name": "Eurpaspielplatz neben Europaschule",
+  "lat": 48.309502,
+  "lon": 14.298036,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb11",
+  "name": "Spielplatz Minnesängerplatz 14",
+  "lat": 48.289027,
+  "lon": 14.276688,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb13",
+  "name": "Spielplatz Limonigasse bei Strm. West",
+  "lat": 48.298419,
+  "lon": 14.281574,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb20",
+  "name": "Park Ziegeleistr. Spielplatz",
+  "lat": 48.289787,
+  "lon": 14.284082,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb24",
+  "name": "Spielplatz Schulertal bei GtA Ritzbergerstr.",
+  "lat": 48.301399,
+  "lon": 14.274624,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb26",
+  "name": "Spielplatz Prunerstift hinter Musikschule",
+  "lat": 48.307556,
+  "lon": 14.292297,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb27",
+  "name": "Donaupark Spielplatz hinter Parkbad",
+  "lat": 48.312446,
+  "lon": 14.294301,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb29",
+  "name": "Tummelplatz",
+  "lat": 48.304716,
+  "lon": 14.283418,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb37",
+  "name": "Spielplatz Schloss",
+  "lat": 48.304963,
+  "lon": 14.281198,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb42",
+  "name": "Liegewiese Bauernberg Eingang bei Auf der Gugl 22",
+  "lat": 48.294471,
+  "lon": 14.279537,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb43",
+  "name": "Andres Hofer Park bei Parkeingang Kandl Heim",
+  "lat": 48.286626,
+  "lon": 14.296553,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb45",
+  "name": "Spielplatz Mittelgasse",
+  "lat": 48.308229,
+  "lon": 14.277693,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb50",
+  "name": "Spielplatz Am Damm unterhalb Ferihumerstr. 50",
+  "lat": 48.316502,
+  "lon": 14.292012,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb51",
+  "name": "Spielplatz Am Damm unterhalb Ferihumerstr. 50",
+  "lat": 48.316487,
+  "lon": 14.292042,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb52",
+  "name": "Spielplatz Am Damm unterhalb Ferihumerstr. 50",
+  "lat": 48.316323,
+  "lon": 14.291998,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb53",
+  "name": "Spielplatz Am Damm unterhalb Ferihumerstr. 50",
+  "lat": 48.316271,
+  "lon": 14.2919,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb57",
+  "name": "Stadtpark gegnüber Huemerstr.3",
+  "lat": 48.30549,
+  "lon": 14.298235,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb58",
+  "name": "Ecke Kaisergasse Untere Donaulände",
+  "lat": 48.309169,
+  "lon": 14.292295,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb59",
+  "name": "Lonstorfer Platz",
+  "lat": 48.293524,
+  "lon": 14.314019,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb72",
+  "name": "Herbert-Bayer-Platz (Prunerstr.)",
+  "lat": 48.306757,
+  "lon": 14.291923,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb74",
+  "name": "Hauptplatz südliche Grüninsel",
+  "lat": 48.305385,
+  "lon": 14.286789,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb75",
+  "name": "Grünmarkt Urfahr",
+  "lat": 48.311289,
+  "lon": 14.28085,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb76",
+  "name": "Bauernberg Spielplatz oberhalb der Liegewiese",
+  "lat": 48.2948,
+  "lon": 14.279576,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb77",
+  "name": "Volksgarten Wasserspielplatz",
+  "lat": 48.295097,
+  "lon": 14.291527,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb79",
+  "name": "Steinmetzplatzl bei WC-Anlage Ottensheimerstr.",
+  "lat": 48.307971,
+  "lon": 14.279105,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb80",
+  "name": "Skaterplatz Ecke Lastenstr./ Grestenbergerstr.",
+  "lat": 48.294853,
+  "lon": 14.306363,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb81",
+  "name": "Basketballfeld Südende Grestenbergerstr.",
+  "lat": 48.291882,
+  "lon": 14.310262,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb82",
+  "name": "Park Hessenplatz Kiosk-Gebäude",
+  "lat": 48.30076,
+  "lon": 14.293931,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb83",
+  "name": "Hundefreilaufzone Blumau",
+  "lat": 48.295328,
+  "lon": 14.295243,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ },
+ {
+  "id": "brunnen_tb84",
+  "name": "Hundefreilaufzone Ing. Stern Str.",
+  "lat": 48.29707,
+  "lon": 14.31696,
+  "kind": "Trinkbrunnen",
+  "drinking": false
+ }
+]
