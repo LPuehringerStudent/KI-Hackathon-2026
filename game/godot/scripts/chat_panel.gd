@@ -26,6 +26,7 @@ func _ready() -> void:
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	header.add_child(icon_rect)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # tscn flag was FILL-only
 	header.add_child(title)
 	$Rows.add_child(header)
 	$Rows.move_child(header, 0)
