@@ -12,20 +12,13 @@ func _ready() -> void:
 	$Rows.minimum_size_changed.connect(func() -> void: custom_minimum_size.y = $Rows.get_combined_minimum_size().y)
 	$Rows/Composer/Send.pressed.connect(_submit)
 	$Rows/Composer/Input.text_submitted.connect(func(_text: String) -> void: _submit())
-	$Rows/Composer/Send.text = "\u2191"
+	$Rows/Composer/Send.text = "Senden"
 	$Rows/Composer/Send.tooltip_text = "Nachricht senden"
-	# header row: entity icon (Astra's 48px art) beside the title
+	# header row: title only (no icon — read as an emoji in playtests)
 	var title: Label = $Rows/Title
 	$Rows.remove_child(title)
 	var header := HBoxContainer.new()
 	header.name = "Header"
-	header.add_theme_constant_override("separation", 6)
-	var icon_rect := TextureRect.new()
-	icon_rect.name = "Icon"
-	icon_rect.custom_minimum_size = Vector2(22, 22)
-	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	header.add_child(icon_rect)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # tscn flag was FILL-only
 	header.add_child(title)
 	$Rows.add_child(header)
@@ -37,12 +30,6 @@ func open_entity(value: Dictionary, decisions: Array) -> void:
 	entity = value
 	_resolved = false
 	$Rows/Header/Title.text = str(entity.get("name", entity.get("species", "Stadtort")))
-	var icon_path := "res://assets/sprites/icon_%s.png" % str(entity.get("type", ""))
-	var icon_rect: TextureRect = $Rows/Header/Icon
-	if ResourceLoader.exists(icon_path):
-		icon_rect.texture = load(icon_path)
-	else:
-		icon_rect.texture = null
 	$Rows/Composer/Input.clear()
 	for child in $Rows/Messages/History.get_children():
 		child.free()
