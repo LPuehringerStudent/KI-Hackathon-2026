@@ -1,5 +1,28 @@
 # AGENTS.md — Instructions for coding agents on this team
 
+## Track assignments — read before picking up any task
+
+Each agent owns ONE track. Do not start tasks outside your track; coordinate in
+the team chat instead. The plan (`docs/superpowers/plans/2026-09-11-buergermeister-spiel-godot.md`)
+defines the tasks and the Shared Interfaces contracts — follow them exactly.
+
+| Agent | Track | Owns (Kanban issues) | Why |
+|-------|-------|----------------------|-----|
+| **GPT Astra 6** | C — Dialogue & UI | #1 scaffold, #8 proxy client, #9 dialogue, #10 panels, #11 wiring/build | Only agent with Godot MCP — scene building/editor work |
+| **Claude Opus 5** | B — Game Core | #6 scoring, #7 day machine | Pure logic + TDD; strongest at meticulous algorithmic code |
+| **Kimi 2.8** | A — Map & Data | #2 extraction, #3 map baking, #4 data loader, #5 map view | Geo/data pipeline + visual verification of the baked map |
+
+- **Mistral (via proxy):** shared grunt worker for ALL agents — commit
+  messages, PR descriptions, text drafts. Never a track owner.
+- Each agent pairs with its track's human teammate; the human reviews PRs per
+  CONTRIBUTING.md.
+- **Kickoff order:** Astra starts #1 (scaffold) immediately — it is the
+  critical path everything plugs into. Opus starts #6, Kimi starts #2; both
+  are independent of the scaffold until Task 4.
+- Track C's Godot MCP is exclusive to Astra. Tracks A and B verify headless
+  (`godot --headless --path game/godot --quit`, `node`-free — see plan) and
+  must not hand-edit `.tscn` scene files that C owns.
+
 ## Cheap-task offload via the local Mistral proxy
 
 This team has 3 OpenRouter keys (Mistral Medium 3.5, $20 budget each) pooled in a
