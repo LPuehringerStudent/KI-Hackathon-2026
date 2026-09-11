@@ -1,0 +1,4 @@
+[mcp_servers.godot-mcp]
+command = "cmd"
+args = ["/c", "npx", "-y", "@yanhuifair/godot-mcp", "-p", "game/godot"]
+startup_timeout_sec = 30
