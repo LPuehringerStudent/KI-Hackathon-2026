@@ -6,9 +6,9 @@ const Dialogue := preload("res://scripts/dialogue.gd")
 func test_intents_are_validated_and_hidden() -> void:
 	var dialogue := Dialogue.new()
 	var tree := {"type": "tree"}
-	check(dialogue.parse_reply("Gut. [[ENTSCHEID:keep]]", tree) == {"reply": "Gut.", "intent": {"type": "decide", "decision_id": "keep"}}, "valid decision")
+	check(dialogue.parse_reply("Gut. [[ENTSCHEID:trim]]", tree) == {"reply": "Gut.", "intent": {"type": "decide", "decision_id": "trim"}}, "valid decision")
 	check(dialogue.parse_reply("[[NAECHSTER_TAG]]", tree).intent == {"type": "next_day"}, "next day")
-	for text in ["[[ENTSCHEID:shuttle]]", "[[ENTSCHEID:keep]][[NAECHSTER_TAG]]", "[[ENTSCHEID:keep]][[ENTSCHEID:cut]]", "[[ENTSCHEID:", "[[other]]"]:
+	for text in ["[[ENTSCHEID:shuttle]]", "[[ENTSCHEID:keep]]", "[[ENTSCHEID:trim]][[NAECHSTER_TAG]]", "[[ENTSCHEID:trim]][[ENTSCHEID:cut]]", "[[ENTSCHEID:", "[[other]]"]:
 		var result := dialogue.parse_reply(text, tree)
 		check(result.intent == null and not result.reply.contains("[["), "reject invalid or ambiguous marker: " + text)
 	dialogue.free()

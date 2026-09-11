@@ -43,21 +43,30 @@ func open_entity(value: Dictionary, decisions: Array) -> void:
 	$Rows/Composer/Input.clear()
 	for child in $Rows/Messages/History.get_children():
 		child.free()
+	set_decisions(decisions)
+	set_status("")
+	set_busy(false)
+
+
+## Rebuilds the decision chips without touching the conversation. A decision's optional "preview"
+## (GameState.preview_text, e.g. "≈ +2.4 Zuf · −800 €") follows the label on the chip.
+func set_decisions(decisions: Array) -> void:
 	for child in $Rows/DecisionsScroll/Decisions.get_children():
 		child.free()
 	for decision: Dictionary in decisions:
 		var button := Button.new()
-		button.text = "%s  /  %s EUR" % [decision.label, int(decision.cost)]
-		button.custom_minimum_size.y = 36
+		var preview := str(decision.get("preview", ""))
+		button.text = "%s   %s" % [decision.label, preview] if not preview.is_empty() else "%s  /  %s EUR" % [decision.label, int(decision.cost)]
+		button.custom_minimum_size.y = 34
+		button.add_theme_font_size_override("font_size", 14)
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.disabled = _resolved
 		button.pressed.connect(func() -> void: decision_selected.emit(str(decision.id)))
 		$Rows/DecisionsScroll/Decisions.add_child(button)
 	# cap the visible chip area (5 chips ≈ 250 px); scrolls inside beyond that
 	$Rows/DecisionsScroll.custom_minimum_size.y = minf(
 		$Rows/DecisionsScroll/Decisions.get_combined_minimum_size().y, 250.0)
-	set_status("")
-	set_busy(false)
 
 
 func add_message(speaker: String, text: String) -> void:

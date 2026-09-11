@@ -104,7 +104,9 @@ func test_real_data_verdicts() -> void:
 	for type: String in ["fountain", "toilet"]:
 		for service: Dictionary in data[type + "s"]:
 			singles.append([type, service.id, "relocate"])
-	singles.append(["tree", data.trees[0].id, "keep"])
+	for venue: Dictionary in data.venues.slice(0, 5):
+		singles.append(["venue", venue.id, "plant"])
+	singles.append(["tree", data.trees[0].id, "trim"])
 	for single: Array in singles:
 		var state: Dictionary = GS.create()
 		GS.decide(state, GS.find_entity(data, single[1], single[0]), single[2])

@@ -109,7 +109,7 @@ func test_decision_ids_are_scoped_by_entity_type() -> void:
 	state.decisions.append(_decision("f1", "fountain", "close", 0.0))
 	var m: Dictionary = GS.compute_meters(state, data)
 	# Fountain closed but the toilet with the same id stays open
-	check(is_equal_approx(m.happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) - GS.FOUNTAIN_WEIGHT), "only the fountain should close, got happiness %s" % m.happiness)
+	check(is_equal_approx(m.happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) - GS.FOUNTAIN_WEIGHT - GS.CLOSED_SERVICE_PENALTY), "only the fountain should close, got happiness %s" % m.happiness)
 
 
 func test_shuttle_near_venue_raises_attendance() -> void:
@@ -152,8 +152,8 @@ func test_closing_service_is_continuous_not_a_cliff() -> void:
 	var state: Dictionary = GS.create()
 	state.decisions.append(_decision("wc1", "toilet", "close", 0.0))
 	var m: Dictionary = GS.compute_meters(state, data)
-	# v1 carries 10 of 40 event_weight: losing its toilet costs 25 * 10/40
-	check(is_equal_approx(fresh.happiness - m.happiness, 6.25), "closing wc1 should cost 6.25, got %s" % (fresh.happiness - m.happiness))
+	# v1 carries 10 of 40 event_weight: losing its toilet costs 25 * 10/40, plus the flat closure penalty
+	check(is_equal_approx(fresh.happiness - m.happiness, 6.25 + GS.CLOSED_SERVICE_PENALTY), "closing wc1 should cost 6.25 + CLOSED_SERVICE_PENALTY, got %s" % (fresh.happiness - m.happiness))
 
 
 func test_relocating_service_moves_it_to_heaviest_uncovered_venue() -> void:
@@ -204,24 +204,13 @@ func test_cutting_distant_tree_costs_base_penalty() -> void:
 	check(is_equal_approx(fresh.happiness - m.happiness, GS.CUT_PENALTY), "distant cut should cost CUT_PENALTY, got %s" % (fresh.happiness - m.happiness))
 
 
-func test_keep_listen_bonus_is_capped() -> void:
-	var data := _data()
-	var state: Dictionary = GS.create()
-	state.decisions.append(_decision("t1", "tree", "keep", 0.0))
-	check(is_equal_approx(GS.compute_meters(state, data).happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) + GS.LISTEN_BONUS), "one keep adds LISTEN_BONUS")
-	for i in 10:
-		state.decisions.append(_decision("far%d" % i, "tree", "keep", 0.0))
-	check(is_equal_approx(GS.compute_meters(state, data).happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) + GS.LISTEN_BONUS_MAX), "listen bonus capped")
-
-
 func test_latest_decision_per_entity_is_in_effect() -> void:
 	var data := _data()
 	var state: Dictionary = GS.create()
-	state.decisions.append(_decision("f1", "fountain", "close", 0.0))
-	state.decisions.append(_decision("f1", "fountain", "keep", 0.0))
+	state.decisions.append(_decision("f1", "fountain", "close", -300.0))
+	state.decisions.append(_decision("f1", "fountain", "reopen", 100.0))
 	var m: Dictionary = GS.compute_meters(state, data)
-	# reopened (+25 back) and heard (+1)
-	check(is_equal_approx(m.happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) + GS.LISTEN_BONUS), "keep after close should reopen the fountain, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M)), "reopen after close should restore the fountain, got %s" % m.happiness)
 
 
 func test_pedestrian_street_near_venue_raises_attendance_until_reopened() -> void:
@@ -230,5 +219,7 @@ func test_pedestrian_street_near_venue_raises_attendance_until_reopened() -> voi
 	var state: Dictionary = GS.create()
 	state.decisions.append(_decision("s1", "street", "pedestrian", 300.0))
 	check(is_equal_approx(GS.compute_meters(state, data).attendance, 100.0 * (GS.ISOLATED_REACH + GS.PEDESTRIAN_REACH_BONUS)), "isolated + pedestrian bonus")
-	state.decisions.append(_decision("s1", "street", "open", 0.0))
+	check(is_equal_approx(GS.compute_meters(state, data).happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M) - GS.PEDESTRIAN_HAPPINESS_PENALTY), "a pedestrian zone costs a little happiness")
+	state.decisions.append(_decision("s1", "street", "open", 50.0))
 	check(is_equal_approx(GS.compute_meters(state, data).attendance, 100.0 * GS.ISOLATED_REACH), "reopening removes the bonus")
+	check(is_equal_approx(GS.compute_meters(state, data).happiness, (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M)), "and the traffic penalty")

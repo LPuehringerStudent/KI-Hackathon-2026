@@ -74,11 +74,11 @@ func test_malformed_decision_records_do_not_corrupt_meters() -> void:
 	var state: Dictionary = GS.create()
 	state.decisions.append({ "entity_id": "f1", "entity_type": "fountain" })  # no decision_id, no cost
 	state.decisions.append("close f1")
-	state.decisions.append({ "entity_id": "x", "entity_type": "tree", "decision_id": "keep" })  # no cost
+	state.decisions.append({ "entity_id": "x", "entity_type": "tree", "decision_id": "trim" })  # no cost, unknown tree
 	var m: Dictionary = GS.compute_meters(state, _data())
 	var fresh: Dictionary = GS.compute_meters(GS.create(), _data())
 	check(is_equal_approx(m.money, fresh.money), "missing costs count as 0, money unchanged, got %s" % m.money)
-	check(is_equal_approx(m.happiness, fresh.happiness + GS.LISTEN_BONUS), "only the valid keep counts, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, fresh.happiness), "malformed and unknown-entity records have no effect, got %s" % m.happiness)
 
 
 func test_numeric_ids_match_their_string_form() -> void:

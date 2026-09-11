@@ -25,7 +25,7 @@ func _run() -> void:
 		ui.apply_decision("relocate")
 		ui.advance_day()
 		ui.select_entity(ui.data.trees[0].id, "tree")
-		ui.apply_decision("keep")
+		ui.apply_decision("trim")
 		ui.advance_day()
 	await create_timer(0.2).timeout
 	await RenderingServer.frame_post_draw

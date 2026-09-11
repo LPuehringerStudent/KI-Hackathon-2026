@@ -113,8 +113,11 @@ func _run() -> void:
 	ui.advance_day(true)
 	ui.select_entity(tree.id, "tree")
 	await settle()
-	ui.apply_decision("keep")
-	check(ui.game.day == 3 and ui.game.decisions[-1].decision_id == "keep", "day three tree kept")
+	var chip_texts: Array = ui.chat.get_node("Rows/DecisionsScroll/Decisions").get_children().map(func(b): return b.text)
+	check(chip_texts.size() == 2 and chip_texts.all(func(t): return t.contains("   ≈ ")), "tree chips show impact previews: %s" % [chip_texts])
+	check(("tree:" + str(tree.id)) in ui.game.consulted, "talking to the tree is remembered")
+	ui.apply_decision("trim")
+	check(ui.game.day == 3 and ui.game.decisions[-1].decision_id == "trim", "day three tree trimmed")
 	ui.select_entity(venue.id, "venue")
 	await settle()
 	ui.apply_decision("foodtruck")
@@ -125,6 +128,8 @@ func _run() -> void:
 	ui.advance_day(true)
 	await settle()
 	check(ui.finished and ui.verdict.visible, "final verdict visible")
+	var subtitle: Label = ui.verdict.find_child("Subtitle", true, false)
+	check(subtitle != null and subtitle.text.contains("wurde nur zurückgeschnitten"), "verdict subtitle tells the tree's story: %s" % (subtitle.text if subtitle else "missing"))
 	var score_found := false
 	for child: Node in ui.verdict.get_child(0).get_child(0).get_children():
 		if child is Label and child.text.begins_with("Gesamtnote"):

@@ -87,10 +87,8 @@ func test_missing_or_malformed_air_quality_is_neutral() -> void:
 func test_bonus_adds_on_top_of_a_full_score() -> void:
 	var data := _data(_air(5.0))
 	var state := _state_on_day(3)
-	for i in 5:
-		state.decisions.append({ "entity_id": "far%d" % i, "entity_type": "tree", "decision_id": "keep", "day": 3, "cost": 0.0 })
 	data.trees[0].crown_m = 400.0  # full shade
-	var full := GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT + GS.LISTEN_BONUS_MAX
+	var full: float = GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT
 	var m: Dictionary = GS.compute_meters(state, data)
 	check(is_equal_approx(m.happiness, minf(100.0, full + GS.AIR_MODIFIER)), "full score plus clean air (clamped), got %s" % m.happiness)
 
