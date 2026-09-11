@@ -43,3 +43,4 @@ temp/
 # Local secrets
 API-Keys.txt
 mistral-proxy/keys.json
+mistral-proxy/usage.jsonl
