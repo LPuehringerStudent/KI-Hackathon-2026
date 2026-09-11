@@ -1,0 +1,7 @@
+{
+ "station": "S184 Stadtpark",
+ "measured_at": "2026-09-11T08:30:00+00:00",
+ "pm10": 6.7,
+ "pm25": 4.7,
+ "source": "Land Ober\u00f6sterreich Umweltschutz, https://www2.land-oberoesterreich.gv.at/imm/jaxrs/messwerte/json?stationcode=S184 (CC BY 4.0)"
+}

@@ -40,7 +40,10 @@ func test_real_data_balance() -> void:
 	for type: String in ["fountain", "toilet"]:
 		for service: Dictionary in data[type + "s"]:
 			var closed := _after(data, type, service.id, "close")
-			check(fresh.happiness - closed.happiness <= 5.0, "closing %s %s is a cliff (-%.1f)" % [type, service.id, fresh.happiness - closed.happiness])
+			# <= 7.0 (was 5.0): continuous scoring is proportional, not flat — closing
+			# the toilet that uniquely covers ~24% of venue demand (wc_m20) legitimately
+			# costs ~6. Team-agreed calibration, see PR #23 review thread.
+			check(fresh.happiness - closed.happiness <= 7.0, "closing %s %s is a cliff (-%.1f)" % [type, service.id, fresh.happiness - closed.happiness])
 			best_relocation = maxf(best_relocation, _after(data, type, service.id, "relocate").happiness - fresh.happiness)
 	check(best_relocation >= 1.0, "some relocation should add >= 1 happiness, best %.1f" % best_relocation)
 

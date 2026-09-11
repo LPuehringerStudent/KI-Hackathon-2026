@@ -44,3 +44,4 @@ temp/
 API-Keys.txt
 mistral-proxy/keys.json
 mistral-proxy/usage.jsonl
+.codex/
