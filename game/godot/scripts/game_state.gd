@@ -42,7 +42,7 @@ const DECISIONS := {
 	],
 }
 
-## Tuning constants — balanced against the real Innenstadt extract (15 venues, 400 trees,
+## Tuning constants — balanced against the real Innenstadt extract (20 venues, 400 trees,
 ## 38 fountains, 41 toilets) so every decision moves a meter without cliffs.
 
 ## Visitor income at 100 % attendance and the reference spend of 35 € per visitor.
@@ -75,6 +75,14 @@ const ISOLATED_REACH := 0.4
 const VENUE_CLUSTER_RADIUS_M := 200.0
 const PEDESTRIAN_REACH_BONUS := 0.15
 const PEDESTRIAN_RADIUS_M := 250.0
+
+## Hitzetag air quality (data.airquality, PM10 in µg/m³ from tools/fetch_airquality.py):
+## <= AIR_CLEAN_PM10 gives +AIR_MODIFIER happiness, >= AIR_POLLUTED_PM10 gives -AIR_MODIFIER,
+## linear in between. Only on AIR_QUALITY_DAY; missing or invalid readings count as 0.
+const AIR_QUALITY_DAY := 3
+const AIR_CLEAN_PM10 := 20.0
+const AIR_POLLUTED_PM10 := 50.0
+const AIR_MODIFIER := 10.0
 
 
 static func create() -> Dictionary:
@@ -147,6 +155,7 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	happiness += SHADE_WEIGHT * _shade_score(venues, data.get("trees", []), latest)
 	happiness -= _cut_penalty(venues, data.get("trees", []), latest)
 	happiness += minf(LISTEN_BONUS_MAX, LISTEN_BONUS * latest.values().count("keep"))
+	happiness += air_quality_modifier(state, data)
 
 	var attendance := clampf(100.0 * _reachability(state, venues, pedestrian_streets), 0.0, 100.0)
 
@@ -155,6 +164,19 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 		"money": clampf(_money_score(state, attendance), 0.0, 100.0),
 		"happiness": clampf(happiness, 0.0, 100.0),
 	}
+
+
+## Happiness modifier from the cached PM10 reading: +AIR_MODIFIER (clean) .. -AIR_MODIFIER (polluted)
+## on AIR_QUALITY_DAY, 0 on other days or when data.airquality is missing or invalid.
+static func air_quality_modifier(state: Dictionary, data: Dictionary) -> float:
+	var air: Variant = data.get("airquality")
+	if state.get("day") != AIR_QUALITY_DAY or not (air is Dictionary):
+		return 0.0
+	var pm10: Variant = air.get("pm10")
+	if not (pm10 is float or pm10 is int) or is_nan(float(pm10)) or float(pm10) < 0.0:
+		return 0.0
+	var pollution := clampf(inverse_lerp(AIR_CLEAN_PM10, AIR_POLLUTED_PM10, float(pm10)), 0.0, 1.0)
+	return lerpf(AIR_MODIFIER, -AIR_MODIFIER, pollution)
 
 
 ## Share (0..1) of total venue event_weight with an open service within radius.
