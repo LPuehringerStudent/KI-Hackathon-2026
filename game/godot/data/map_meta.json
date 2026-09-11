@@ -5,6 +5,9 @@
  "lat_max": 48.318,
  "lon_min": 14.27,
  "lon_max": 14.32,
+ "km_per_deg_lon": 74.05344308012344,
+ "km_per_deg_lat": 110.57,
+ "scale_px_per_km": 544.7706802717643,
  "projection": "equirectangular corrected for lat 48.3 (see project())",
  "source": "OpenStreetMap via Overpass (ODbL), rendered by tools/render_map.py"
 }

@@ -104,17 +104,26 @@ def load():
     return fetch()
 
 
-def project(lat, lon):
-    """WGS84 -> pixel coords (equirectangular, corrected for lat 48.3)."""
-    lat_min, lat_max, lon_min, lon_max = BOUNDS
+def projection_constants():
     km_per_deg_lon = 111.32 * math.cos(math.radians(48.3))
     km_per_deg_lat = 110.57
-    x = (lon - lon_min) * km_per_deg_lon
-    y = (lat_max - lat) * km_per_deg_lat
+    lat_min, lat_max, lon_min, lon_max = BOUNDS
     w_km = (lon_max - lon_min) * km_per_deg_lon
     h_km = (lat_max - lat_min) * km_per_deg_lat
-    scale = SIZE / max(w_km, h_km)
-    return x * scale, y * scale
+    return {
+        "km_per_deg_lon": km_per_deg_lon,
+        "km_per_deg_lat": km_per_deg_lat,
+        "scale_px_per_km": SIZE / max(w_km, h_km),
+    }
+
+
+def project(lat, lon):
+    """WGS84 -> pixel coords (equirectangular, corrected for lat 48.3)."""
+    c = projection_constants()
+    lat_min, lat_max, lon_min, lon_max = BOUNDS
+    x = (lon - lon_min) * c["km_per_deg_lon"]
+    y = (lat_max - lat) * c["km_per_deg_lat"]
+    return x * c["scale_px_per_km"], y * c["scale_px_per_km"]
 
 
 def ring_geom(el):
@@ -165,6 +174,7 @@ def main():
         "width": SIZE, "height": SIZE,
         "lat_min": BOUNDS[0], "lat_max": BOUNDS[1],
         "lon_min": BOUNDS[2], "lon_max": BOUNDS[3],
+        **projection_constants(),
         "projection": "equirectangular corrected for lat 48.3 (see project())",
         "source": "OpenStreetMap via Overpass (ODbL), rendered by tools/render_map.py",
     }, indent=1), encoding="utf-8")
