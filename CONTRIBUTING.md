@@ -23,6 +23,23 @@ Workflow for our 3-person team. The goal: nobody blocks anyone, and `main` alway
 - PR author merges their own PR after approval (no long handoffs).
 - CI / tests (once they exist) must be green before merging.
 
+## Task board (Kanban)
+
+We track work on the GitHub project board
+**"KI-Hackathon 2026 — Bürgermeister:in fürs Festival"**
+(https://github.com/users/LPuehringerStudent/projects/10 — columns: Todo, In Progress, Done).
+
+- Every task is a GitHub issue on the board. Pick your next task, **assign
+  yourself**, and move it to **In Progress**.
+- **PRs must reference their task:** put `Part of #N` (task continues) or
+  `Closes #N` (task finished) in the PR body — this links the PR to the card
+  and shows it under "Linked pull requests" on the board.
+- When the PR merges: the linked issue closes, and the board's workflow moves
+  the card to **Done** automatically.
+- One-time setup by any teammate in the board's web UI (can't be done from
+  git/CLI): board → **⋯ Menu → Workflow → Auto-add to project** → enable, so
+  new issues/PRs land on the board automatically.
+
 ## Staying in sync
 
 - Pull `main` frequently (`git pull --rebase origin main` while on your branch) to catch conflicts early.
