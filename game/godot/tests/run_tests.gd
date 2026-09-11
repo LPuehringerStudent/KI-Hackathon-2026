@@ -31,4 +31,24 @@ func _run() -> void:
 	check(data.get("streets", []).size() >= 5, "streets loaded")
 	check(data.has("meta") and data.meta.has("bounds"), "meta with bounds loaded")
 	check(data.venues[0].has("event_weight"), "venues expose event_weight")
+	await _check_map_view(data)
 	quit(1 if failures > 0 else 0)
+
+
+func _check_map_view(data: Dictionary) -> void:
+	var mv = preload("res://scenes/map_view.tscn").instantiate()
+	get_root().add_child(mv)
+	await process_frame
+	check(mv.markers.size() > 400, "map_view created markers (%d)" % mv.markers.size())
+	check(mv.has_signal("entity_clicked"), "map_view exposes entity_clicked signal")
+	var mm = JSON.parse_string(FileAccess.get_file_as_string("res://data/map_meta.json"))
+	var sample: Vector2 = mv.latlon_to_pixel(float(mm.lat_min), float(mm.lon_min))
+	check(sample.x >= -0.5 and sample.y <= float(mm.height) + 0.5,
+		"latlon_to_pixel maps bounds corner into image")
+	mv.set_entity_state(data.venues[0].id, "affected")
+	mv.set_entity_state(data.venues[0].id, "resolved")
+	mv.focus_entity(data.venues[0].id)
+	mv.set_entity_state("unknown-id", "affected")
+	mv.focus_entity("unknown-id")
+	check(true, "set_entity_state/focus_entity tolerate known and unknown ids")
+	mv.queue_free()
