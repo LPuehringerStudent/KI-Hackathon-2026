@@ -85,6 +85,7 @@ func _start_game() -> void:
 	$RootSplit/MapSlot.add_child(map_view)
 	map_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	map_view.entity_clicked.connect(select_entity)
+	map_view.bulk_action_requested.connect(_on_bulk_action)
 	_refresh()
 	_initial_entity.call_deferred()
 
@@ -167,6 +168,23 @@ func _initial_entity() -> void:
 		if str(venue.name).contains("Ars Electronica Center"):
 			first = venue
 	select_entity(str(first.id), "venue")
+
+
+## Multi-select (Ctrl+click): apply one shared decision to all selected.
+func _on_bulk_action(action_id: String) -> void:
+	var kind: String = map_view.selection_type()
+	if kind.is_empty():
+		return
+	var applied := 0
+	for id: String in map_view.get_selection_ids():
+		var entity := State.find_entity(data, id, kind)
+		if not entity.is_empty() and State.decide(game, entity, action_id):
+			applied += 1
+			_resolved[_key(entity)] = true
+	map_view.clear_selection()
+	if applied > 0:
+		chat.set_status("%d × %s festgehalten." % [applied, action_id])
+	_refresh()
 
 
 func select_entity(id: String, kind: String) -> void:
