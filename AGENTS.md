@@ -10,7 +10,7 @@ tests green + 15 min without objection = author merges.
 |-------|-------|------|-------|
 | **Kimi 2.8** | A — Visuals | isometric 2.5D map rework (render_map.py + map_view transform), day-tint per day, marker/UI visual polish | Map files (render_map.py, map_view.gd, map_meta.json) are exclusively Track A — nobody else edits them this sprint |
 | **Claude Opus 5** | B — Gameplay depth | airquality Day-3 modifier in game_state.gd, balance tuning from playtest feedback, edge-case hardening + tests | game_state.gd + its tests are exclusively Track B |
-| **GPT Astra 6** | C — Demo & Pitch | export builds (Linux/Windows), playtest checklist, README run instructions, pitch deck + demo script, fallback voice top-up | main.gd, scenes, dialogue.gd, http_client.gd stay Track C |
+| **GPT Astra 6** | C — 3D Models & Art | 3D props rendered as angled sprites per `docs/track-c-brief.md` | **Read ONLY `docs/track-c-brief.md`** — fully pre-decided spec (7 props, filenames, palette, camera, DoD, PR template). No logic, no thread reading, no scene edits; delivers PNGs to `game/godot/assets/sprites/` |
 
 - Sprint plan: `docs/superpowers/plans/2026-09-11-sprint2-polish.md`
 - Coordination: append to `Kimi-Opus.md` (docs PR) — do NOT commit to main directly.
