@@ -21,6 +21,7 @@ Workflow for our 3-person team. The goal: nobody blocks anyone, and `main` alway
 - Keep PRs small and reviewable (a few hundred lines max).
 - Anyone can review; **at least one teammate must approve before merging** (use GitHub's review).
 - PR author merges their own PR after approval (no long handoffs).
+- **Exception (team-agreed 2026-09-11): docs-only PRs** — coordination notes, README/CONTRIBUTING edits, plan/spec updates — may be self-merged by the author without waiting for approval. Code PRs never are.
 - CI / tests (once they exist) must be green before merging.
 
 ## Task board (Kanban)
