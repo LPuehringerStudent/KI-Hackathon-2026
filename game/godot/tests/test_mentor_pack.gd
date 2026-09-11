@@ -45,9 +45,9 @@ func _meters(state: Dictionary) -> Dictionary:
 
 
 func test_catalogue_offers_purchases_only_at_headline_venues() -> void:
-	check(_ids(GS.available_decisions(_entity("H"))) == ["shuttle", "extend", "curfew", "foodtruck", "security"],
+	check(_ids(GS.available_decisions(_entity("H"))) == ["shuttle", "extend", "foodtruck", "security", "plant"],
 		"headline venue decisions: %s" % [_ids(GS.available_decisions(_entity("H")))])
-	check(_ids(GS.available_decisions(_entity("S"))) == ["shuttle", "extend", "curfew"],
+	check(_ids(GS.available_decisions(_entity("S"))) == ["shuttle", "extend", "plant"],
 		"small venue decisions: %s" % [_ids(GS.available_decisions(_entity("S")))])
 	for d: Dictionary in GS.available_decisions(_entity("H")):
 		check(d.has("group"), "%s needs a group" % d.id)

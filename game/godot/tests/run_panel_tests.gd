@@ -33,7 +33,12 @@ func _run() -> void:
 	root.add_child(chat)
 	chat.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	chat.size = Vector2(440, 500)
-	chat.open_entity({"id": "tree-1", "name": "Linde", "type": "tree"}, [{"id": "keep", "label": "Stehen lassen", "cost": 0}])
+	chat.open_entity({"id": "tree-1", "name": "Ars Electronica Center", "type": "tree"}, [{"id": "trim", "label": "Zurückschneiden", "cost": 150, "preview": "≈ −0.6 Zuf · −150 €"}])
+	await process_frame
+	await process_frame
+	var chat_title: Label = chat.get_node("Rows/Header/Title")
+	check(chat_title.size.x > 150 and chat_title.size.y < 60, "chat title stays on one line (size %s)" % chat_title.size)
+	check(chat.get_node("Rows/DecisionsScroll/Decisions").get_child(0).text == "Zurückschneiden   ≈ −0.6 Zuf · −150 €", "decision chip shows its preview line")
 	chat.message_submitted.connect(func(_text: String) -> void: submitted += 1)
 	chat.get_node("Rows/Composer/Input").text = " "
 	chat._submit()

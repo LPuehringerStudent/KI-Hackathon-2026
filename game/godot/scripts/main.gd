@@ -34,6 +34,7 @@ var verdict: Control
 var _generation := 0
 var _voice_busy := false
 var _resolved := {}
+var _preview_cache := {}
 var menu: Control
 var started := false
 
@@ -188,7 +189,8 @@ func _on_bulk_action(action_id: String) -> void:
 		var entity := State.find_entity(data, id, kind)
 		if not entity.is_empty() and State.decide(game, entity, action_id):
 			applied += 1
-			_resolved[_key(entity)] = true
+			if _locks_after(entity, action_id):
+				_resolved[_key(entity)] = true
 	map_view.clear_selection()
 	if applied > 0:
 		chat.set_status("%d × %s festgehalten." % [applied, action_id])
@@ -204,7 +206,9 @@ func select_entity(id: String, kind: String) -> void:
 	_generation += 1
 	selected = entity
 	dialogue_state = {}
-	chat.open_entity(entity, State.available_decisions(entity))
+	State.consult(game, entity)
+	chat.open_entity(entity, _decision_chips(entity, false))
+	_fill_previews.call_deferred(_generation)
 	map_view.focus_entity(id)
 	if _resolved.has(_key(entity)):
 		chat.set_resolved(true)
@@ -260,26 +264,60 @@ func apply_decision(id: String) -> void:
 		chat.set_status("Diese Entscheidung ist nicht verfuegbar.")
 		return
 	_generation += 1
-	# Venues stay open: food trucks and security are repeatable, curfew is a toggle.
-	var stays_open := str(selected.get("type", "")) == "venue"
+	var stays_open := not _locks_after(selected, id)
 	if not stays_open:
 		_resolved[_key(selected)] = true
 		chat.set_resolved(true)
 	chat.set_busy(false)
-	for decision: Dictionary in State.available_decisions(selected):
-		if decision.id == id:
-			chat.add_message("Entscheidung", "%s / %d EUR" % [decision.label, int(decision.cost)])
-	chat.set_status(_venue_status(selected) if stays_open else "Entscheidung festgehalten.")
+	var entry: Dictionary = State._catalogue_entry(selected.get("type", ""), id)
+	if not entry.is_empty():
+		chat.add_message("Entscheidung", "%s / %d EUR" % [entry.label, int(entry.cost)])
+	chat.set_status(_venue_status(selected) if str(selected.get("type", "")) == "venue" else "Entscheidung festgehalten.")
+	if stays_open:
+		chat.set_decisions(_decision_chips(selected))
 	_refresh()
+
+
+## Trees lock after any decision and services after relocating; venues (purchases, planting, curfew
+## toggle), streets (pedestrian toggle, planting) and closed services (reopen) stay open.
+func _locks_after(entity: Dictionary, decision_id: String) -> bool:
+	match str(entity.get("type", "")):
+		"tree":
+			return true
+		"fountain", "toilet":
+			return decision_id == "relocate"
+	return false
+
+
+## Decisions available right now, each with its impact preview line. Previews are cached per
+## entity, decision count, day and pricing (≈ 5 what-if simulations, ~100 ms, per selection).
+func _decision_chips(entity: Dictionary, with_previews := true) -> Array:
+	var chips := State.available_decisions(entity, game)
+	if not with_previews:
+		return chips
+	var key := "%s|%d|%d|%s" % [_key(entity), game.decisions.size(), int(game.day), State.pricing_for_day(game, game.day)]
+	if not _preview_cache.has(key):
+		_preview_cache = { key: State.preview_decisions(game, data, entity) }
+	var previews: Dictionary = _preview_cache[key]
+	for chip: Dictionary in chips:
+		chip["preview"] = State.preview_text(previews.get(chip.id, {}))
+	return chips
+
+
+## Fills the chip previews one frame after the chat opened, so a click never waits for simulations.
+func _fill_previews(ticket: int) -> void:
+	if ticket != _generation or finished or selected.is_empty() or _resolved.has(_key(selected)):
+		return
+	chat.set_decisions(_decision_chips(selected))
 
 
 func apply_pricing(id: String) -> void:
 	if finished or game.is_empty():
 		return
 	if State.decide(game, State.find_entity(data, "festival", "festival"), id):
-		for decision: Dictionary in State.available_decisions(State.find_entity(data, "festival", "festival")):
-			if decision.id == id:
-				chat.set_status("Tag %d: %s" % [game.day, decision.label])
+		chat.set_status("Tag %d: %s" % [game.day, State._catalogue_entry("festival", id).label])
+		if not selected.is_empty() and not _resolved.has(_key(selected)):
+			chat.set_decisions(_decision_chips(selected))
 	_refresh()
 
 
@@ -389,6 +427,14 @@ func _show_verdict() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 24)
 	rows.add_child(title)
+	var subtitle := Label.new()
+	subtitle.name = "Subtitle"
+	subtitle.text = State.verdict_subtitle(game, data)
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	subtitle.add_theme_font_size_override("font_size", 17)
+	subtitle.add_theme_color_override("font_color", Color("42685f"))
+	rows.add_child(subtitle)
 	var final_meters = MetersScene.instantiate()
 	rows.add_child(final_meters)
 	final_meters.set_meters(results)

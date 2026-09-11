@@ -58,12 +58,12 @@ func test_next_day_advances_and_caps_at_three() -> void:
 func test_available_decisions_per_type() -> void:
 	var data := _data()
 	var tree: Dictionary = GS.find_entity(data, "t1", "tree")
-	check(_ids(GS.available_decisions(tree)) == ["keep", "trim", "cut"], "tree ids: %s" % [_ids(GS.available_decisions(tree))])
+	check(_ids(GS.available_decisions(tree)) == ["trim", "cut"], "tree ids: %s" % [_ids(GS.available_decisions(tree))])
 	for type: String in ["fountain", "toilet"]:
 		var entity := { "id": "x", "type": type, "lat": VENUE_LAT, "lon": VENUE_LON }
-		check(_ids(GS.available_decisions(entity)) == ["keep", "relocate", "close"], "%s ids" % type)
-	check(_ids(GS.available_decisions(GS.find_entity(data, "v1", "venue"))) == ["shuttle", "extend", "curfew"], "venue ids (no purchases below HEADLINE_MIN_EVENTS)")
-	check(_ids(GS.available_decisions(GS.find_entity(data, "s1", "street"))) == ["pedestrian", "open"], "street ids")
+		check(_ids(GS.available_decisions(entity)) == ["relocate", "close"], "%s ids (reopen only once closed)" % type)
+	check(_ids(GS.available_decisions(GS.find_entity(data, "v1", "venue"))) == ["shuttle", "extend", "plant"], "venue ids (no purchases below HEADLINE_MIN_EVENTS, curfew only once extended)")
+	check(_ids(GS.available_decisions(GS.find_entity(data, "s1", "street"))) == ["pedestrian", "plant"], "street ids (open only once pedestrian)")
 	check(GS.available_decisions({ "id": "x", "type": "ufo" }).is_empty(), "unknown type has no decisions")
 	check(GS.available_decisions({ "id": "t1" }).is_empty(), "entity without type has no decisions")
 
@@ -75,10 +75,10 @@ func test_decision_shape_and_costs() -> void:
 			for key: String in ["id", "label", "cost", "adds_shuttle"]:
 				check(d.has(key), "%s/%s missing %s" % [type, d.get("id"), key])
 			costs["%s/%s" % [type, d.id]] = d.cost
-	check(costs.get("tree/keep") == 0.0 and costs.get("tree/trim") == 150.0 and costs.get("tree/cut") == 400.0, "tree costs: %s" % costs)
-	check(costs.get("fountain/relocate") == 800.0 and costs.get("fountain/close") == 0.0, "service costs: %s" % costs)
-	check(costs.get("venue/shuttle") == 1800.0, "shuttle cost: %s" % costs)
-	check(costs.get("street/pedestrian") == 300.0 and costs.get("street/open") == 0.0, "street costs: %s" % costs)
+	check(not costs.has("tree/keep") and costs.get("tree/trim") == 150.0 and costs.get("tree/cut") == 400.0, "tree costs: %s" % costs)
+	check(costs.get("fountain/relocate") == 800.0 and costs.get("fountain/close") == -300.0, "service costs (closing refunds operating costs): %s" % costs)
+	check(costs.get("venue/shuttle") == 1800.0 and costs.get("venue/plant") == 300.0, "venue costs: %s" % costs)
+	check(costs.get("street/pedestrian") == 300.0 and costs.get("street/plant") == 300.0, "street costs: %s" % costs)
 	var shuttle: Dictionary = GS.available_decisions({ "id": "x", "type": "venue" })[0]
 	check(shuttle.adds_shuttle == true, "venue shuttle adds a shuttle")
 
@@ -88,7 +88,7 @@ func test_available_decisions_returns_copies() -> void:
 	var first: Array = GS.available_decisions(tree)
 	first[0].cost = 99999.0
 	first.clear()
-	check(GS.available_decisions(tree).size() == 3 and GS.available_decisions(tree)[0].cost == 0.0, "catalog must not be mutable by callers")
+	check(GS.available_decisions(tree).size() == 2 and GS.available_decisions(tree)[0].cost == 150.0, "catalog must not be mutable by callers")
 
 
 func test_find_entity() -> void:
@@ -156,16 +156,16 @@ func test_decide_and_money_meter_count_costs_once() -> void:
 func test_changing_a_decision_is_allowed_and_costs_again() -> void:
 	var state: Dictionary = GS.create()
 	var toilet: Dictionary = GS.find_entity(_data(), "wc1", "toilet")
-	check(GS.decide(state, toilet, "relocate"), "relocate")
-	check(GS.decide(state, toilet, "keep"), "keep after relocate")
-	check(GS.decide(state, toilet, "relocate"), "relocate again once no longer in effect")
-	check(state.decisions.size() == 3 and is_equal_approx(state.budget, GS.CONFIG.start_budget - 1600.0), "every change is recorded and paid, budget %s" % state.budget)
+	check(not GS.decide(state, toilet, "reopen"), "nothing to reopen while open")
+	check(GS.decide(state, toilet, "close"), "close")
+	check(GS.decide(state, toilet, "reopen"), "reopen after close")
+	check(GS.decide(state, toilet, "close"), "close again once no longer in effect")
+	check(state.decisions.size() == 3 and is_equal_approx(state.budget, GS.CONFIG.start_budget + 300.0 - 100.0 + 300.0), "every change is recorded and paid, budget %s" % state.budget)
 
 
 func test_felled_tree_accepts_no_further_decisions() -> void:
 	var state: Dictionary = GS.create()
 	var tree: Dictionary = GS.find_entity(_data(), "t1", "tree")
 	check(GS.decide(state, tree, "cut"), "cut")
-	check(not GS.decide(state, tree, "keep"), "a felled tree cannot be kept")
 	check(not GS.decide(state, tree, "trim"), "a felled tree cannot be trimmed")
 	check(state.decisions.size() == 1, "rejected decisions not recorded")
