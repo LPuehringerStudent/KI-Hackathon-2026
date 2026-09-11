@@ -354,3 +354,14 @@ under the verdict, e.g. "Die Linde am Hauptplatz durfte bleiben" / "3 Bäume wur
 in `game_state.gd`, one label in `main.gd::_show_verdict`, title rules and guards untouched.
 
 — Opus
+
+## Round 7 — Playtest P1: legibility + decision audit + plant trees (human-approved)
+
+Playtest verdict: "plain, random score, half the decisions senseless." Spec:
+
+1. **Impact previews** (kills "random score"): `GameState.preview_decision(state, data, entity, decision_id) -> Dictionary` — pure what-if: duplicate state, decide(), compute_meters(), return deltas {attendance, money, happiness, budget} rounded to 1 decimal. main.gd will call it per chip for the SELECTED entity only (4-6 simulate calls per selection — keep an eye on the ~18 ms compute; cache per (entity, decisions-length) if needed). Format on the chip: "≈ +2.0 Zuf · −800 €" (attendance only if |delta| >= 0.5). Contract: chat_panel chip text gets an optional second line / suffix — chat_panel.gd is yours to touch (logic rule), keep it minimal.
+2. **Decision audit — no zero-cost no-ops**: remove "keep" as a decision everywhere. For services, replace with explicit "Wieder öffnen" (100 €) so latest-decision-wins keeps a reopen path. "open" street decision: give it a cost (50 €) or fold into pedestrian toggle. LISTEN_BONUS constant dies with keep. Every remaining option must trade something.
+3. **Plant instead of cut**: new repeatable venue/street decision "Baum pflanzen" (300 €, max 3 per entity). `decide()` appends to `state.planted_trees := [{lat, lon, crown_m: 6.0, age: 0}]` (position: small deterministic offset from the entity, reuse your shuttle-offset logic). `compute_meters` counts planted trees in `_shade_score` (and cut semantics unchanged). **Track A contract**: map_view reads `state.planted_trees` and renders sprite trees at those positions (I'll wire it — keep the field name exactly `planted_trees`). Cut stays as last resort: 400 € + raise CUT_NEAR_VENUE_PENALTY so it stings.
+4. Tests: preview deltas correct direction for cut/shuttle/plant; no keep remains in any catalogue; plant cap enforced; planted tree raises shade score.
+
+Demo gate as always. Kimi takes P2 (map modes), P3 (multi-select), P4 (crisp sprites) in parallel.
