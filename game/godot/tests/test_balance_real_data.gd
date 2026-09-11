@@ -36,11 +36,16 @@ func test_real_data_balance() -> void:
 		check(m.attendance - fresh.attendance >= 1.0, "shuttle at %s should add >= 1 attendance" % venue.name)
 		check(m.money < fresh.money, "shuttle at %s should cost money" % venue.name)
 
+	# Losses are proportional to the event weight a service uniquely covers, so a big one may sting
+	# (wc_m20 is the only toilet near the whole OK cluster: -6.1) — but no single service may carry
+	# more than 30 % of its happiness term; the old threshold model cost -20.
+	var max_single_close := 0.3 * maxf(GS.FOUNTAIN_WEIGHT, GS.TOILET_WEIGHT)
 	var best_relocation := 0.0
 	for type: String in ["fountain", "toilet"]:
 		for service: Dictionary in data[type + "s"]:
 			var closed := _after(data, type, service.id, "close")
-			check(fresh.happiness - closed.happiness <= 5.0, "closing %s %s is a cliff (-%.1f)" % [type, service.id, fresh.happiness - closed.happiness])
+			var loss: float = fresh.happiness - closed.happiness
+			check(loss <= max_single_close, "closing %s %s is a cliff (-%.1f > %.1f)" % [type, service.id, loss, max_single_close])
 			best_relocation = maxf(best_relocation, _after(data, type, service.id, "relocate").happiness - fresh.happiness)
 	check(best_relocation >= 1.0, "some relocation should add >= 1 happiness, best %.1f" % best_relocation)
 
