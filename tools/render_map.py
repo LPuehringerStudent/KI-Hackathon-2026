@@ -22,6 +22,9 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from PIL import Image, ImageDraw
+from shapely.geometry import LineString
+from shapely.geometry import box as shapely_box
+from shapely.ops import polygonize, unary_union
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = Path(__file__).resolve().parent / "cache" / "overpass_innenstadt_v2.json"
@@ -245,15 +248,31 @@ def main():
     span_x = (w_km + h_km) * COS_A * scale
     iso = Iso(scale, (SIZE - span_x) / 2 + h_km * COS_A * scale, TOP_MARGIN)
 
-    fills = {"water": [], "forest": [], "park": [], "grass": [], "garden": []}
+    # Ground fills are built with shapely: Overpass returns FULL member
+    # geometries for relations (the Danube spans ~20 km), and naively closing
+    # each way filled giant chords across land — the "buildings in water" bug.
+    # polygonize() forms real polygons from the linework; inner roles become
+    # holes; everything is clipped to the bbox before rasterizing.
+    kind_lines = {k: {"outer": [], "inner": []} for k in
+                  ("water", "forest", "park", "grass", "garden")}
     roads = {"road_major": [], "road_minor": [], "pedestrian": []}
     buildings = []  # (depth_sy, ground_ring_ccw_px, height_m, roof_color)
     trees = []      # (depth_sy, px, radius)
 
     for el in data.get("elements", []):
         kind = classify(el)
-        if kind in fills:
-            fills[kind].extend(rings_px(el, iso))
+        if kind in kind_lines:
+            if el["type"] == "way":
+                pts = [ground_km(p["lat"], p["lon"]) for p in el.get("geometry", [])]
+                if len(pts) >= 3:
+                    kind_lines[kind]["outer"].append(LineString(pts))
+            elif el["type"] == "relation":
+                for m in el.get("members", []):
+                    if m.get("type") == "way" and "geometry" in m:
+                        pts = [ground_km(p["lat"], p["lon"]) for p in m["geometry"]]
+                        if len(pts) >= 3:
+                            key = "inner" if m.get("role") == "inner" else "outer"
+                            kind_lines[kind][key].append(LineString(pts))
         elif kind in roads:
             roads[kind].extend(rings_px(el, iso, min_len=2))
         elif kind == "building":
@@ -270,6 +289,31 @@ def main():
             px = iso.pt(el["lat"], el["lon"])
             r = 2.2 + (hash(el.get("id")) % 10) / 6.0
             trees.append((px[1], px, r))
+
+    bbox_geom = shapely_box(0.0, 0.0, w_km, h_km)
+    fills = {"water": [], "forest": [], "park": [], "grass": [], "garden": []}
+    water_holes_px = []
+    for kind in ("forest", "park", "grass", "garden", "water"):
+        outers = kind_lines[kind]["outer"]
+        if not outers:
+            continue
+        geom = unary_union(list(polygonize(unary_union(outers))))
+        if geom.is_empty:
+            continue
+        inners = kind_lines[kind]["inner"]
+        if inners:
+            inner_geom = unary_union(list(polygonize(unary_union(inners))))
+            if not inner_geom.is_empty:
+                geom = geom.difference(inner_geom)
+        geom = geom.intersection(bbox_geom)
+        if geom.is_empty:
+            continue
+        polys = geom.geoms if geom.geom_type == "MultiPolygon" else [geom]
+        for poly in polys:
+            fills[kind].append([iso.xy(x, y) for x, y in poly.exterior.coords])
+            if kind == "water":
+                for interior in poly.interiors:
+                    water_holes_px.append([iso.xy(x, y) for x, y in interior.coords])
 
     # trees standing in water are OSM edge cases (quay promenades etc.) —
     # drop them so the miniature never plants trees in the Danube
@@ -336,6 +380,8 @@ def main():
     for ring in fills["water"]:
         draw.polygon(ring, fill=C_WATER)
         draw.line(ring + [ring[0]], fill=C_WATER_EDGE, width=2)
+    for ring in water_holes_px:  # islands: back to ground
+        draw.polygon(ring, fill=C_GROUND)
 
     for kind, width in (("road_minor", 2), ("pedestrian", 4), ("road_major", 5)):
         color = {"road_minor": C_ROAD_MINOR, "pedestrian": C_PEDESTRIAN,
