@@ -36,6 +36,7 @@ var _map_root: Control
 var _map_rect: TextureRect
 var _dot_cache := {}
 var _badges := {}
+var _shuttle_markers: Array = []
 
 
 func _ready() -> void:
@@ -215,6 +216,44 @@ func _make_dot(color: Color, size := MARKER_SIZE) -> ImageTexture:
 				img.set_pixel(x, y, color)
 	var tex := ImageTexture.create_from_image(img)
 	_dot_cache[key] = tex
+	return tex
+
+
+## Dynamic shuttle markers: purchased shuttles appear on the map.
+## Sprites (Astra's prop_shuttle) preferred; amber-dot fallback otherwise.
+func update_shuttles(shuttles: Array) -> void:
+	for m: Node in _shuttle_markers:
+		m.queue_free()
+	_shuttle_markers.clear()
+	for shuttle: Dictionary in shuttles:
+		var px := latlon_to_pixel(float(shuttle.lat), float(shuttle.lon))
+		var marker: Control
+		var tex := _load_sprite("prop_shuttle")
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.position = px - Vector2(tex.get_width() / 2.0, tex.get_height())
+			marker = rect
+		else:
+			var dot := TextureButton.new()
+			dot.texture_normal = _make_dot(Color("#e58e3f"))
+			dot.position = px - Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
+			marker = dot
+		marker.tooltip_text = "Shuttle-Haltestelle"
+		marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_map_root.add_child(marker)
+		_shuttle_markers.append(marker)
+
+
+func _load_sprite(stem: String) -> Texture2D:
+	var path := "res://assets/sprites/" + stem + ".png"
+	var tex: Texture2D = null
+	if ResourceLoader.exists(path):
+		tex = load(path)
+	if tex == null:
+		var img := Image.load_from_file(path)
+		if img != null:
+			tex = ImageTexture.create_from_image(img)
 	return tex
 
 
