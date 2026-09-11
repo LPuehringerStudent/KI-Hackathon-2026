@@ -59,6 +59,16 @@ Godot's imported resource in the export. Tests are excluded from the export.
 Implementation details, dependency branches, verification results, and remaining
 demo checks are in [docs/track-c-handoff.md](docs/track-c-handoff.md).
 
+## Run the game
+
+```bash
+git pull
+godot --headless --path game/godot --import   # REQUIRED after pulls: re-imports updated assets
+godot --path game/godot                        # play (proxy running for live dialogue)
+```
+
+Running without `--import` first keeps using stale cached assets (old maps/sprites).
+
 ## Data
 
 Ready-to-use snapshots live in [`data/`](data/README.md): the official
