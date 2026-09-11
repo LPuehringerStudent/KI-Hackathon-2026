@@ -114,4 +114,18 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.set_layer_mode("stadt")
 	await process_frame
 	check(not mv._layer_rect.visible, "stadt mode hides the overlay")
+	# multi-select API: selection set drives the bulk bar (ctrl-path itself
+	# needs a held key, so the selection is populated directly)
+	var trees: Array = data.trees.slice(0, 5)
+	for t: Dictionary in trees:
+		mv._selection[str(t.id)] = mv.markers[str(t.id)]
+		mv._selection_type = "tree"
+		mv.markers[str(t.id)].modulate = Color(1.0, 0.62, 0.2)
+	mv._update_bulk_bar()
+	check(mv.get_selection_ids().size() == 5, "multi-select holds five trees")
+	check(mv._bulk_bar.visible, "bulk action bar appears for multi-selection")
+	check(mv._bulk_decisions().size() > 0, "bulk decisions resolve for the selection type")
+	mv.clear_selection()
+	check(mv.get_selection_ids().is_empty() and not mv._bulk_bar.visible,
+		"clear_selection empties selection and hides the bar")
 	mv.queue_free()

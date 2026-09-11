@@ -6,7 +6,9 @@ extends PanelContainer
 ## map_meta.json format_version 2.
 
 signal entity_clicked(id: String, type: String)
+signal bulk_action_requested(action_id: String)
 
+const State := preload("res://scripts/game_state.gd")
 const META_PATH := "res://data/map_meta.json"
 const MAP_TEXTURE_PATH := "res://assets/innenstadt_map.png"
 const MARKER_SIZE := 18
@@ -43,6 +45,9 @@ var _layer_rect: TextureRect = null
 var _layer_readout: Label = null
 var _layer_data := {}
 var _layer_game := {}
+var _selection := {}          # id -> dot, multi-select via Ctrl+click
+var _selection_type := ""
+var _bulk_bar: HBoxContainer = null
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -332,6 +337,12 @@ func _add_zoom_controls() -> void:
 	layers.position = Vector2(8, 8)
 	layers.add_theme_constant_override("separation", 4)
 	overlay.add_child(layers)
+	_bulk_bar = HBoxContainer.new()
+	_bulk_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_bulk_bar.position = Vector2(8, -40)
+	_bulk_bar.add_theme_constant_override("separation", 6)
+	_bulk_bar.visible = false
+	overlay.add_child(_bulk_bar)
 	for mode: String in LAYER_MODES:
 		var btn := Button.new()
 		btn.text = LAYER_LABELS[mode]
@@ -460,9 +471,10 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	dot.tooltip_text = str(entity.get("name", id))
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
 	dot.set_meta("msize", marker_size)
+	dot.set_meta("etype", entity_type)
 	dot.scale = Vector2(_zoom, _zoom)
 	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) * _zoom / 2.0
-	dot.pressed.connect(func() -> void: entity_clicked.emit(id, entity_type))
+	dot.pressed.connect(func() -> void: _on_marker_pressed(id, entity_type, dot))
 	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
 	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
 	_map_root.add_child(dot)
@@ -470,6 +482,102 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	_pop_in(dot)
 	if entity_type == "venue":
 		_add_pulse_ring(dot)
+
+
+## Ctrl+click toggles an entity in the multi-selection; plain click selects
+## single (and clears the multi-selection).
+func _on_marker_pressed(id: String, entity_type: String, dot: TextureButton) -> void:
+	if Input.is_key_pressed(KEY_CTRL):
+		if _selection.has(id):
+			_selection.erase(id)
+			dot.modulate = Color.WHITE
+			if _selection.is_empty():
+				_selection_type = ""
+		else:
+			if _selection.is_empty():
+				_selection_type = entity_type
+			if entity_type == _selection_type:
+				_selection[id] = dot
+				dot.modulate = Color(1.0, 0.62, 0.2)
+		_update_bulk_bar()
+	else:
+		clear_selection()
+		entity_clicked.emit(id, entity_type)
+
+
+func get_selection_ids() -> Array:
+	return _selection.keys()
+
+
+func selection_type() -> String:
+	return _selection_type
+
+
+func clear_selection() -> void:
+	for id: String in _selection:
+		if is_instance_valid(_selection[id]):
+			_selection[id].modulate = Color.WHITE
+	_selection.clear()
+	_selection_type = ""
+	_update_bulk_bar()
+
+
+## Bulk action bar: applies one shared decision to every selected entity.
+## Includes a "select all <type> in view" button for the 20-trees-at-once feel.
+func _update_bulk_bar() -> void:
+	if _bulk_bar == null:
+		return
+	for child: Node in _bulk_bar.get_children():
+		child.queue_free()
+	if _selection.size() < 2:
+		_bulk_bar.visible = false
+		return
+	_bulk_bar.visible = true
+	var count := Label.new()
+	count.text = "%d × %s:" % [_selection.size(), _selection_type]
+	_bulk_bar.add_child(count)
+	for decision: Dictionary in _bulk_decisions():
+		var btn := Button.new()
+		btn.text = decision.label
+		btn.tooltip_text = "%d EUR" % int(decision.cost)
+		btn.pressed.connect(func() -> void:
+			bulk_action_requested.emit(str(decision.id)))
+		_bulk_bar.add_child(btn)
+	var all := Button.new()
+	all.text = "alle sichtbaren"
+	all.tooltip_text = "Alle %s im sichtbaren Bereich auswählen" % _selection_type
+	all.pressed.connect(_select_visible_of_type)
+	_bulk_bar.add_child(all)
+	var clear := Button.new()
+	clear.text = "×"
+	clear.tooltip_text = "Auswahl aufheben"
+	clear.pressed.connect(clear_selection)
+	_bulk_bar.add_child(clear)
+
+
+## Common decisions of the selected entities (same-type selection by design).
+func _bulk_decisions() -> Array:
+	var data := _load_game_data()
+	var first: String = str(_selection.keys()[0]) if not _selection.is_empty() else ""
+	for record: Dictionary in data.get(_selection_type + "s", []):
+		if str(record.id) == first:
+			var entity := record.duplicate(true)
+			entity["type"] = _selection_type
+			return State.available_decisions(entity)
+	return []
+
+
+func _select_visible_of_type() -> void:
+	var view := Rect2(Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical), _scroll.size)
+	for id: String in markers:
+		var dot: Control = markers[id]
+		if dot.get_meta("etype") != _selection_type:
+			continue
+		var center: Vector2 = dot.position + Vector2(dot.get_meta("msize"), dot.get_meta("msize")) * _zoom / 2.0
+		if view.has_point(center):
+			_selection[id] = dot
+			dot.modulate = Color(1.0, 0.62, 0.2)
+	_update_bulk_bar()
 
 
 ## Expanding glow ring behind venue markers — makes festival venues findable
@@ -532,10 +640,14 @@ func set_entity_state(id: String, state: String) -> void:
 	if not markers.has(id):
 		return
 	var dot: TextureButton = markers[id]
+	if state != "resolved" and _selection.has(id):
+		return  # selection tint wins over neutral/affected
 	match state:
 		"affected":
-			dot.modulate = Color(1.0, 0.62, 0.2)
+			if not _selection.has(id):
+				dot.modulate = Color(1.0, 0.62, 0.2)
 		"resolved":
+			_selection.erase(id)
 			dot.modulate = Color(0.55, 0.55, 0.55, 0.55)
 			dot.disabled = true
 		_:
