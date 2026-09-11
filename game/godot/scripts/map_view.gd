@@ -100,7 +100,8 @@ func _relayout_markers() -> void:
 		var dot: Control = markers[id]
 		var ll: Vector2 = dot.get_meta("latlon")
 		var msize: float = dot.get_meta("msize")
-		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) / 2.0
+		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) * _zoom / 2.0
+		dot.scale = Vector2(_zoom, _zoom)
 
 
 func _add_zoom_controls() -> void:
@@ -207,17 +208,38 @@ func play_day_transition(speed := 1.0, on_finished := Callable()) -> void:
 	)
 
 
+## Astra's prop sprites as marker art where they exist (crisp at any zoom);
+## tree variant by id hash. Returns null where only the dot fallback fits.
+func _marker_texture(entity_type: String, id: String) -> Texture2D:
+	match entity_type:
+		"tree":
+			var variants := ["prop_tree_broad_a", "prop_tree_broad_b", "prop_tree_broad_c", "prop_tree_conifer"]
+			return _load_sprite(variants[abs(hash(id)) % variants.size()])
+		"fountain":
+			return _load_sprite("prop_fountain")
+		"toilet":
+			return _load_sprite("prop_toilet")
+	return null
+
+
 func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	var id := str(entity.id)
 	if markers.has(id):
 		return
 	var dot := TextureButton.new()
-	var marker_size := TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
-	dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], marker_size)
+	var tex: Texture2D = _marker_texture(entity_type, id)
+	var marker_size: float
+	if tex != null:
+		dot.texture_normal = tex
+		marker_size = tex.get_width()
+	else:
+		marker_size = TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
+		dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], int(marker_size))
 	dot.tooltip_text = str(entity.get("name", id))
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
-	dot.set_meta("msize", float(marker_size))
-	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) / 2.0
+	dot.set_meta("msize", marker_size)
+	dot.scale = Vector2(_zoom, _zoom)
+	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) * _zoom / 2.0
 	dot.pressed.connect(func() -> void: entity_clicked.emit(id, entity_type))
 	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
 	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
@@ -271,7 +293,7 @@ func _pop_in(dot: TextureButton) -> void:
 	dot.scale = Vector2.ZERO
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(dot, "scale", Vector2.ONE, 0.35)
+	tween.tween_property(dot, "scale", Vector2(_zoom, _zoom), 0.35)
 
 
 func _hover(dot: TextureButton, on: bool) -> void:
@@ -279,7 +301,8 @@ func _hover(dot: TextureButton, on: bool) -> void:
 		return
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_SPRING)
-	tween.tween_property(dot, "scale", Vector2(1.35, 1.35) if on else Vector2.ONE, 0.18)
+	var target := _zoom * 1.35 if on else _zoom
+	tween.tween_property(dot, "scale", Vector2(target, target), 0.18)
 
 
 ## state: "neutral" | "affected" | "resolved"
@@ -302,7 +325,7 @@ func focus_entity(id: String) -> void:
 	if not markers.has(id):
 		return
 	var dot: TextureButton = markers[id]
-	var w: float = dot.get_meta("msize")
+	var w: float = dot.get_meta("msize") * _zoom
 	_scroll.scroll_horizontal = int(dot.position.x + w / 2.0 - _scroll.size.x / 2.0)
 	_scroll.scroll_vertical = int(dot.position.y + w / 2.0 - _scroll.size.y / 2.0)
 
@@ -351,7 +374,8 @@ func update_purchases(purchases: Dictionary) -> void:
 			if tex != null:
 				var rect := TextureRect.new()
 				rect.texture = tex
-				rect.position = base + Vector2(-18 + slot * 14, -tex.get_height() - 6)
+				rect.scale = Vector2(_zoom, _zoom)
+				rect.position = base + Vector2(-18 + slot * 14, -tex.get_height()) * _zoom
 				marker = rect
 			else:
 				var fb := TextureRect.new()
