@@ -30,6 +30,12 @@ func _run() -> void:
 			if child is Button and child.text == "Festival starten":
 				start = child
 	check(start != null, "start button present in menu")
+	var version_found := false
+	if rows != null:
+		for child: Node in rows.get_children():
+			if child is Label and child.text.begins_with("v"):
+				version_found = true
+	check(version_found, "version label visible on menu")
 	# Headless engine quirk: driving the menu -> start transition in `-s` mode
 	# crashes intermittently inside scene/gui (signals 6/11, racy — identical
 	# steps pass in isolation, see bisect notes in git history). Not an app bug;
