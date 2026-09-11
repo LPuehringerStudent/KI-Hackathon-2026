@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1iwi8plgbdo5"
-path="res://.godot/imported/innenstadt_map.png-83ca3a41df2c89e05a80e076be50cd5f.ctex"
+uid="uid://bj8s4kp0kwl7h"
+path="res://.godot/imported/prop_stall.png-1884397e6033aaaa548830185dc1e786.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/innenstadt_map.png"
-dest_files=["res://.godot/imported/innenstadt_map.png-83ca3a41df2c89e05a80e076be50cd5f.ctex"]
+source_file="res://assets/sprites/prop_stall.png"
+dest_files=["res://.godot/imported/prop_stall.png-1884397e6033aaaa548830185dc1e786.ctex"]
 
 [params]
 
