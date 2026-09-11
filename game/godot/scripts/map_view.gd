@@ -1,7 +1,9 @@
 class_name MapView
 extends PanelContainer
-## Interactive map: baked Innenstadt PNG with clickable entity markers.
-## Track A owns this file; main.tscn integration is Track C's job.
+## Interactive map: baked isometric 2.5D Innenstadt PNG with clickable entity
+## markers. Track A owns this file; main.tscn integration is Track C's job.
+## The lat/lon->pixel transform mirrors tools/render_map.py (iso30) via
+## map_meta.json format_version 2.
 
 signal entity_clicked(id: String, type: String)
 
@@ -9,21 +11,28 @@ const META_PATH := "res://data/map_meta.json"
 const MAP_TEXTURE_PATH := "res://assets/innenstadt_map.png"
 const MARKER_SIZE := 18
 
-# marker colors match the plan: venue red, tree green, fountain blue,
-# toilet purple, street gray
+# marker colors tuned for the light iso map (darker cores, white ring drawn in
+# _make_dot): venue red, tree green, fountain blue, toilet purple, street gray
 const MARKER_COLORS := {
-	"venue": Color("#e5484d"),
-	"tree": Color("#46a758"),
-	"fountain": Color("#3e8fde"),
-	"toilet": Color("#8e4ec6"),
-	"street": Color("#9ba1ab"),
+	"venue": Color("#d3362c"),
+	"tree": Color("#2e7d32"),
+	"fountain": Color("#1a6fc4"),
+	"toilet": Color("#7b3fb3"),
+	"street": Color("#5f6b78"),
 }
+
+const DAY_TINTS := [
+	Color.WHITE,                    # Tag 1 — neutral
+	Color(0.92, 0.97, 1.08),        # Tag 2 — cool morning
+	Color(1.08, 0.86, 0.70),        # Tag 3 — Hitzetag glow
+]
 
 var markers := {}
 
 var _meta := {}
 var _scroll: ScrollContainer
 var _map_root: Control
+var _map_rect: TextureRect
 var _dot_cache := {}
 
 
@@ -31,7 +40,7 @@ func _ready() -> void:
 	_meta = JSON.parse_string(FileAccess.get_file_as_string(META_PATH))
 	_scroll = $Scroll
 	_map_root = $Scroll/MapRoot
-	var map_rect: TextureRect = $Scroll/MapRoot/Map
+	_map_rect = $Scroll/MapRoot/Map
 	# ResourceLoader first: required for export builds (res:// PNGs are imported
 	# at export time). ResourceLoader.exists() guards the headless `-s` case,
 	# where load() on an unimported resource stalls instead of returning null.
@@ -45,7 +54,7 @@ func _ready() -> void:
 	if tex == null:
 		push_error("map_view: cannot load " + MAP_TEXTURE_PATH)
 	else:
-		map_rect.texture = tex
+		_map_rect.texture = tex
 	refresh()
 
 
@@ -71,18 +80,25 @@ func _load_game_data() -> Dictionary:
 	return node.load_all()
 
 
-## WGS84 -> pixel coords. Mirrors tools/render_map.py project(); the projection
-## constants come from map_meta.json (written by render_map.py) with the
-## hardcoded values as fallback for stale meta files.
+## WGS84 -> pixel coords. Mirrors tools/render_map.py iso30 projection:
+## gx/gy in km from the west/south edges, then the 30-degree iso transform.
+## Constants come from map_meta.json (single source of truth).
 func latlon_to_pixel(lat: float, lon: float) -> Vector2:
-	var km_per_deg_lon := float(_meta.get("km_per_deg_lon", 111.32 * cos(deg_to_rad(48.3))))
-	var km_per_deg_lat := float(_meta.get("km_per_deg_lat", 110.57))
-	var x := (lon - float(_meta.lon_min)) * km_per_deg_lon
-	var y := (float(_meta.lat_max) - lat) * km_per_deg_lat
-	var w_km := (float(_meta.lon_max) - float(_meta.lon_min)) * km_per_deg_lon
-	var h_km := (float(_meta.lat_max) - float(_meta.lat_min)) * km_per_deg_lat
-	var scale := float(_meta.get("scale_px_per_km", float(_meta.width) / maxf(w_km, h_km)))
-	return Vector2(x * scale, y * scale)
+	var gx := (lon - float(_meta.lon_min)) * float(_meta.km_per_deg_lon)
+	var gy := (lat - float(_meta.lat_min)) * float(_meta.km_per_deg_lat)
+	var scale := float(_meta.scale)
+	var sx := (gx - gy) * float(_meta.cos_a) * scale + float(_meta.offset_x)
+	var sy := (gx + gy) * float(_meta.sin_a) * scale + float(_meta.offset_y)
+	return Vector2(sx, sy)
+
+
+## Day tint for the baked map (Tag 1 neutral, Tag 2 cool, Tag 3 Hitzetag).
+## Track C calls this on day change; markers stay untinted for readability.
+func set_day_tint(day: int) -> void:
+	if _map_rect == null:
+		return
+	var index := clampi(day - 1, 0, DAY_TINTS.size() - 1)
+	_map_rect.modulate = DAY_TINTS[index]
 
 
 func _add_marker(entity: Dictionary, entity_type: String) -> void:
@@ -94,8 +110,26 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	dot.tooltip_text = str(entity.get("name", id))
 	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) - Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
 	dot.pressed.connect(func() -> void: entity_clicked.emit(id, entity_type))
+	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
+	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
 	_map_root.add_child(dot)
 	markers[id] = dot
+	_pop_in(dot)
+
+
+func _pop_in(dot: TextureButton) -> void:
+	dot.scale = Vector2.ZERO
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(dot, "scale", Vector2.ONE, 0.35)
+
+
+func _hover(dot: TextureButton, on: bool) -> void:
+	if dot.disabled:
+		return
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SPRING)
+	tween.tween_property(dot, "scale", Vector2(1.35, 1.35) if on else Vector2.ONE, 0.18)
 
 
 ## state: "neutral" | "affected" | "resolved"
@@ -128,10 +162,14 @@ func _make_dot(color: Color) -> ImageTexture:
 		return _dot_cache[key]
 	var img := Image.create_empty(MARKER_SIZE, MARKER_SIZE, false, Image.FORMAT_RGBA8)
 	var center := Vector2(MARKER_SIZE, MARKER_SIZE) / 2.0
-	var radius := MARKER_SIZE / 2.0 - 1.5
+	var outer := MARKER_SIZE / 2.0 - 0.5
+	var inner := MARKER_SIZE / 2.0 - 3.0
 	for x in MARKER_SIZE:
 		for y in MARKER_SIZE:
-			if Vector2(x, y).distance_to(center) <= radius:
+			var d := Vector2(x, y).distance_to(center)
+			if d <= outer:
+				img.set_pixel(x, y, Color.WHITE)      # ring for contrast on the light map
+			if d <= inner:
 				img.set_pixel(x, y, color)
 	var tex := ImageTexture.create_from_image(img)
 	_dot_cache[key] = tex

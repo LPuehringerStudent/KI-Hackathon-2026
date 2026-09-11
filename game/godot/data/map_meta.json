@@ -1,4 +1,6 @@
 {
+ "format_version": 2,
+ "projection": "iso30",
  "width": 2048,
  "height": 2048,
  "lat_min": 48.284,
@@ -7,7 +9,10 @@
  "lon_max": 14.32,
  "km_per_deg_lon": 74.05344308012344,
  "km_per_deg_lat": 110.57,
- "scale_px_per_km": 544.7706802717643,
- "projection": "equirectangular corrected for lat 48.3 (see project())",
- "source": "OpenStreetMap via Overpass (ODbL), rendered by tools/render_map.py"
+ "cos_a": 0.8660254037844387,
+ "sin_a": 0.49999999999999994,
+ "scale": 500.13051677700014,
+ "offset_x": 1036.2808136739616,
+ "offset_y": 110,
+ "source": "OpenStreetMap via Overpass (ODbL) + festival venue data; isometric 2.5D render by tools/render_map.py"
 }
