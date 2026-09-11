@@ -6,8 +6,41 @@ extends RefCounted
 ## State:    { day: int, budget: float, decisions: Array, shuttles: Array }
 ## Decision: { entity_id, entity_type, decision_id, day, cost }
 ## Shuttle:  { lat, lon }
+## Entity:   a Data record plus "type" ("venue" | "tree" | "fountain" | "toilet" | "street"),
+##           as returned by find_entity() — the same type string map_view's entity_clicked emits.
 
 const CONFIG := { "start_budget": 50000.0, "visitor_spend": 35.0, "walk_radius": 300.0, "shuttle_radius": 250.0 }
+
+const LAST_DAY := 3
+
+const DAY_THEMES := {
+	1: { "title": "Tag 1 — Anreise", "focus": "Mobilität", "hint": "Wo sollen Shuttle fahren?" },
+	2: { "title": "Tag 2 — Höhepunkt", "focus": "Sanitär & Wasser", "hint": "Reichen Toiletten und Trinkbrunnen für den Andrang?" },
+	3: { "title": "Tag 3 — Hitzetag", "focus": "Schatten & Bäume", "hint": "Welche Bäume spenden den Besucher:innen Schatten?" },
+}
+
+## Decision catalogue per entity type. ids are what dialogue.gd emits in [[ENTSCHEID:<id>]].
+const SERVICE_DECISIONS := [
+	{ "id": "keep", "label": "Stehen lassen", "cost": 0.0, "adds_shuttle": false },
+	{ "id": "relocate", "label": "Verlegen", "cost": 800.0, "adds_shuttle": false },
+	{ "id": "close", "label": "Schließen", "cost": 0.0, "adds_shuttle": false },
+]
+const DECISIONS := {
+	"tree": [
+		{ "id": "keep", "label": "Stehen lassen", "cost": 0.0, "adds_shuttle": false },
+		{ "id": "trim", "label": "Zurückschneiden", "cost": 150.0, "adds_shuttle": false },
+		{ "id": "cut", "label": "Fällen", "cost": 400.0, "adds_shuttle": false },
+	],
+	"fountain": SERVICE_DECISIONS,
+	"toilet": SERVICE_DECISIONS,
+	"venue": [
+		{ "id": "shuttle", "label": "Shuttle-Haltestelle einrichten", "cost": 1200.0, "adds_shuttle": true },
+	],
+	"street": [
+		{ "id": "pedestrian", "label": "Für Fußgänger sperren", "cost": 300.0, "adds_shuttle": false },
+		{ "id": "open", "label": "Freigeben", "cost": 0.0, "adds_shuttle": false },
+	],
+}
 
 ## Visitor income at 100 % attendance and the reference spend of 35 € per visitor.
 const MAX_VISITOR_INCOME := 20000.0
@@ -25,6 +58,56 @@ const VENUE_CLUSTER_RADIUS_M := 200.0
 
 static func create() -> Dictionary:
 	return { "day": 1, "budget": CONFIG.start_budget, "decisions": [], "shuttles": [] }
+
+
+## Copy of the Data record `id` in data["<type>s"] with "type" added, or {} if not found.
+static func find_entity(data: Dictionary, id: String, type: String) -> Dictionary:
+	if not DECISIONS.has(type):
+		return {}
+	for record: Dictionary in data.get(type + "s", []):
+		if record.get("id") == id:
+			var entity := record.duplicate(true)
+			entity["type"] = type
+			return entity
+	return {}
+
+
+## [{ id, label, cost, adds_shuttle }] for the entity's type; [] for unknown or missing type.
+## Every type is always available — the day focus only changes the hint.
+static func available_decisions(entity: Dictionary) -> Array:
+	return DECISIONS.get(entity.get("type", ""), []).duplicate(true)
+
+
+## Records the decision and spends its cost. Returns false (state unchanged) if the decision
+## isn't available for the entity or this exact entity+decision was already taken.
+static func decide(state: Dictionary, entity: Dictionary, decision_id: String) -> bool:
+	var matches := available_decisions(entity).filter(func(d): return d.id == decision_id)
+	if matches.is_empty():
+		return false
+	for taken: Dictionary in state.decisions:
+		if taken.entity_type == entity.type and taken.entity_id == entity.id and taken.decision_id == decision_id:
+			return false
+	var decision: Dictionary = matches[0]
+	state.decisions.append({
+		"entity_id": entity.id,
+		"entity_type": entity.type,
+		"decision_id": decision_id,
+		"day": state.day,
+		"cost": decision.cost,
+	})
+	state.budget -= decision.cost
+	if decision.adds_shuttle:
+		state.shuttles.append({ "lat": entity.lat, "lon": entity.lon })
+	return true
+
+
+static func next_day(state: Dictionary) -> void:
+	state.day = mini(LAST_DAY, state.day + 1)
+
+
+## { title, focus, hint } — days outside 1..LAST_DAY clamp to the nearest day.
+static func day_theme(day: int) -> Dictionary:
+	return DAY_THEMES[clampi(day, 1, LAST_DAY)].duplicate()
 
 
 static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
