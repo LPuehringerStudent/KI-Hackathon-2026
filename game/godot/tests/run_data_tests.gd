@@ -128,4 +128,12 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.clear_selection()
 	check(mv.get_selection_ids().is_empty() and not mv._bulk_bar.visible,
 		"clear_selection empties selection and hides the bar")
+	# planted trees (Opus contract: state.planted_trees) appear as sprites
+	var tree0: Dictionary = data.trees[0]
+	mv.update_planted_trees([{ "lat": tree0.lat, "lon": tree0.lon, "crown_m": 6.0, "age": 0 }])
+	await process_frame
+	check(mv._planted_markers.size() == 1, "planted tree appears on the map")
+	mv.update_planted_trees([])
+	await process_frame
+	check(mv._planted_markers.is_empty(), "planted trees clear when none")
 	mv.queue_free()

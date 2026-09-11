@@ -327,6 +327,7 @@ func _refresh() -> void:
 	map_view.update_purchases(game.get("purchases", {}))
 	map_view.update_shuttles(game.get("shuttles", []))
 	map_view.rebuild_layers(data, game)
+	map_view.update_planted_trees(game.get("planted_trees", []))
 	# Resolve each decision's origin ONCE — the old inner find_entity per
 	# marker × decision made refresh O(records × decisions × records) (~50 ms).
 	var origins: Array = []
