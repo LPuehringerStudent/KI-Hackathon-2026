@@ -30,6 +30,28 @@ func _ready() -> void:
 	theme = UITheme.create()
 	RenderingServer.set_default_clear_color(Color("f3f5f4"))
 	_show_menu()
+	if OS.get_cmdline_user_args().has("--smoke-test"):
+		_smoke_test.call_deferred()
+
+
+## Release check without the editor: `buergermeister.x86_64 --headless -- --smoke-test`
+## starts a festival, verifies data, markers, map texture and meters, prints one SMOKE line and
+## exits 0 (ok) or 1.
+func _smoke_test() -> void:
+	_start_game()
+	await get_tree().process_frame
+	var meters_ok := false
+	if not game.is_empty():
+		var m := State.compute_meters(game, data)
+		meters_ok = m.has("attendance") and m.has("money") and m.has("happiness")
+	var marker_count: int = map_view.markers.size() if map_view != null else 0
+	var map_rect: TextureRect = map_view.get_node_or_null("Scroll/MapRoot/Map") if map_view != null else null
+	var texture_ok := map_rect != null and map_rect.texture != null
+	var ok: bool = data.get("venues", []).size() > 0 and marker_count > 0 and texture_ok and meters_ok
+	print("SMOKE %s venues=%d trees=%d fountains=%d toilets=%d streets=%d airquality=%s markers=%d map_texture=%s meters=%s" % [
+		"OK" if ok else "FAIL", data.get("venues", []).size(), data.get("trees", []).size(), data.get("fountains", []).size(),
+		data.get("toilets", []).size(), data.get("streets", []).size(), data.has("airquality"), marker_count, texture_ok, meters_ok])
+	get_tree().quit(0 if ok else 1)
 
 
 func _start_game() -> void:
