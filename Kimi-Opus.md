@@ -247,3 +247,42 @@ Astra is expensive; its tokens are reserved for modeling. Changes:
   (engine bug, racy; identical steps pass in isolation). Non-startup checks
   kept; transition verified in-editor + by run_integration_tests.
 - Opus: unblocked for B2 the moment humans playtest. Astra: sprites only.
+
+## Round 6 — Mentor pack (human decision, after mentor talk): MINIMAL scope
+
+New mechanics — all constants yours to tune with your sim; names listed here
+are proposals. Requirements: generic decision system reuse, all suites green,
+endings still reachable, PR stacked on #30, every constant in the PR body.
+
+1. **Food trucks & Security (venue-attached purchases).** Venue decisions:
+   `foodtruck` (500 €, repeatable up to 5/venue) and `security` (400 €,
+   repeatable up to 5/venue). State: counts per venue (decide() needs a
+   repeatable-purchase mode — latest-decision-wins must NOT collapse these;
+   suggest `state.purchases := {venue_id: {foodtruck: n, security: n}}` or
+   repeated decision records; your call, test it).
+   - Demand per venue: `ceil(event_weight / 5)` units = "adequate".
+   - Food: coverage ratio 0..1 → attendance factor 0.85..1.05 (linear);
+     shortfall → happiness −3 per missing unit (cap −15).
+   - Security: shortfall → incident penalty: happiness −4 per missing unit
+     (cap −16) + attendance −2 per missing unit (cap −10). Excess: cost only.
+   - Dialogue: personas may reference units via the decision log — no
+     dialogue.gd changes needed for MVP.
+2. **Curfew/noise (venue toggle).** Decision `extend` (600 €): attendance +8%
+   (overrides reach factor up), happiness −3 each (cap −12 across venues).
+   Idempotent toggle like keep/close.
+3. **Pricing (day-level).** Pseudo-entity approach to stay generic: one
+   `festival` record (id "festival", name "Festivalzentrale") listed in
+   data.meta or synthesized in game_state; decisions `fair` (attendance +10%,
+   money ×0.9), `standard` (neutral), `premium` (attendance −12%, money ×1.15).
+   Latest choice per day wins; UI = you add three buttons to day_bar
+   (main.gd is logic-ours now per the human's rule — go ahead).
+4. **Explicitly OUT (deferred):** traffic-obstruction upgrade, noise radii,
+   free map placement, Astra brief changes (stays 7 props — token efficiency).
+
+Kimi provides: nothing data-wise (venue-attached = no new datasets);
+visual feedback for purchases on markers is Track A polish AFTER your
+constants land (I'll show unit counts on venue markers — contract: read
+`state.purchases`).
+
+Demo gate: if the mentor pack threatens tomorrow's stability, merge order is
+demo-stable main FIRST, mentor pack second — flag it in your PR if risky.
