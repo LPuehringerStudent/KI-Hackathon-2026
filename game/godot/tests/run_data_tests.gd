@@ -98,4 +98,20 @@ func _check_map_view(data: Dictionary) -> void:
 			break
 		await process_frame
 	check(not mv.transition_busy, "day transition completes and clears busy flag")
+	# map modes: layer switch builds an overlay; inverse transform roundtrips
+	var venue2: Dictionary = data.venues[0]
+	var px: Vector2 = mv.latlon_to_pixel(float(venue2.lat), float(venue2.lon))
+	var ll: Vector2 = mv.pixel_to_latlon(px)
+	check(ll.distance_to(Vector2(float(venue2.lat), float(venue2.lon))) < 0.0005,
+		"pixel_to_latlon inverts latlon_to_pixel")
+	mv.rebuild_layers(data, {})
+	mv.set_layer_mode("sicherheit")
+	await process_frame
+	check(mv._layer_rect.visible and mv._layer_rect.texture != null,
+		"security layer builds a visible overlay")
+	check(mv._layer_value_at(float(venue2.lat), float(venue2.lon)).contains("Sicherheit"),
+		"layer hover reports the venue security value")
+	mv.set_layer_mode("stadt")
+	await process_frame
+	check(not mv._layer_rect.visible, "stadt mode hides the overlay")
 	mv.queue_free()

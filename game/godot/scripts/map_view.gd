@@ -34,7 +34,15 @@ var _map_root: Control
 var _map_rect: TextureRect
 var _dot_cache := {}
 var _badges := {}
+const LAYER_MODES := ["stadt", "sicherheit", "luft", "versorgung"]
+const LAYER_LABELS := {"stadt": "Stadt", "sicherheit": "Sicherheit", "luft": "Luft", "versorgung": "Versorgung"}
+
 var _shuttle_markers: Array = []
+var _layer_mode := "stadt"
+var _layer_rect: TextureRect = null
+var _layer_readout: Label = null
+var _layer_data := {}
+var _layer_game := {}
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -60,6 +68,7 @@ func _ready() -> void:
 		push_error("map_view: cannot load " + MAP_TEXTURE_PATH)
 	else:
 		_map_rect.texture = tex
+	_add_layer_controls()
 	_add_zoom_controls()
 	refresh()
 
@@ -104,6 +113,202 @@ func _relayout_markers() -> void:
 		dot.scale = Vector2(_zoom, _zoom)
 
 
+## ---- Map modes (HOI4-style layers) ------------------------------------
+## Runtime-rendered heat overlays from live game state; v1: Sicherheit
+## (coverage vs venue demand), Luft (PM10 modulated by nearby canopy),
+## Versorgung (walk-radius bubbles of open services). Hover shows the value.
+
+func set_layer_mode(mode: String) -> void:
+	if not LAYER_MODES.has(mode):
+		return
+	_layer_mode = mode
+	if _layer_rect != null:
+		_layer_rect.visible = mode != "stadt"
+		if _layer_readout != null:
+			_layer_readout.visible = mode != "stadt"
+	rebuild_layers(_layer_data, _layer_game)
+
+
+func pixel_to_latlon(px: Vector2) -> Vector2:
+	var scale := float(_meta.scale) * _zoom
+	var sx := (px.x - float(_meta.offset_x) * _zoom) / scale
+	var sy := (px.y - float(_meta.offset_y) * _zoom) / scale
+	var gsum := sy / float(_meta.sin_a)   # gx + gy
+	var gdiff := sx / float(_meta.cos_a)  # gx - gy
+	var gx := (gsum + gdiff) / 2.0
+	var gy := (gsum - gdiff) / 2.0
+	var lon := gx / float(_meta.km_per_deg_lon) + float(_meta.lon_min)
+	var lat := gy / float(_meta.km_per_deg_lat) + float(_meta.lat_min)
+	return Vector2(lat, lon)
+
+
+## Rebuilds the overlay for the active mode. Called from main.gd::_refresh
+## and on mode switches; safe with empty data (hides the overlay).
+func rebuild_layers(data: Dictionary, game: Dictionary) -> void:
+	_layer_data = data
+	_layer_game = game
+	if _layer_rect == null or data.is_empty():
+		return
+	if _layer_mode == "stadt":
+		_layer_rect.visible = false
+		return
+	var img := Image.create_empty(1024, 1024, false, Image.FORMAT_RGBA8)
+	match _layer_mode:
+		"sicherheit":
+			_build_security_layer(img, data, game)
+		"luft":
+			_build_air_layer(img, data, game)
+		"versorgung":
+			_build_service_layer(img, data, game)
+	_layer_rect.texture = ImageTexture.create_from_image(img)
+	_layer_rect.visible = true
+
+
+func _stamp(img: Image, center: Vector2, radius_px: float, color: Color, strength: float) -> void:
+	var lut: Array[float] = []
+	var r := int(radius_px)
+	for i in range(r + 1):
+		lut.append((1.0 - float(i) / max(1.0, radius_px)) * strength)
+	var x0: int = max(0, int(center.x) - r)
+	var x1: int = min(1023, int(center.x) + r)
+	var y0: int = max(0, int(center.y) - r)
+	var y1: int = min(1023, int(center.y) + r)
+	for x in range(x0, x1 + 1):
+		for y in range(y0, y1 + 1):
+			var d := Vector2(x, y).distance_to(center)
+			if d > radius_px:
+				continue
+			var a := lut[int(d)]
+			if a <= 0.0:
+				continue
+			var existing := img.get_pixel(x, y)
+			if a > existing.a:
+				img.set_pixel(x, y, Color(color.r, color.g, color.b, a))
+
+
+## half-res overlay position for a lat/lon
+func _layer_px(lat: float, lon: float) -> Vector2:
+	# overlay image is 1024² covering the (meta.width) map: quarter-res at 4096
+	return latlon_to_pixel(lat, lon) * _zoom * (1024.0 / float(_meta.width))
+
+
+func _purchases_at(game: Dictionary, venue_id: String) -> Dictionary:
+	return game.get("purchases", {}).get(venue_id, {})
+
+
+func _build_security_layer(img: Image, data: Dictionary, game: Dictionary) -> void:
+	for venue: Dictionary in data.get("venues", []):
+		var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
+		var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
+		var coverage := clampf(float(units) / float(demand), 0.0, 1.0)
+		var color := Color("#e5484d").lerp(Color("#46a758"), coverage)
+		_stamp(img, _layer_px(float(venue.lat), float(venue.lon)), 46.0, color, 0.55)
+
+
+func _build_air_layer(img: Image, data: Dictionary, game: Dictionary) -> void:
+	var pm10 := float(data.get("airquality", {}).get("pm10", 20.0))
+	var base := clampf((pm10 - 10.0) / 50.0, 0.0, 1.0)  # 10..60 ug/m3 -> 0..1
+	var good := Color("#3e8fde")
+	var bad := Color("#e58e3f")
+	for tree: Dictionary in data.get("trees", []):
+		if str(_layer_game.get("latest", {})) == "cut":
+			continue
+		_stamp(img, _layer_px(float(tree.lat), float(tree.lon)), 14.0, good, 0.30 * (1.0 - base))
+	var city_color: Color = good.lerp(bad, base)
+	_stamp(img, Vector2(512, 512), 500.0, city_color, 0.22)
+
+
+func _build_service_layer(img: Image, data: Dictionary, game: Dictionary) -> void:
+	var closed := {}
+	for decision: Dictionary in game.get("decisions", []):
+		if decision.decision_id == "close":
+			closed[str(decision.entity_id)] = true
+		elif decision.decision_id in ["keep", "reopen"]:
+			closed.erase(str(decision.entity_id))
+	for key: String in ["fountains", "toilets"]:
+		for service: Dictionary in data.get(key, []):
+			if closed.has(str(service.id)):
+				continue
+			_stamp(img, _layer_px(float(service.lat), float(service.lon)), 38.0, Color("#2e9e6b"), 0.5)
+
+
+func _layer_value_at(lat: float, lon: float) -> String:
+	var data := _layer_data
+	var game := _layer_game
+	match _layer_mode:
+		"sicherheit":
+			var best := ""
+			var best_d := 1e9
+			for venue: Dictionary in data.get("venues", []):
+				var d := _dist_m(lat, lon, float(venue.lat), float(venue.lon))
+				if d < best_d:
+					best_d = d
+					var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
+					var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
+					best = "%s: Sicherheit %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
+			return best if best_d <= 250.0 else "kein Handlungsort in der Nähe"
+		"luft":
+			var pm := float(data.get("airquality", {}).get("pm10", -1.0))
+			if pm < 0.0:
+				return "keine Luftdaten"
+			var trees := 0
+			for tree: Dictionary in data.get("trees", []):
+				if _dist_m(lat, lon, float(tree.lat), float(tree.lon)) <= 100.0:
+					trees += 1
+			return "PM10 %g µg/m³ — %d Bäume im 100-m-Radius" % [pm, trees]
+		"versorgung":
+			var nearest := 1e9
+			for key: String in ["fountains", "toilets"]:
+				for service: Dictionary in data.get(key, []):
+					nearest = min(nearest, _dist_m(lat, lon, float(service.lat), float(service.lon)))
+			if nearest <= 300.0:
+				return "versorgt (nächste Anlage %d m)" % int(nearest)
+			return "keine Versorgung im Umkreis (nächste %d m)" % int(nearest)
+	return ""
+
+
+static func _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+	var d_lat := deg_to_rad(lat2 - lat1)
+	var d_lon := deg_to_rad(lon2 - lon1)
+	var a := sin(d_lat / 2.0) ** 2 + cos(deg_to_rad(lat1)) * cos(deg_to_rad(lat2)) * sin(d_lon / 2.0) ** 2
+	return 2.0 * 6371000.0 * asin(minf(1.0, sqrt(a)))
+
+
+func _on_layer_hover(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and _layer_readout != null:
+		var latlon := pixel_to_latlon(event.position)
+		_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
+
+
+func _add_layer_controls() -> void:
+	if _map_root == null:
+		return
+	_layer_rect = TextureRect.new()
+	_layer_rect.name = "LayerOverlay"
+	_layer_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_layer_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_layer_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	_layer_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layer_rect.visible = false
+	_map_root.add_child(_layer_rect)
+	_layer_rect.move_to_front()
+	# interactivity: an invisible full-rect control above the map, below markers
+	var probe := Control.new()
+	probe.set_anchors_preset(Control.PRESET_FULL_RECT)
+	probe.mouse_filter = Control.MOUSE_FILTER_PASS
+	probe.mouse_exited.connect(func() -> void:
+		if _layer_readout != null:
+			_layer_readout.text = "")
+	_map_root.add_child(probe)
+	probe.move_to_front()
+	probe.gui_input.connect(_on_layer_hover)
+	_layer_readout = Label.new()
+	_layer_readout.position = Vector2(8, 8)
+	_layer_readout.add_theme_font_size_override("font_size", 12)
+	_layer_readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	probe.add_child(_layer_readout)
+
+
 func _add_zoom_controls() -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -122,6 +327,23 @@ func _add_zoom_controls() -> void:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.pressed.connect(Callable(self, spec[1]))
 		box.add_child(btn)
+	var layers := HBoxContainer.new()
+	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	layers.position = Vector2(8, 8)
+	layers.add_theme_constant_override("separation", 4)
+	overlay.add_child(layers)
+	for mode: String in LAYER_MODES:
+		var btn := Button.new()
+		btn.text = LAYER_LABELS[mode]
+		btn.name = "Layer_" + mode
+		btn.toggle_mode = true
+		btn.button_pressed = mode == _layer_mode
+		btn.custom_minimum_size = Vector2(0, 28)
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.toggled.connect(func(on: bool) -> void:
+			if on:
+				set_layer_mode(mode))
+		layers.add_child(btn)
 
 
 func _unhandled_input(event: InputEvent) -> void:
