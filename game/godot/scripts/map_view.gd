@@ -51,6 +51,8 @@ var _bulk_bar: HBoxContainer = null
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
+var _planted_markers: Array = []
+var _last_planted: Array = []
 var _zoom := 1.0
 
 
@@ -96,6 +98,7 @@ func set_zoom(z: float) -> void:
 	_relayout_markers()
 	update_shuttles(_last_shuttles)
 	update_purchases(_last_purchases)
+	update_planted_trees(_last_planted)
 	await get_tree().process_frame
 	_scroll.scroll_horizontal = int(center_px.x * _zoom - view.x / 2.0)
 	_scroll.scroll_vertical = int(center_px.y * _zoom - view.y / 2.0)
@@ -720,6 +723,34 @@ func update_purchases(purchases: Dictionary) -> void:
 			_map_root.add_child(marker)
 			_purchase_markers.append(marker)
 			slot += 1
+
+
+## Planted trees (Opus's mentor-pack contract: state.planted_trees with
+## {lat, lon, crown_m, age}) rendered as young-tree sprites; zoom-scaled.
+func update_planted_trees(planted: Array) -> void:
+	_last_planted = planted
+	for m: Node in _planted_markers:
+		m.queue_free()
+	_planted_markers.clear()
+	for tree: Dictionary in planted:
+		var px := latlon_to_pixel(float(tree.lat), float(tree.lon)) * _zoom
+		var tex := _load_sprite("prop_tree_broad_b")
+		var marker: Control
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.scale = Vector2(_zoom, _zoom)
+			rect.position = px - Vector2(tex.get_width() / 2.0, tex.get_height()) * _zoom
+			marker = rect
+		else:
+			var dot := TextureRect.new()
+			dot.texture = _make_dot(Color("#3f7d3a"), 12)
+			dot.position = px - Vector2(6, 6) * _zoom
+			marker = dot
+		marker.tooltip_text = "Gepflanzter Baum"
+		marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_map_root.add_child(marker)
+		_planted_markers.append(marker)
 
 
 ## Dynamic shuttle markers: purchased shuttles appear on the map.
