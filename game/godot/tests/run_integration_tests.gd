@@ -112,6 +112,11 @@ func _run() -> void:
 	check(ui.game.day == 3 and ui.game.decisions[-1].decision_id == "keep", "day three tree kept")
 	ui.advance_day()
 	check(ui.finished and ui.verdict.visible, "final verdict visible")
+	var score_found := false
+	for child: Node in ui.verdict.get_child(0).get_child(0).get_children():
+		if child is Label and child.text.begins_with("Gesamtnote"):
+			score_found = true
+	check(score_found, "verdict shows a 0-100 Gesamtnote")
 	before = ui.game.duplicate(true)
 	ui.apply_decision("cut")
 	ui.advance_day()

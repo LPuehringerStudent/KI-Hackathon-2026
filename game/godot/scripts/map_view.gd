@@ -38,6 +38,9 @@ var _dot_cache := {}
 var _badges := {}
 var _shuttle_markers: Array = []
 var _purchase_markers: Array = []
+var _last_shuttles: Array = []
+var _last_purchases: Dictionary = {}
+var _zoom := 1.0
 
 
 func _ready() -> void:
@@ -59,7 +62,75 @@ func _ready() -> void:
 		push_error("map_view: cannot load " + MAP_TEXTURE_PATH)
 	else:
 		_map_rect.texture = tex
+	_add_zoom_controls()
 	refresh()
+
+
+## Zoom: 0.6x..3.0x via on-map buttons or Ctrl+wheel. Marker sprites keep a
+## constant screen size; only their map positions scale. The visible center
+## is preserved across zoom changes.
+func set_zoom(z: float) -> void:
+	if _meta.is_empty():
+		return
+	var old_zoom := _zoom
+	_zoom = clampf(z, 0.6, 3.0)
+	if is_equal_approx(old_zoom, _zoom):
+		return
+	var base := Vector2(float(_meta.width), float(_meta.height))
+	var view := _scroll.size
+	var center_px := (Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical) + view / 2.0) / old_zoom
+	_map_root.custom_minimum_size = base * _zoom
+	_map_root.size = base * _zoom
+	_relayout_markers()
+	update_shuttles(_last_shuttles)
+	update_purchases(_last_purchases)
+	await get_tree().process_frame
+	_scroll.scroll_horizontal = int(center_px.x * _zoom - view.x / 2.0)
+	_scroll.scroll_vertical = int(center_px.y * _zoom - view.y / 2.0)
+
+
+func zoom_in() -> void:
+	set_zoom(_zoom * 1.25)
+
+
+func zoom_out() -> void:
+	set_zoom(_zoom / 1.25)
+
+
+func _relayout_markers() -> void:
+	for id: String in markers:
+		var dot: Control = markers[id]
+		var ll: Vector2 = dot.get_meta("latlon")
+		var msize: float = dot.get_meta("msize")
+		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) / 2.0
+
+
+func _add_zoom_controls() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(overlay)
+	var box := VBoxContainer.new()
+	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	box.position = Vector2(-46, 8)
+	box.add_theme_constant_override("separation", 4)
+	overlay.add_child(box)
+	for spec in [["+", "zoom_in"], ["−", "zoom_out"]]:
+		var btn := Button.new()
+		btn.text = spec[0]
+		btn.tooltip_text = "Zoom (Strg+Mausrad)"
+		btn.custom_minimum_size = Vector2(38, 32)
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.pressed.connect(Callable(self, spec[1]))
+		box.add_child(btn)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.ctrl_pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			zoom_in()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			zoom_out()
 
 
 ## (Re)build all markers from the loaded data.
@@ -113,7 +184,9 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	var marker_size := TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
 	dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], marker_size)
 	dot.tooltip_text = str(entity.get("name", id))
-	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) - Vector2(marker_size, marker_size) / 2.0
+	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
+	dot.set_meta("msize", float(marker_size))
+	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) / 2.0
 	dot.pressed.connect(func() -> void: entity_clicked.emit(id, entity_type))
 	dot.mouse_entered.connect(func() -> void: _hover(dot, true))
 	dot.mouse_exited.connect(func() -> void: _hover(dot, false))
@@ -196,8 +269,9 @@ func focus_entity(id: String) -> void:
 	if not markers.has(id):
 		return
 	var dot: TextureButton = markers[id]
-	_scroll.scroll_horizontal = int(dot.position.x - _scroll.size.x / 2.0)
-	_scroll.scroll_vertical = int(dot.position.y - _scroll.size.y / 2.0)
+	var w: float = dot.get_meta("msize")
+	_scroll.scroll_horizontal = int(dot.position.x + w / 2.0 - _scroll.size.x / 2.0)
+	_scroll.scroll_vertical = int(dot.position.y + w / 2.0 - _scroll.size.y / 2.0)
 
 
 func _make_dot(color: Color, size := MARKER_SIZE) -> ImageTexture:
@@ -224,6 +298,7 @@ func _make_dot(color: Color, size := MARKER_SIZE) -> ImageTexture:
 ## units > 0 (badges show counts; sprites show presence). Same fallback logic
 ## as shuttles. Wired from main.gd::_refresh alongside refresh_badges.
 func update_purchases(purchases: Dictionary) -> void:
+	_last_purchases = purchases
 	for m: Node in _purchase_markers:
 		m.queue_free()
 	_purchase_markers.clear()
@@ -232,7 +307,8 @@ func update_purchases(purchases: Dictionary) -> void:
 			continue
 		var counts: Dictionary = purchases[venue_id]
 		var dot: TextureButton = markers[venue_id]
-		var base := dot.position + Vector2(dot.texture_normal.get_width(), dot.texture_normal.get_height()) / 2.0
+		var ll: Vector2 = dot.get_meta("latlon")
+		var base := latlon_to_pixel(ll.x, ll.y) * _zoom
 		var slot := 0
 		for kind: String in ["foodtruck", "security"]:
 			if int(counts.get(kind, 0)) <= 0:
@@ -258,11 +334,12 @@ func update_purchases(purchases: Dictionary) -> void:
 ## Dynamic shuttle markers: purchased shuttles appear on the map.
 ## Sprites (Astra's prop_shuttle) preferred; amber-dot fallback otherwise.
 func update_shuttles(shuttles: Array) -> void:
+	_last_shuttles = shuttles
 	for m: Node in _shuttle_markers:
 		m.queue_free()
 	_shuttle_markers.clear()
 	for shuttle: Dictionary in shuttles:
-		var px := latlon_to_pixel(float(shuttle.lat), float(shuttle.lon))
+		var px := latlon_to_pixel(float(shuttle.lat), float(shuttle.lon)) * _zoom
 		var marker: Control
 		var tex := _load_sprite("prop_shuttle")
 		if tex != null:

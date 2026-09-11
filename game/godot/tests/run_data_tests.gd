@@ -81,4 +81,14 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.update_purchases({})
 	await process_frame
 	check(mv._purchase_markers.is_empty(), "purchase sprites clear when none")
+	# zoom: positions scale, map root resizes, 1.0 restores
+	var before: Vector2 = mv.markers[data.venues[0].id].position
+	mv.set_zoom(2.0)
+	await process_frame
+	check(mv.markers[data.venues[0].id].position != before, "zoom repositions markers")
+	check(mv._map_root.custom_minimum_size.x > 2000, "zoom enlarges map root")
+	mv.set_zoom(1.0)
+	await process_frame
+	var restored: Vector2 = mv.markers[data.venues[0].id].position
+	check(restored.distance_to(before) < 0.5, "zoom 1.0 restores positions (~0.01px float32 drift)")
 	mv.queue_free()

@@ -218,6 +218,7 @@ func advance_day() -> void:
 
 func _refresh() -> void:
 	meters.set_meters(State.compute_meters(game, data))
+	meters.set_budget(game.get("budget"))
 	day_bar.set_day(game.day, State.day_theme(game.day))
 	map_view.set_day_tint(game.day)
 	map_view.refresh_badges(game.get("purchases", {}))
@@ -266,6 +267,13 @@ func _show_verdict() -> void:
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_font_size_override("font_size", 34)
 	rows.add_child(heading)
+	var score := Label.new()
+	var avg := (float(results.attendance) + float(results.money) + float(results.happiness)) / 3.0
+	score.text = "Gesamtnote: %d / 100" % int(round(avg))
+	score.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	score.add_theme_font_size_override("font_size", 46)
+	score.add_theme_color_override("font_color", Color("238573"))
+	rows.add_child(score)
 	var title := Label.new()
 	title.text = verdict_title(results)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
