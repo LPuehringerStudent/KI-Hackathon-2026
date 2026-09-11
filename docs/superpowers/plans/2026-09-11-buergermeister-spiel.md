@@ -1,5 +1,9 @@
 # Bürgermeister:in fürs Festival — Implementation Plan
 
+> **SUPERSEDED 2026-09-11:** engine switched to Godot 4 desktop app. Use
+> `2026-09-11-buergermeister-spiel-godot.md` instead. This file is kept for
+> scoring-test reference only (Task 4's meter logic still describes the agreed formulas).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a playable browser game where the player is Linz's mayor during festival week, negotiating with speaking city entities, scored on attendance / money / happiness from real open data.

@@ -35,7 +35,7 @@ title verdict + shareable summary.
 
 ## Core interaction loop
 
-1. Map of central Linz (Leaflet, OSM tiles) with entities from the datasets.
+1. Stylized baked map of central Linz with entities from the datasets.
 2. Click an entity → chat panel opens with its Mistral persona, grounded in its
    actual record (tree: species/age/location; street: naming history; venue:
    festival program & event count).
@@ -54,14 +54,30 @@ title verdict + shareable summary.
 
 Preprocessing: `tools/extract_innenstadt.py` filters these by bounding box
 (Innenstadt: Ars Electronica Center → Hauptplatz → Tabakfabrik) into small
-`game/data/*.json`. Persona facts come only from these extracted records.
+`game/godot/data/*.json`. Persona facts come only from these extracted records.
 
-## Architecture
+## Architecture (REVISED — Godot desktop app)
 
-- Static browser app in `game/` — no build step: `index.html` + `style.css` + native ES modules
-- Module ownership (one teammate each): `map.js` (Leaflet layers/markers), `dialogue.js` (persona prompt building, chat state, decision intents), `game.js` (day state machine, scoring, decisions); shared: `data.js`, `ui.js`, `score.js`, `voices.js` (proxy HTTP client)
-- LLM path: browser → `mistral-proxy` (127.0.0.1:8377) → OpenRouter; model `mistralai/mistral-medium-3-5`
-- Serve with `python3 -m http.server` (ES modules require http, not file://)
+- **Godot 4.7 desktop application** (engine confirmed installed on pitch laptop with
+  export templates; hackathon rules require no web export — deliverable is a demo
+  pitch). No WASM, no server, no browser dependency.
+- Map: `tools/render_map.py` bakes a stylized Innenstadt map PNG (2048×2048) from the
+  geo datasets (water, buildings, green, roads); entities are clickable markers over
+  the baked image via lat/lon→pixel transform (`map_meta.json`). No slippy tiles.
+- Scenes (text .tscn): `main` (root layout), `map_view`, `chat_panel`, `meters`,
+  `day_bar`. Scripts (.gd): `data_loader`, `map_view`, `game_state` (day machine,
+  decisions, three meters), `dialogue` (persona engine + decision intents),
+  `http_client` (proxy calls).
+- Module ownership (one teammate each): map&data (`data_loader` + `map_view` +
+  both python tools), game core (`game_state` + headless tests), dialogue&UI shell
+  (`dialogue`, `http_client`, panels, main wiring — pair with the Godot-MCP agent).
+- LLM path: Godot HTTPRequest → `mistral-proxy` (127.0.0.1:8377) → OpenRouter; model
+  `mistralai/mistral-medium-3-5`; fallback personas from `game/godot/data/fallback_voices.json`
+- Old web/Leaflet architecture superseded 2026-09-11 after engine decision; scoring
+  model, personas, data sources, and demo-robustness rules are unchanged.
+- Run/verify with `godot --headless --path game/godot --quit` (import + syntax check)
+  and `godot --headless -s res://tests/run_tests.gd` (unit tests); final demo either
+  from editor or `godot --headless --export-release` Linux build.
 
 ## Scoring: three mayor meters
 
@@ -89,9 +105,11 @@ final verdict shows all three plus the mayor title earned (e.g.
 
 - Proxy down / keys exhausted / offline → canned personas: pre-generate a voice
   line set per entity type via the proxy while it works, commit as
-  `game/data/fallback_voices.json`; dialogue degrades gracefully to those lines
+  `game/godot/data/fallback_voices.json`; dialogue degrades gracefully to those lines
 - Score mode works fully offline (all data local)
-- Map tiles need internet — known risk; documented fallback is reduced-detail map
+- Baked map is a local PNG — no tile server, no internet dependency at demo time
+- Engine availability verified on pitch laptop (Godot 4.7.2 + export templates);
+  final Linux build produced ahead of the pitch, editor run as backup
 
 ## MVP cut (Saturday 16:00 pitch, half-finished still demos)
 
