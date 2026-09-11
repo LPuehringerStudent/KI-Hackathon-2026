@@ -1,0 +1,289 @@
+[
+ {
+  "id": "wc_1",
+  "name": "Hauptplatz ARH",
+  "lat": 48.305932,
+  "lon": 14.286867,
+  "kind": "mit Personalbesetztung"
+ },
+ {
+  "id": "wc_2",
+  "name": "Südbahnhofmarkt an Markttagen Di, Fr, Sa besetzt von 07:00 - 14:00",
+  "lat": 48.300985,
+  "lon": 14.300901,
+  "kind": "mit Personalbesetztung"
+ },
+ {
+  "id": "wc_3",
+  "name": "Auf der Gugl",
+  "lat": 48.294001,
+  "lon": 14.279934,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_5",
+  "name": "Bergschlösslpark Pförtnergebäude",
+  "lat": 48.291419,
+  "lon": 14.285519,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_7",
+  "name": "Donaupark",
+  "lat": 48.312199,
+  "lon": 14.294533,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_9",
+  "name": "Grüne Mitte",
+  "lat": 48.292293,
+  "lon": 14.30792,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_10",
+  "name": "Grünmarkt Urfahr",
+  "lat": 48.311504,
+  "lon": 14.280755,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_11",
+  "name": "Hessenplatz",
+  "lat": 48.300407,
+  "lon": 14.294744,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_13",
+  "name": "Lentos Kunstmuseum",
+  "lat": 48.308198,
+  "lon": 14.287934,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_16",
+  "name": "Neues Rathaus",
+  "lat": 48.309676,
+  "lon": 14.283148,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_18",
+  "name": "Promenade",
+  "lat": 48.303966,
+  "lon": 14.286345,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_19",
+  "name": "Sonnensteinstraße",
+  "lat": 48.312418,
+  "lon": 14.283293,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_20",
+  "name": "Steinmetzplatz",
+  "lat": 48.307974,
+  "lon": 14.27914,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_21",
+  "name": "Unionkreuzung",
+  "lat": 48.290404,
+  "lon": 14.297211,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_22",
+  "name": "Urfahrmarkt",
+  "lat": 48.312205,
+  "lon": 14.287361,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_23",
+  "name": "Volksgarten",
+  "lat": 48.295981,
+  "lon": 14.291709,
+  "kind": "mit Personalbesetztung"
+ },
+ {
+  "id": "wc_25",
+  "name": "Ziegeleistraße",
+  "lat": 48.289951,
+  "lon": 14.284616,
+  "kind": "ohne Personalbesetztung"
+ },
+ {
+  "id": "wc_28",
+  "name": "Domplatz",
+  "lat": 48.300543,
+  "lon": 14.287104,
+  "kind": "Externe Betreung (Severin Stiftung)"
+ },
+ {
+  "id": "wc_34",
+  "name": "Volkshaus Franckviertel",
+  "lat": 48.291978,
+  "lon": 14.31534,
+  "kind": "in Volkshäuser"
+ },
+ {
+  "id": "wc_35",
+  "name": "Volkshaus Froschberg",
+  "lat": 48.285359,
+  "lon": 14.282011,
+  "kind": "in Volkshäuser"
+ },
+ {
+  "id": "wc_37",
+  "name": "Volkshaus Kandlheim",
+  "lat": 48.286398,
+  "lon": 14.296678,
+  "kind": "in Volkshäuser"
+ },
+ {
+  "id": "wc_m1",
+  "name": "Stadtpark Huemerstraße gegenüber Oberbank",
+  "lat": 48.303224,
+  "lon": 14.2988,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m2",
+  "name": "Lohnstorferpark Lohnstorferplatz",
+  "lat": 48.293292,
+  "lon": 14.314166,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m3",
+  "name": "Stadtpark Huemerstraße",
+  "lat": 48.305569,
+  "lon": 14.296916,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m4",
+  "name": "Kinderspielplatz Limonikeller Limonigasse",
+  "lat": 48.298321,
+  "lon": 14.281698,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m5",
+  "name": "Kinderspielplatz Prunerstift Fabrikstraße 10",
+  "lat": 48.307544,
+  "lon": 14.291925,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m9",
+  "name": "Andreas Hoferpark Andreas-Hofer-Platz",
+  "lat": 48.286479,
+  "lon": 14.29769,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m10",
+  "name": "Radweg Obere Donaustraße",
+  "lat": 48.306147,
+  "lon": 14.272636,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m11",
+  "name": "Donaustrand Alturfahr",
+  "lat": 48.306864,
+  "lon": 14.276262,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m12",
+  "name": "Donaustrand Alturfahr",
+  "lat": 48.306864,
+  "lon": 14.276262,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m14",
+  "name": "Kinderspielplatz Am Damm",
+  "lat": 48.316097,
+  "lon": 14.291937,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m15",
+  "name": "Kinderspielplatz Am Damm",
+  "lat": 48.316097,
+  "lon": 14.291937,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m16",
+  "name": "Kinderspielplatz Schulertal Schulertal",
+  "lat": 48.301525,
+  "lon": 14.274869,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m17",
+  "name": "Poschacherwiese Poschacherstraße",
+  "lat": 48.285011,
+  "lon": 14.3044,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m18",
+  "name": "Kinderspielplatz Minnesängerplatz Wallnerstraße 18-20",
+  "lat": 48.288922,
+  "lon": 14.27639,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m19",
+  "name": "Kinderspielplatz Mittelgasse Mittelgasse",
+  "lat": 48.307874,
+  "lon": 14.277089,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m20",
+  "name": "City Park Johann-Konrad-Vogelstraße",
+  "lat": 48.300358,
+  "lon": 14.291966,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m21",
+  "name": "Sternpark Spielplatz Ing. Sternstraße 4",
+  "lat": 48.297941,
+  "lon": 14.315292,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m23",
+  "name": "Schillerpark bei Würstlstand",
+  "lat": 48.298233,
+  "lon": 14.291226,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m24",
+  "name": "Volksgarten gegenüber Volksgartenstraße 28",
+  "lat": 48.295388,
+  "lon": 14.290526,
+  "kind": "Mobile WC Kabinen"
+ },
+ {
+  "id": "wc_m27",
+  "name": "Volksgarten gegenüber Weingartshofstraße",
+  "lat": 48.2947,
+  "lon": 14.291079,
+  "kind": "Mobile WC Kabinen"
+ }
+]

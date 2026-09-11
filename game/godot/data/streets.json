@@ -1,0 +1,146 @@
+[
+ {
+  "id": "strasse_3439",
+  "name": "Ars-Electronica-Straße",
+  "history": "Ab 2009 Bezeichnung für den von der Nibelungenbrücke zur Verkehrsfläche Urfahrmarkt verlaufenden Straßenzug. Benannt nach Ars Electronica, der internationalen Plattform für digitale Kunst und Medienkultur. - Ab 1921 Linke Donaustraße.",
+  "lat": 48.3092,
+  "lon": 14.283,
+  "approximate": true
+ },
+ {
+  "id": "strasse_3310",
+  "name": "Bahnhofplatz",
+  "history": "Platz vor dem Hauptbahnhof. Benannt 1950 nach Beendigung der Wiederaufbau- und Neugestaltungsarbeiten des Bahnhofs.",
+  "lat": 48.2903,
+  "lon": 14.2917,
+  "approximate": true
+ },
+ {
+  "id": "strasse_3335",
+  "name": "Bethlehemstraße",
+  "history": "Nach dem Objekt Landstraße 15 etwa in ostnordöstlicher bzw. östlicher Richtung zur Harrachstraße bzw. Eisenhandstraße verlaufend. Benannt 1869 nach der der Kirche zu Bethlehem nachgebildeten Kapelle (1805 profaniert, 1962 demoliert) im ehemaligen Nordischen Stift (heute Stadtmuseum). - Wahrscheinlich schon vor 1439 Spitalgasse nach dem Bürgerspital. 1595 Schliechtlgasse vermutlich nach dem 1535 bezeugten Hausbesitzer Hans Schliechtl. 1730 Grünbaumgasse nach dem 1961 demolierten Gasthof \"Zum Grünen Baum\". 1771 Bethlehemgasse. 1825 Alte Bethlehemgasse. - Der östliche Teil vor dem Elisabethinenkloster wurde in das Spitzfeld einbezogen (Raum zwischen Bethlehem-, Harrach- und Fadingerstraße). Später hieß dieser Teil Äußere Bethlehemstraße, der östliche Teil behielt die Bezeichnung Spitzfeld bei. 1815 wurde der Teil zwischen Harrachstraße und der Eisernen Hand Oberes Primerfeld (1812 Harrachfeld), der Teil zwischen Harrachstraße und Elisabethstraße Obere Peissenfeldstraße genannt.",
+  "lat": 48.2979,
+  "lon": 14.2957,
+  "approximate": true
+ },
+ {
+  "id": "strasse_3346",
+  "name": "Bischofstraße",
+  "history": "Nach dem Objekt Landstraße 30 etwa in westlicher Richtung zur Herrenstraße verlaufend. Benannt 1869 nach dem an der Ecke zur Herrenstraße gelegenen Bischofshof. - 1652 und 1730 Lange Gasse. 1771 Lange oder Deutsche Rauchfangkehrergasse, 1800 Rauchfangkehrergasse (nach dem Haus 11).",
+  "lat": 48.3037,
+  "lon": 14.2897,
+  "approximate": true
+ },
+ {
+  "id": "strasse_3386",
+  "name": "Bürgerstraße",
+  "history": "Nach dem Objekt Landstraße 63 etwa in ostnordöstlicher Richtung zur Kantstraße verlaufend. Benannt 1869 in bewußter Gegenüberstellung zur aristokratischen Herrenstraße.",
+  "lat": 48.304,
+  "lon": 14.2933,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2097",
+  "name": "Domgasse",
+  "history": "Vom Pfarrplatz zweimal hakenförmig zum Graben bzw. Taubenmarkt verlaufend. Benannt 1869 nach der bei der Errichtung des Bistums Linz zur Domkirche (bis 1909) erhobenen Jesuitenkirche. - 1612 Schmidgassen. 1644 Schmid- oder Jesuitergassen. 1710 bis nach 1801 Jesuitengassen. Seit 1802 Dombrückel (nach der dort vorhandenen Brücke über den Graben). 1834 Domgasse und Domplatz.",
+  "lat": 48.3046,
+  "lon": 14.2845,
+  "approximate": true
+ },
+ {
+  "id": "strasse_1712",
+  "name": "Fischergasse",
+  "history": "Von der Flußgasse etwa in westlicher Richtung zur Ottensheimer Straße verlaufend. Benannt 1875 nach den alten Häusern, die zum größten Teil von Donaufischern und -flößern bewohnt waren. - Vorher Untum (Namensbezeichnung nicht geklärt).",
+  "lat": 48.304,
+  "lon": 14.2837,
+  "approximate": true
+ },
+ {
+  "id": "strasse_3204",
+  "name": "Graben",
+  "history": "Vom Pfarrplatz vorerst etwa in südsüdöstlicher, dann in westsüdwestlicher Richtung zum Taubenmarkt verlaufend. Benannt 1869 nach dem hier ehemals verlaufenden Stadtgraben. - Bis 1869 Unterer Graben.",
+  "lat": 48.3036,
+  "lon": 14.2832,
+  "approximate": true
+ },
+ {
+  "id": "strasse_1806",
+  "name": "Hauptplatz",
+  "history": "Stadtmittelpunkt, im 13. Jahrhundert entstanden. Benannt 1945. - 1338 An dem Markt. Die nördliche, ursprünglich zur Donau abfallende Seite hieß 1439 Heubühel. Im 15. Jahrhundert Am Platz. Später Großer Platz. Seit etwa 1800 Hauptplatz. 1873 Franz-Josephs-Platz nach Kaiser Franz Joseph I. 1921 Platz des 12. November nach dem Datum der Ausrufung der Republik am 12. November 1918. 1934 wiederum Franz-Joseph-Platz. 1938 Adolf-Hitler-Platz nach Adolf Hitler (1889-1945).",
+  "lat": 48.30549,
+  "lon": 14.28668,
+  "approximate": true
+ },
+ {
+  "id": "strasse_1831",
+  "name": "Herrenstraße",
+  "history": "Nach dem Objekt Promenade 17 etwa in südsüdöstlicher bzw. südlicher Richtung zur Stockhofstraße bzw. Volksgartenstraße verlaufend. Altbennant nach den ehemaligen landtäflichen Besitzen in dieser Gasse. - 1595 Saugasse. 1612 Rosen- oder Saugasse. 1644 Welsergassen. 1710 Herrengassen. 1781 Innere und Äußere Herrengasse (Grenze Bischofstraße).",
+  "lat": 48.3049,
+  "lon": 14.2889,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2034",
+  "name": "Klammstraße",
+  "history": "Beim Objekt Promenade 27 etwa in westsüdwestlicher Richtung zur Kapuzinerstraße verlaufend. Benannt 1771 nach dem in dieser Straße stehenden Freihaus des Adelsgeschlechts von Clam. - Früher war diese Straße Teil des Straßenzugs Weingarten.",
+  "lat": 48.3068,
+  "lon": 14.2876,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2269",
+  "name": "Landstraße",
+  "history": "Vom Taubenmarkt etwa in südsüdöstlicher Richtung zur Blumauerstraße (bis 2011 zur Unterführung der Westbahn) verlaufend. Altbenannt. - Nennungen im 13. Jahrhundert (via contra Lintzam, in Lintze aput stratam, aput stratam Lintze) dürften sich auf die Gegend um Straßfelden beziehen, die im 16. und 17. Jahrhundert diese Bezeichnung nach dem gleichnamigen Hof (heute Kaufmännisches Vereinshaus) führte, der 1579 zu einem Edelmannssitz erhoben wurde. 1730 wird die Landstraße als Innere Vorstadt (bis Bethlehemstraße), Mittlere Vorstadt (bis Bischofstraße) und Äußere Vorstadt (bis Langgasse) sowie Neuhäusl (ab Langgasse) bezeichnet. 1825 innere und äußere Landstraße (Grenze Karmeliten).",
+  "lat": 48.3026,
+  "lon": 14.2888,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2550",
+  "name": "Mozartstraße",
+  "history": "Nach dem Objekt Landstraße 35b etwa in ostnordöstlicher Richtung zur Eisenhandstraße verlaufend. Benannt 1869 nach dem Komponisten Wolfgang Amadeus Mozart (1756-1791).",
+  "lat": 48.3017,
+  "lon": 14.2917,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2698",
+  "name": "Promenade",
+  "history": "Nach dem Objekt Schmidtorstraße 8 vorerst etwa in westsüdwestlicher, dann in nordwestlicher Richtung zur Römerstraße verlaufend. Benannt 1869. - Im Spätmittelalter hieß die Gegend Im Baumgarten. 1781 Oberer Graben und Landhausgraben nach der hier verlaufenden Stadtbefestigung. Dann Oberer Graben und Theaterplatz.",
+  "lat": 48.3008,
+  "lon": 14.2902,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2719",
+  "name": "Rathausgasse",
+  "history": "Nach dem Objekt Hauptplatz 1 etwa in ostnordöstlicher Richtung zum Pfarrplatz verlaufend. Benannt 1869. - 1328 Chirch (= Kirch)gassen. 1500 Untere Pfarrgasse. 1710 Schergengasse, dann wiederum Untere Pfarrgasse.",
+  "lat": 48.3053,
+  "lon": 14.2862,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2888",
+  "name": "Schillerstraße",
+  "history": "Nach dem Objekt Landstraße 91 etwa in ostnordöstlicher Richtung zur Khevenhüllerstraße verlaufend. Benannt 1869 nach dem Dichter Friedrich von Schiller (1759-1805).",
+  "lat": 48.3009,
+  "lon": 14.2888,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2837",
+  "name": "Spittelwiese",
+  "history": "Nach dem Objekt Landstraße 22 etwa in westsüdwestlicher Richtung zur Herrenstraße verlaufend. Altbenannt nach der im 16. Jahrhundert zum Bürgerspital gehörigen Wiese.",
+  "lat": 48.3046,
+  "lon": 14.2882,
+  "approximate": true
+ },
+ {
+  "id": "strasse_2982",
+  "name": "Taubenmarkt",
+  "history": "Platz bei der Schmidtorstraße, Landstraße, Promenade und Graben. Benannt 1952 nach dem hier bis 1880 abgehaltenen Geflügelmarkt. Inoffiziell früher bereits so bezeichnet.",
+  "lat": 48.3047,
+  "lon": 14.287,
+  "approximate": true
+ }
+]

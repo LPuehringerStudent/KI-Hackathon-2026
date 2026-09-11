@@ -1,37 +1,64 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://c1o5hyr6j0spp"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_4jfu6"]
 
 [node name="Main" type="Control"]
-layout_mode=3
-anchors_preset=15
-anchor_right=1.0
-anchor_bottom=1.0
-script=ExtResource("1")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4jfu6")
 
-[node name="Split" type="HSplitContainer" parent="."]
-layout_mode=1
-anchors_preset=15
-anchor_right=1.0
-anchor_bottom=1.0
+[node name="RootSplit" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 20.0
+offset_top = 82.0
+offset_right = -20.0
+offset_bottom = -38.0
+theme_override_constants/separation = 24
+split_offset = 1080
 
-[node name="MapSlot" type="PanelContainer" parent="Split"]
-layout_mode=2
-size_flags_horizontal=3
+[node name="MapSlot" type="Panel" parent="RootSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="PanelSlot" type="VBoxContainer" parent="Split"]
-custom_minimum_size=Vector2(380, 0)
-layout_mode=2
+[node name="PanelSlot" type="VBoxContainer" parent="RootSplit"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_constants/separation = 18
 
-[node name="MetersSlot" type="Label" parent="Split/PanelSlot"]
-layout_mode=2
-text="Meters"
+[node name="Header" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 18.0
+offset_right = -24.0
+offset_bottom = 62.0
 
-[node name="DaySlot" type="Label" parent="Split/PanelSlot"]
-layout_mode=2
-text="Day"
+[node name="Title" type="Label" parent="Header"]
+text = "Bürgermeister:in fürs Festival"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
 
-[node name="ChatSlot" type="Label" parent="Split/PanelSlot"]
-layout_mode=2
-size_flags_vertical=3
-text="Chat"
+[node name="Edition" type="Label" parent="Header"]
+text = "LINZ  /  2026"
+theme_override_colors/font_color = Color(0.14, 0.52, 0.45, 1)
+
+[node name="Sources" type="Label" parent="."]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -30.0
+offset_right = -24.0
+offset_bottom = -6.0
+text = "Daten: Stadt Linz (CC BY 4.0) · Ars Electronica 2026 · Karte: © OpenStreetMap-Mitwirkende (ODbL)"
+theme_override_font_sizes/font_size = 12

@@ -1,0 +1,3602 @@
+[
+ {
+  "id": "baum_de748f2ea7a37e369bb8",
+  "lat": 48.290377,
+  "lon": 14.286014,
+  "species": "Platanus hispanica",
+  "height_m": 30.0,
+  "crown_m": 30.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_7a398c0b8657fe450fee",
+  "lat": 48.294545,
+  "lon": 14.282613,
+  "species": "Quercus robur",
+  "height_m": 35.0,
+  "crown_m": 30.0,
+  "age_estimate": 165
+ },
+ {
+  "id": "baum_0a0617bcc030afa67a43",
+  "lat": 48.290228,
+  "lon": 14.286655,
+  "species": "Fagus sylvatica",
+  "height_m": 35.0,
+  "crown_m": 26.0,
+  "age_estimate": 156
+ },
+ {
+  "id": "baum_9979f8e205daeaf04528",
+  "lat": 48.295541,
+  "lon": 14.291634,
+  "species": "Platanus hispanica",
+  "height_m": 22.0,
+  "crown_m": 26.0,
+  "age_estimate": 190
+ },
+ {
+  "id": "baum_21f57233718a8666975e",
+  "lat": 48.315412,
+  "lon": 14.288923,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 25.0,
+  "age_estimate": 119
+ },
+ {
+  "id": "baum_1766867fa19d7ffc59f2",
+  "lat": 48.289275,
+  "lon": 14.284846,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 25.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_51b693c3d4a21493d847",
+  "lat": 48.315933,
+  "lon": 14.311481,
+  "species": "Populus nigra",
+  "height_m": 25.0,
+  "crown_m": 25.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_08c61ef249b9ab9ebe50",
+  "lat": 48.296976,
+  "lon": 14.313724,
+  "species": "Quercus rubra",
+  "height_m": 18.0,
+  "crown_m": 25.0,
+  "age_estimate": 152
+ },
+ {
+  "id": "baum_03ff7be0fc024e466189",
+  "lat": 48.29083,
+  "lon": 14.284417,
+  "species": "Fagus sylvatica",
+  "height_m": 33.0,
+  "crown_m": 25.0,
+  "age_estimate": 177
+ },
+ {
+  "id": "baum_803c81b5c8518bf8222e",
+  "lat": 48.303071,
+  "lon": 14.27211,
+  "species": "Fraxinus excelsior",
+  "height_m": 28.0,
+  "crown_m": 25.0,
+  "age_estimate": 177
+ },
+ {
+  "id": "baum_e77261f72a1a925cd2c4",
+  "lat": 48.289285,
+  "lon": 14.284685,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 25.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_2c7afa3e19ed1609a4f9",
+  "lat": 48.291015,
+  "lon": 14.284429,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 25.0,
+  "age_estimate": 132
+ },
+ {
+  "id": "baum_6317baf9a5b9301d0b2a",
+  "lat": 48.315445,
+  "lon": 14.289015,
+  "species": "Platanus hispanica",
+  "height_m": 28.0,
+  "crown_m": 25.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_7a7c5ec8b8362a81c80a",
+  "lat": 48.294548,
+  "lon": 14.291837,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 25.0,
+  "age_estimate": 204
+ },
+ {
+  "id": "baum_e22119fe301572e887df",
+  "lat": 48.290951,
+  "lon": 14.284545,
+  "species": "Fagus sylvatica",
+  "height_m": 32.0,
+  "crown_m": 24.0,
+  "age_estimate": 147
+ },
+ {
+  "id": "baum_f2ae43ff4e43d4f057aa",
+  "lat": 48.291157,
+  "lon": 14.284514,
+  "species": "Quercus robur",
+  "height_m": 35.0,
+  "crown_m": 24.0,
+  "age_estimate": 207
+ },
+ {
+  "id": "baum_5db78ad5a24dfaed8161",
+  "lat": 48.290056,
+  "lon": 14.286817,
+  "species": "Fagus sylvatica",
+  "height_m": 25.0,
+  "crown_m": 24.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_0669def5cb56e7d0ca79",
+  "lat": 48.305628,
+  "lon": 14.280957,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 23.0,
+  "age_estimate": 195
+ },
+ {
+  "id": "baum_ef02336001adf28e5db6",
+  "lat": 48.296869,
+  "lon": 14.313786,
+  "species": "Quercus robur",
+  "height_m": 19.0,
+  "crown_m": 23.0,
+  "age_estimate": 184
+ },
+ {
+  "id": "baum_58bc804ce2793c8e851e",
+  "lat": 48.294363,
+  "lon": 14.282036,
+  "species": "Quercus rubra",
+  "height_m": 35.0,
+  "crown_m": 23.0,
+  "age_estimate": 220
+ },
+ {
+  "id": "baum_2906dad14188c9a6216e",
+  "lat": 48.296371,
+  "lon": 14.282967,
+  "species": "Quercus robur",
+  "height_m": 31.0,
+  "crown_m": 22.0,
+  "age_estimate": 146
+ },
+ {
+  "id": "baum_f3622c4f6275258470fa",
+  "lat": 48.291082,
+  "lon": 14.286078,
+  "species": "Tilia cordata",
+  "height_m": 27.0,
+  "crown_m": 22.0,
+  "age_estimate": 61
+ },
+ {
+  "id": "baum_715b2914ce5e51720a1e",
+  "lat": 48.305288,
+  "lon": 14.282223,
+  "species": "Quercus robur",
+  "height_m": 20.0,
+  "crown_m": 22.0,
+  "age_estimate": 192
+ },
+ {
+  "id": "baum_f161d5ceabde60010453",
+  "lat": 48.290974,
+  "lon": 14.285983,
+  "species": "Fraxinus excelsior",
+  "height_m": 32.0,
+  "crown_m": 22.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_8f440f71119179791f4d",
+  "lat": 48.30568,
+  "lon": 14.297646,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 22.0,
+  "age_estimate": 206
+ },
+ {
+  "id": "baum_06af4805b83d4391f62b",
+  "lat": 48.315505,
+  "lon": 14.289126,
+  "species": "Gleditsia triacanthos",
+  "height_m": 20.0,
+  "crown_m": 22.0,
+  "age_estimate": 137
+ },
+ {
+  "id": "baum_b3734e40d5c8b1a80bc4",
+  "lat": 48.284981,
+  "lon": 14.281034,
+  "species": "Quercus robur",
+  "height_m": 24.0,
+  "crown_m": 22.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_1e0fb792652e1baf6d74",
+  "lat": 48.290913,
+  "lon": 14.286315,
+  "species": "Fraxinus excelsior",
+  "height_m": 33.0,
+  "crown_m": 22.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_eed7f2ae6fd4e1b03395",
+  "lat": 48.30145,
+  "lon": 14.275273,
+  "species": "Fagus sylvatica",
+  "height_m": 35.0,
+  "crown_m": 22.0,
+  "age_estimate": 310
+ },
+ {
+  "id": "baum_ba374b4c7f4a02bdccc4",
+  "lat": 48.302025,
+  "lon": 14.275218,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 22.0,
+  "age_estimate": 285
+ },
+ {
+  "id": "baum_49e6bc2611bd3ef191e7",
+  "lat": 48.290729,
+  "lon": 14.28448,
+  "species": "Quercus robur",
+  "height_m": 35.0,
+  "crown_m": 22.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_572c35d70a5114b01d3d",
+  "lat": 48.310132,
+  "lon": 14.298595,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 22.0,
+  "age_estimate": 186
+ },
+ {
+  "id": "baum_13520248e40c1e1a02f2",
+  "lat": 48.290101,
+  "lon": 14.286516,
+  "species": "Quercus robur",
+  "height_m": 32.0,
+  "crown_m": 22.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_2992c476158ed0296c60",
+  "lat": 48.295262,
+  "lon": 14.290593,
+  "species": "Platanus hispanica",
+  "height_m": 17.0,
+  "crown_m": 22.0,
+  "age_estimate": 180
+ },
+ {
+  "id": "baum_d85f0f9e6e05fdee96b8",
+  "lat": 48.317015,
+  "lon": 14.285734,
+  "species": "Acer negundo",
+  "height_m": 18.0,
+  "crown_m": 22.0,
+  "age_estimate": 70
+ },
+ {
+  "id": "baum_2ce186274b007fa8e428",
+  "lat": 48.295179,
+  "lon": 14.290805,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 22.0,
+  "age_estimate": 151
+ },
+ {
+  "id": "baum_c9bb861d25ef2a031d88",
+  "lat": 48.295481,
+  "lon": 14.278985,
+  "species": "Platanus hispanica",
+  "height_m": 27.0,
+  "crown_m": 22.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_cca4481e100b1eefeb62",
+  "lat": 48.294909,
+  "lon": 14.281169,
+  "species": "Fagus sylvatica",
+  "height_m": 31.0,
+  "crown_m": 22.0,
+  "age_estimate": 192
+ },
+ {
+  "id": "baum_ddb818d14d27419702a3",
+  "lat": 48.303925,
+  "lon": 14.28594,
+  "species": "Aesculus hippocastanum",
+  "height_m": 28.0,
+  "crown_m": 22.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_b762a176098c77127489",
+  "lat": 48.302098,
+  "lon": 14.303038,
+  "species": "Platanus hispanica",
+  "height_m": 17.0,
+  "crown_m": 21.0,
+  "age_estimate": 170
+ },
+ {
+  "id": "baum_a3949680855748d06007",
+  "lat": 48.290738,
+  "lon": 14.286122,
+  "species": "Acer platanoides",
+  "height_m": 30.0,
+  "crown_m": 21.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_4f57dfd654de049cd7b4",
+  "lat": 48.290164,
+  "lon": 14.285068,
+  "species": "Tilia sp.",
+  "height_m": 28.0,
+  "crown_m": 21.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_7945db10e84e4f32e23c",
+  "lat": 48.305517,
+  "lon": 14.302147,
+  "species": "Acer platanoides",
+  "height_m": 16.0,
+  "crown_m": 21.0,
+  "age_estimate": 116
+ },
+ {
+  "id": "baum_f0f3a02c465f36014944",
+  "lat": 48.289846,
+  "lon": 14.285396,
+  "species": "Prunus avium",
+  "height_m": 18.0,
+  "crown_m": 21.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_089c02bf4d4df5f09b3b",
+  "lat": 48.293865,
+  "lon": 14.314029,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 21.0,
+  "age_estimate": 173
+ },
+ {
+  "id": "baum_316ab29d5ffbc9856f3d",
+  "lat": 48.290722,
+  "lon": 14.286087,
+  "species": "Tilia cordata",
+  "height_m": 29.0,
+  "crown_m": 21.0,
+  "age_estimate": 165
+ },
+ {
+  "id": "baum_2b434ce62e70fdd0ca5e",
+  "lat": 48.293575,
+  "lon": 14.314036,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 159
+ },
+ {
+  "id": "baum_863f26ac53414cdc3088",
+  "lat": 48.290024,
+  "lon": 14.286837,
+  "species": "Fagus sylvatica",
+  "height_m": 35.0,
+  "crown_m": 20.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_4b71a7bcf2b9b1a94670",
+  "lat": 48.301527,
+  "lon": 14.275723,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_16a88329580a953f1359",
+  "lat": 48.308083,
+  "lon": 14.29982,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 134
+ },
+ {
+  "id": "baum_fd6e0595ec8f846b5793",
+  "lat": 48.296748,
+  "lon": 14.276705,
+  "species": "Fagus sylvatica",
+  "height_m": 22.0,
+  "crown_m": 20.0,
+  "age_estimate": 144
+ },
+ {
+  "id": "baum_22b3a0ffd56b75b8300d",
+  "lat": 48.285139,
+  "lon": 14.284729,
+  "species": "Fraxinus americana",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_9815843f18a9d6f7c19f",
+  "lat": 48.309823,
+  "lon": 14.298045,
+  "species": "Ailanthus altissima",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 226
+ },
+ {
+  "id": "baum_32abfa6ddf10ed184cde",
+  "lat": 48.285201,
+  "lon": 14.282574,
+  "species": "Quercus robur",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_c96322e76283a500423e",
+  "lat": 48.307884,
+  "lon": 14.299877,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 129
+ },
+ {
+  "id": "baum_ef5278e7bf8680dbc59b",
+  "lat": 48.315557,
+  "lon": 14.289048,
+  "species": "Gleditsia triacanthos",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 127
+ },
+ {
+  "id": "baum_912b07cfadc302553396",
+  "lat": 48.304431,
+  "lon": 14.283496,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 142
+ },
+ {
+  "id": "baum_c3fcf49c8880079039cb",
+  "lat": 48.29491,
+  "lon": 14.28052,
+  "species": "Platanus hispanica",
+  "height_m": 23.0,
+  "crown_m": 20.0,
+  "age_estimate": 152
+ },
+ {
+  "id": "baum_523fc7e00f756379a508",
+  "lat": 48.30381,
+  "lon": 14.285749,
+  "species": "Paulownia tomentosa",
+  "height_m": 16.0,
+  "crown_m": 20.0,
+  "age_estimate": 170
+ },
+ {
+  "id": "baum_7d78f9b60f4a39919d48",
+  "lat": 48.294946,
+  "lon": 14.281306,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 175
+ },
+ {
+  "id": "baum_f61b1e36585258fb1873",
+  "lat": 48.29038,
+  "lon": 14.285821,
+  "species": "Acer platanoides",
+  "height_m": 28.0,
+  "crown_m": 20.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_5f3913126bf8a1b56df0",
+  "lat": 48.2945,
+  "lon": 14.279892,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_55ad2d2e3387d07df2d5",
+  "lat": 48.30827,
+  "lon": 14.299778,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 133
+ },
+ {
+  "id": "baum_e7d532784dbc56beb3a0",
+  "lat": 48.298318,
+  "lon": 14.316418,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 20.0,
+  "age_estimate": 151
+ },
+ {
+  "id": "baum_d0d0296e7073734f5f3f",
+  "lat": 48.309406,
+  "lon": 14.291731,
+  "species": "Fagus sylvatica",
+  "height_m": 22.0,
+  "crown_m": 20.0,
+  "age_estimate": 197
+ },
+ {
+  "id": "baum_595baf64d301d9e45c08",
+  "lat": 48.305591,
+  "lon": 14.297865,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 180
+ },
+ {
+  "id": "baum_a8a4c52d085d1994003b",
+  "lat": 48.296702,
+  "lon": 14.287208,
+  "species": "Sophora (syn. S japonica (syn. ja",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_81fb3d8325d2e4fc022b",
+  "lat": 48.29047,
+  "lon": 14.286319,
+  "species": "Aesculus hippocastanum",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 180
+ },
+ {
+  "id": "baum_ed35cb865c4b11ffa551",
+  "lat": 48.290564,
+  "lon": 14.28635,
+  "species": "Quercus robur",
+  "height_m": 32.0,
+  "crown_m": 20.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_667ffabffccbd990dc43",
+  "lat": 48.2954,
+  "lon": 14.279013,
+  "species": "Fagus sp.",
+  "height_m": 26.0,
+  "crown_m": 20.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_01eab5e3cb8a70377ff1",
+  "lat": 48.297786,
+  "lon": 14.283057,
+  "species": "Fagus sylvatica",
+  "height_m": 28.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_75b3304f8ce22a26de27",
+  "lat": 48.312683,
+  "lon": 14.294449,
+  "species": "Pterocarya fraxinifolia",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 108
+ },
+ {
+  "id": "baum_f2ab154e1d4dfaa7ab4c",
+  "lat": 48.288036,
+  "lon": 14.302121,
+  "species": "Platanus hispanica",
+  "height_m": 15.0,
+  "crown_m": 20.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_fc2168656290ac84aa6d",
+  "lat": 48.296908,
+  "lon": 14.287293,
+  "species": "Sophora (syn. S japonica (syn. ja",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 124
+ },
+ {
+  "id": "baum_e76b173bc3810f509901",
+  "lat": 48.307782,
+  "lon": 14.2999,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_539c78457348dd83d3ca",
+  "lat": 48.307983,
+  "lon": 14.299846,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_e921db058c040ba13a55",
+  "lat": 48.296786,
+  "lon": 14.275373,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 20.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_e46eb4c3e193335ab7b8",
+  "lat": 48.290682,
+  "lon": 14.286473,
+  "species": "Acer platanoides",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_ee3dc356f2540ede5be1",
+  "lat": 48.302156,
+  "lon": 14.276782,
+  "species": "Quercus rubra",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 190
+ },
+ {
+  "id": "baum_c11d374a22ab69c8c226",
+  "lat": 48.294247,
+  "lon": 14.281676,
+  "species": "Acer pseudoplatanus",
+  "height_m": 23.0,
+  "crown_m": 20.0,
+  "age_estimate": 87
+ },
+ {
+  "id": "baum_e9850839c7a7d9d2917e",
+  "lat": 48.290759,
+  "lon": 14.286223,
+  "species": "Acer platanoides",
+  "height_m": 29.0,
+  "crown_m": 20.0,
+  "age_estimate": 70
+ },
+ {
+  "id": "baum_fbb00bf7dea3c643eeca",
+  "lat": 48.307687,
+  "lon": 14.299909,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 148
+ },
+ {
+  "id": "baum_4dceefd3afb4933e0520",
+  "lat": 48.295647,
+  "lon": 14.278836,
+  "species": "Quercus rubra",
+  "height_m": 29.0,
+  "crown_m": 20.0,
+  "age_estimate": 155
+ },
+ {
+  "id": "baum_540bb6ecc360e2be4eea",
+  "lat": 48.2945,
+  "lon": 14.28121,
+  "species": "Quercus robur",
+  "height_m": 35.0,
+  "crown_m": 20.0,
+  "age_estimate": 206
+ },
+ {
+  "id": "baum_be5f42f9b8f14f5a95b7",
+  "lat": 48.29009,
+  "lon": 14.285763,
+  "species": "Tilia sp.",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_689234c3207a86eea523",
+  "lat": 48.294424,
+  "lon": 14.281463,
+  "species": "Quercus robur",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 171
+ },
+ {
+  "id": "baum_92828bdc6de369b00c1a",
+  "lat": 48.297976,
+  "lon": 14.282832,
+  "species": "Prunus sp.",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 70
+ },
+ {
+  "id": "baum_52ee6579062d1abfb5c4",
+  "lat": 48.300546,
+  "lon": 14.282051,
+  "species": "Sophora (syn. S japonica (syn. ja",
+  "height_m": 14.0,
+  "crown_m": 20.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_cbf586acf9c67a90691f",
+  "lat": 48.316234,
+  "lon": 14.274949,
+  "species": "Tilia cordata",
+  "height_m": 18.0,
+  "crown_m": 20.0,
+  "age_estimate": 161
+ },
+ {
+  "id": "baum_70f950f734f3eec33fa4",
+  "lat": 48.294687,
+  "lon": 14.281875,
+  "species": "Fraxinus excelsior",
+  "height_m": 26.0,
+  "crown_m": 20.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_d27206ed250f605d3954",
+  "lat": 48.313873,
+  "lon": 14.295325,
+  "species": "Quercus robur",
+  "height_m": 21.0,
+  "crown_m": 20.0,
+  "age_estimate": 154
+ },
+ {
+  "id": "baum_e8c6f67083d9f5dc7433",
+  "lat": 48.301782,
+  "lon": 14.274187,
+  "species": "Tilia platyphyllos",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_b8e21f30d617e44475eb",
+  "lat": 48.314413,
+  "lon": 14.296462,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 20.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_3c92395f383636226a07",
+  "lat": 48.304491,
+  "lon": 14.281838,
+  "species": "Fraxinus excelsior",
+  "height_m": 22.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_a542e6b943fcb19a5fd0",
+  "lat": 48.295305,
+  "lon": 14.283152,
+  "species": "Acer pseudoplatanus",
+  "height_m": 27.0,
+  "crown_m": 20.0,
+  "age_estimate": 163
+ },
+ {
+  "id": "baum_e2dc035ecc04887271ea",
+  "lat": 48.305068,
+  "lon": 14.279366,
+  "species": "Robinia pseudoacacia",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 175
+ },
+ {
+  "id": "baum_eb860c8136858812cc90",
+  "lat": 48.297743,
+  "lon": 14.282558,
+  "species": "Tilia cordata",
+  "height_m": 27.0,
+  "crown_m": 20.0,
+  "age_estimate": 86
+ },
+ {
+  "id": "baum_b2101847859ad8bb4393",
+  "lat": 48.315495,
+  "lon": 14.297277,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 197
+ },
+ {
+  "id": "baum_407af0577ce791d69630",
+  "lat": 48.296849,
+  "lon": 14.311583,
+  "species": "Quercus robur",
+  "height_m": 19.0,
+  "crown_m": 20.0,
+  "age_estimate": 180
+ },
+ {
+  "id": "baum_b46d4cc5d4cb21242b4b",
+  "lat": 48.285405,
+  "lon": 14.283247,
+  "species": "Populus tremula",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_17b6e8b367508c7a29c1",
+  "lat": 48.307112,
+  "lon": 14.300049,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_e2c2d94ff122994638cc",
+  "lat": 48.301859,
+  "lon": 14.27472,
+  "species": "Tilia platyphyllos",
+  "height_m": 28.0,
+  "crown_m": 20.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_60476106cd54c974179c",
+  "lat": 48.287978,
+  "lon": 14.302162,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 20.0,
+  "age_estimate": 152
+ },
+ {
+  "id": "baum_18b01bdc8e433892834f",
+  "lat": 48.294681,
+  "lon": 14.280224,
+  "species": "Quercus rubra",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_f3b56f36d20cec2f0850",
+  "lat": 48.30838,
+  "lon": 14.299763,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 147
+ },
+ {
+  "id": "baum_7f3416a082152aa1cbd7",
+  "lat": 48.296375,
+  "lon": 14.283212,
+  "species": "Fraxinus sp.",
+  "height_m": 27.0,
+  "crown_m": 20.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_e0de364feba379d36aa6",
+  "lat": 48.296771,
+  "lon": 14.276602,
+  "species": "Fagus sylvatica",
+  "height_m": 23.0,
+  "crown_m": 20.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_b011451a4fa5e77135f7",
+  "lat": 48.295348,
+  "lon": 14.278625,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_528f11fe492290e111f1",
+  "lat": 48.289743,
+  "lon": 14.28589,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 175
+ },
+ {
+  "id": "baum_7cbb4edf3b842bfe3a0a",
+  "lat": 48.295782,
+  "lon": 14.279658,
+  "species": "Quercus rubra",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 197
+ },
+ {
+  "id": "baum_581447a6e1d7b6746b5d",
+  "lat": 48.296765,
+  "lon": 14.287236,
+  "species": "Sophora (syn. S japonica (syn. ja",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 121
+ },
+ {
+  "id": "baum_92b398da512a7729a472",
+  "lat": 48.308181,
+  "lon": 14.299813,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 20.0,
+  "age_estimate": 124
+ },
+ {
+  "id": "baum_a48a887b8451121c7850",
+  "lat": 48.295163,
+  "lon": 14.278627,
+  "species": "Quercus robur",
+  "height_m": 27.0,
+  "crown_m": 20.0,
+  "age_estimate": 205
+ },
+ {
+  "id": "baum_acfd71ae15ba3aa6979d",
+  "lat": 48.295214,
+  "lon": 14.283617,
+  "species": "Acer pseudoplatanus",
+  "height_m": 30.0,
+  "crown_m": 20.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_14dd220f938dcbc7d4fc",
+  "lat": 48.290765,
+  "lon": 14.285856,
+  "species": "Acer platanoides",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_54c4e6dcc20bd34a032c",
+  "lat": 48.295745,
+  "lon": 14.279171,
+  "species": "Fagus sylvatica",
+  "height_m": 27.0,
+  "crown_m": 20.0,
+  "age_estimate": 141
+ },
+ {
+  "id": "baum_82baab442f5bee19c9c4",
+  "lat": 48.289444,
+  "lon": 14.283966,
+  "species": "Fagus sylvatica",
+  "height_m": 25.0,
+  "crown_m": 20.0,
+  "age_estimate": 200
+ },
+ {
+  "id": "baum_60d7bea70362f863d705",
+  "lat": 48.293691,
+  "lon": 14.314307,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 20.0,
+  "age_estimate": 153
+ },
+ {
+  "id": "baum_1b51840024c31e2584c5",
+  "lat": 48.312015,
+  "lon": 14.311476,
+  "species": "Aesculus hippocastanum",
+  "height_m": 30.0,
+  "crown_m": 19.0,
+  "age_estimate": 205
+ },
+ {
+  "id": "baum_12d09cc438a965c922d5",
+  "lat": 48.293454,
+  "lon": 14.313994,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 19.0,
+  "age_estimate": 157
+ },
+ {
+  "id": "baum_c15a0aa4a8042356d430",
+  "lat": 48.311779,
+  "lon": 14.288338,
+  "species": "Salix alba",
+  "height_m": 16.0,
+  "crown_m": 19.0,
+  "age_estimate": 138
+ },
+ {
+  "id": "baum_367e198c02d87361d530",
+  "lat": 48.295199,
+  "lon": 14.279301,
+  "species": "Tilia cordata",
+  "height_m": 30.0,
+  "crown_m": 19.0,
+  "age_estimate": 138
+ },
+ {
+  "id": "baum_187b1f8461e117bea6b6",
+  "lat": 48.302796,
+  "lon": 14.31126,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 19.0,
+  "age_estimate": 131
+ },
+ {
+  "id": "baum_2e2e92c71acf034bd2eb",
+  "lat": 48.294809,
+  "lon": 14.291132,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 19.0,
+  "age_estimate": 164
+ },
+ {
+  "id": "baum_7043ed41cbab2d8936c5",
+  "lat": 48.298201,
+  "lon": 14.31647,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 19.0,
+  "age_estimate": 119
+ },
+ {
+  "id": "baum_60e83bede4ccef85ffda",
+  "lat": 48.297393,
+  "lon": 14.315228,
+  "species": "Juglans nigra",
+  "height_m": 18.0,
+  "crown_m": 19.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_562fcd9aa178a7d431ed",
+  "lat": 48.310153,
+  "lon": 14.292658,
+  "species": "Fagus sylvatica",
+  "height_m": 25.0,
+  "crown_m": 19.0,
+  "age_estimate": 173
+ },
+ {
+  "id": "baum_c34760b7d93f98384c09",
+  "lat": 48.308241,
+  "lon": 14.289964,
+  "species": "Fagus sylvatica",
+  "height_m": 20.0,
+  "crown_m": 19.0,
+  "age_estimate": 212
+ },
+ {
+  "id": "baum_31a0f78f968232bb9184",
+  "lat": 48.304128,
+  "lon": 14.286429,
+  "species": "Tilia sp.",
+  "height_m": 27.0,
+  "crown_m": 19.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_a0902f4e45ff838cfe40",
+  "lat": 48.290683,
+  "lon": 14.28567,
+  "species": "Carpinus betulus",
+  "height_m": 11.0,
+  "crown_m": 19.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_6d679bcf509947f0484f",
+  "lat": 48.290163,
+  "lon": 14.285912,
+  "species": "Fraxinus excelsior",
+  "height_m": 32.0,
+  "crown_m": 19.0,
+  "age_estimate": 152
+ },
+ {
+  "id": "baum_4465e2ab248bc585c5ff",
+  "lat": 48.297407,
+  "lon": 14.308032,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 19.0,
+  "age_estimate": 148
+ },
+ {
+  "id": "baum_236c33a9a9c1e0908c3c",
+  "lat": 48.29802,
+  "lon": 14.316547,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 19.0,
+  "age_estimate": 272
+ },
+ {
+  "id": "baum_d080fb21afd4a46d8ebb",
+  "lat": 48.30292,
+  "lon": 14.311492,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 121
+ },
+ {
+  "id": "baum_3596a626deb7837fef53",
+  "lat": 48.291384,
+  "lon": 14.279391,
+  "species": "Aesculus hippocastanum",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 153
+ },
+ {
+  "id": "baum_08c68e6bdd1f0aae080c",
+  "lat": 48.311901,
+  "lon": 14.293962,
+  "species": "Acer pseudoplatanus",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 247
+ },
+ {
+  "id": "baum_3f0f7edb2cf05f40c959",
+  "lat": 48.28777,
+  "lon": 14.303626,
+  "species": "Tilia cordata",
+  "height_m": 16.0,
+  "crown_m": 18.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_466369349a1a629abb1c",
+  "lat": 48.290908,
+  "lon": 14.301533,
+  "species": "Platanus hispanica",
+  "height_m": 16.0,
+  "crown_m": 18.0,
+  "age_estimate": 92
+ },
+ {
+  "id": "baum_7a840da5bec1fb1547c1",
+  "lat": 48.290879,
+  "lon": 14.286083,
+  "species": "Acer platanoides",
+  "height_m": 27.0,
+  "crown_m": 18.0,
+  "age_estimate": 85
+ },
+ {
+  "id": "baum_82f13713ec52d0ebc7c9",
+  "lat": 48.310679,
+  "lon": 14.294203,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 18.0,
+  "age_estimate": 210
+ },
+ {
+  "id": "baum_cd292d180f3e5d013eae",
+  "lat": 48.290111,
+  "lon": 14.286779,
+  "species": "Fagus sylvatica",
+  "height_m": 35.0,
+  "crown_m": 18.0,
+  "age_estimate": 125
+ },
+ {
+  "id": "baum_0ffe3a496a7e840994c6",
+  "lat": 48.296523,
+  "lon": 14.283051,
+  "species": "Platanus hispanica",
+  "height_m": 27.0,
+  "crown_m": 18.0,
+  "age_estimate": 195
+ },
+ {
+  "id": "baum_0bf770783cb036d118b7",
+  "lat": 48.302966,
+  "lon": 14.276783,
+  "species": "Tilia sp.",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 170
+ },
+ {
+  "id": "baum_c5d441b4e865f4885fc6",
+  "lat": 48.314738,
+  "lon": 14.296196,
+  "species": "Fraxinus excelsior",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_351e07f67f3e1c6b29a2",
+  "lat": 48.297984,
+  "lon": 14.282484,
+  "species": "Acer platanoides",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_7e57a5e66a24a5005375",
+  "lat": 48.29672,
+  "lon": 14.282449,
+  "species": "Platanus hispanica",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 142
+ },
+ {
+  "id": "baum_a106aa19264a940f1522",
+  "lat": 48.297547,
+  "lon": 14.282597,
+  "species": "Tilia cordata",
+  "height_m": 27.0,
+  "crown_m": 18.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_e80179aed221e9313030",
+  "lat": 48.290393,
+  "lon": 14.28706,
+  "species": "Acer platanoides",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 66
+ },
+ {
+  "id": "baum_0014294212a82ed338e8",
+  "lat": 48.294931,
+  "lon": 14.292498,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 213
+ },
+ {
+  "id": "baum_dee9644d980439ec5d50",
+  "lat": 48.29747,
+  "lon": 14.316725,
+  "species": "Quercus robur",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 195
+ },
+ {
+  "id": "baum_b54e627ddd45b53a5f57",
+  "lat": 48.295385,
+  "lon": 14.279915,
+  "species": "Fagus sylvatica",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_b5d4d2d618a9820f2e6e",
+  "lat": 48.314652,
+  "lon": 14.296158,
+  "species": "Populus alba",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 147
+ },
+ {
+  "id": "baum_e187b9b5b481e0de320d",
+  "lat": 48.296004,
+  "lon": 14.282142,
+  "species": "Acer platanoides",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_a94ec0d08ad6a4869b2c",
+  "lat": 48.29561,
+  "lon": 14.27477,
+  "species": "Acer pseudoplatanus",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_2318d52e506d5311ee12",
+  "lat": 48.290485,
+  "lon": 14.285117,
+  "species": "Fraxinus excelsior",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 90
+ },
+ {
+  "id": "baum_7fa48b16bf7717fa8bcc",
+  "lat": 48.301693,
+  "lon": 14.275322,
+  "species": "Acer pseudoplatanus",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_1f5750b9c268cebaea20",
+  "lat": 48.314772,
+  "lon": 14.297689,
+  "species": "Fraxinus excelsior",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_19bdab877afd4ac185f3",
+  "lat": 48.298159,
+  "lon": 14.315027,
+  "species": "Gleditsia triacanthos",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_2b3751827fdb300fecce",
+  "lat": 48.295655,
+  "lon": 14.290948,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_e0699e4f8840ec285245",
+  "lat": 48.31642,
+  "lon": 14.283946,
+  "species": "Quercus rubra",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 177
+ },
+ {
+  "id": "baum_2712f830e10f82537181",
+  "lat": 48.294323,
+  "lon": 14.292069,
+  "species": "Pterocarya fraxinifolia",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 200
+ },
+ {
+  "id": "baum_eb6b6443855de5359baa",
+  "lat": 48.297502,
+  "lon": 14.282755,
+  "species": "Aesculus hippocastanum",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_b879cf70914c324dc538",
+  "lat": 48.305629,
+  "lon": 14.30173,
+  "species": "Quercus rubra",
+  "height_m": 21.0,
+  "crown_m": 18.0,
+  "age_estimate": 119
+ },
+ {
+  "id": "baum_ee1d625b3ab73b492a3b",
+  "lat": 48.315015,
+  "lon": 14.29762,
+  "species": "Quercus cerris",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_a72e288b9019cb562022",
+  "lat": 48.290741,
+  "lon": 14.285016,
+  "species": "Fraxinus excelsior",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_6d319b51fb1528e560d7",
+  "lat": 48.3072,
+  "lon": 14.300018,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 128
+ },
+ {
+  "id": "baum_123aa9bc53090fb99fd8",
+  "lat": 48.295477,
+  "lon": 14.279856,
+  "species": "Fagus sylvatica",
+  "height_m": 27.0,
+  "crown_m": 18.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_78ca8c6899141a791b84",
+  "lat": 48.297417,
+  "lon": 14.283459,
+  "species": "Acer pseudoplatanus",
+  "height_m": 30.0,
+  "crown_m": 18.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_ea48395ce0c3a21f30d5",
+  "lat": 48.302249,
+  "lon": 14.277275,
+  "species": "Acer pseudoplatanus",
+  "height_m": 26.0,
+  "crown_m": 18.0,
+  "age_estimate": 137
+ },
+ {
+  "id": "baum_b006da521a14d83714ee",
+  "lat": 48.303105,
+  "lon": 14.311846,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 123
+ },
+ {
+  "id": "baum_0c3dd2bd705a717831d4",
+  "lat": 48.298499,
+  "lon": 14.316314,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 156
+ },
+ {
+  "id": "baum_2601cdc90448609d1cff",
+  "lat": 48.301786,
+  "lon": 14.275378,
+  "species": "Tilia sp.",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_2c7659d7f7e173d09b17",
+  "lat": 48.291254,
+  "lon": 14.279317,
+  "species": "Fraxinus excelsior",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_a5a6f1575794b0d10dda",
+  "lat": 48.294582,
+  "lon": 14.278791,
+  "species": "Tilia cordata",
+  "height_m": 30.0,
+  "crown_m": 18.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_c41dea56ffce536ba5de",
+  "lat": 48.295662,
+  "lon": 14.270314,
+  "species": "Tilia cordata",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_daa32e298097626dfd79",
+  "lat": 48.297364,
+  "lon": 14.275914,
+  "species": "Fraxinus excelsior",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 200
+ },
+ {
+  "id": "baum_26c628b25bd56a5ff174",
+  "lat": 48.294443,
+  "lon": 14.28173,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_111445261ee3465e57cb",
+  "lat": 48.29707,
+  "lon": 14.275511,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 260
+ },
+ {
+  "id": "baum_6006eecad7e3bc0b9f9a",
+  "lat": 48.289311,
+  "lon": 14.275732,
+  "species": "Fagus sylvatica",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_d025a14f8a85300fe267",
+  "lat": 48.306849,
+  "lon": 14.300108,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 18.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_e4db379b56337f31e3b7",
+  "lat": 48.2903,
+  "lon": 14.285898,
+  "species": "Acer platanoides",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_e86dc06016d8632cb7ab",
+  "lat": 48.31352,
+  "lon": 14.295204,
+  "species": "Fagus sylvatica",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 139
+ },
+ {
+  "id": "baum_e90a0042c19c4b492677",
+  "lat": 48.295262,
+  "lon": 14.291723,
+  "species": "Fagus sylvatica",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 139
+ },
+ {
+  "id": "baum_7fedf0e1f8ff28274567",
+  "lat": 48.286561,
+  "lon": 14.29656,
+  "species": "Acer pseudoplatanus",
+  "height_m": 16.0,
+  "crown_m": 18.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_d87b11ff1d309a64eba6",
+  "lat": 48.29032,
+  "lon": 14.284947,
+  "species": "Acer platanoides",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_a173cab8b9eee0d23e5e",
+  "lat": 48.288264,
+  "lon": 14.301743,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 98
+ },
+ {
+  "id": "baum_5ca2bd1717fe486dd470",
+  "lat": 48.296551,
+  "lon": 14.282646,
+  "species": "Platanus hispanica",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_203ab8a70bb5e6d6c854",
+  "lat": 48.304701,
+  "lon": 14.282138,
+  "species": "Tilia sp.",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 167
+ },
+ {
+  "id": "baum_ecae1d9b3e24d98a4eca",
+  "lat": 48.310375,
+  "lon": 14.293232,
+  "species": "Quercus robur",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 150
+ },
+ {
+  "id": "baum_61de75ddba015dc0f185",
+  "lat": 48.307029,
+  "lon": 14.30007,
+  "species": "Platanus hispanica",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 96
+ },
+ {
+  "id": "baum_e522c67ee188d4ed3c76",
+  "lat": 48.312876,
+  "lon": 14.294985,
+  "species": "Acer pseudoplatanus",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 217
+ },
+ {
+  "id": "baum_26db4dea2b78794b0e8b",
+  "lat": 48.301634,
+  "lon": 14.274957,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 18.0,
+  "age_estimate": 172
+ },
+ {
+  "id": "baum_283fb19d8b91f315f17a",
+  "lat": 48.304755,
+  "lon": 14.282483,
+  "species": "Quercus robur",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_8db03870ce4b7d45fa10",
+  "lat": 48.310435,
+  "lon": 14.293597,
+  "species": "Acer pseudoplatanus",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 141
+ },
+ {
+  "id": "baum_2868955162b41b602a0a",
+  "lat": 48.284745,
+  "lon": 14.281245,
+  "species": "Carpinus betulus",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_28a6979b5da9b3ee1033",
+  "lat": 48.295564,
+  "lon": 14.291041,
+  "species": "Tilia cordata",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 128
+ },
+ {
+  "id": "baum_64fc5578f74576330f0c",
+  "lat": 48.315608,
+  "lon": 14.297574,
+  "species": "Quercus robur",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_e79ead39d0fc7623b814",
+  "lat": 48.289377,
+  "lon": 14.275729,
+  "species": "Fagus sylvatica",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_7872c33708e430589196",
+  "lat": 48.309368,
+  "lon": 14.291318,
+  "species": "Quercus robur",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 161
+ },
+ {
+  "id": "baum_133c84002a192e9907af",
+  "lat": 48.303628,
+  "lon": 14.280529,
+  "species": "Tilia sp.",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 157
+ },
+ {
+  "id": "baum_1b5056474b32823aab3c",
+  "lat": 48.313199,
+  "lon": 14.29506,
+  "species": "Taxodium distichum",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 165
+ },
+ {
+  "id": "baum_70b5e96ce31204b2e216",
+  "lat": 48.305337,
+  "lon": 14.297788,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_6aca0bc8e78374772fb0",
+  "lat": 48.312429,
+  "lon": 14.293955,
+  "species": "Pterocarya fraxinifolia",
+  "height_m": 16.0,
+  "crown_m": 18.0,
+  "age_estimate": 71
+ },
+ {
+  "id": "baum_78b8b8ac1d18b50176f2",
+  "lat": 48.300484,
+  "lon": 14.300197,
+  "species": "Tilia sp.",
+  "height_m": 12.0,
+  "crown_m": 18.0,
+  "age_estimate": 61
+ },
+ {
+  "id": "baum_b49a27d9c47410c0ff98",
+  "lat": 48.314329,
+  "lon": 14.297914,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 125
+ },
+ {
+  "id": "baum_6a7ef43a5f5798823802",
+  "lat": 48.314479,
+  "lon": 14.297856,
+  "species": "Acer pseudoplatanus",
+  "height_m": 18.0,
+  "crown_m": 18.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_905bf1aeb8b830ec2a91",
+  "lat": 48.302982,
+  "lon": 14.311614,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 136
+ },
+ {
+  "id": "baum_212934c1d6f1bf13dd03",
+  "lat": 48.294711,
+  "lon": 14.280121,
+  "species": "Platanus hispanica",
+  "height_m": 25.0,
+  "crown_m": 18.0,
+  "age_estimate": 125
+ },
+ {
+  "id": "baum_093b4bca162697820481",
+  "lat": 48.301314,
+  "lon": 14.273643,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 18.0,
+  "age_estimate": 245
+ },
+ {
+  "id": "baum_57e1b05a39a3ef1f93ef",
+  "lat": 48.306939,
+  "lon": 14.300096,
+  "species": "Platanus hispanica",
+  "height_m": 23.0,
+  "crown_m": 18.0,
+  "age_estimate": 109
+ },
+ {
+  "id": "baum_38b0e348bd411c197f77",
+  "lat": 48.300595,
+  "lon": 14.300142,
+  "species": "Tilia sp.",
+  "height_m": 10.0,
+  "crown_m": 18.0,
+  "age_estimate": 68
+ },
+ {
+  "id": "baum_8a76a7d75ae4c85ea5ca",
+  "lat": 48.309692,
+  "lon": 14.29171,
+  "species": "Quercus robur",
+  "height_m": 19.0,
+  "crown_m": 18.0,
+  "age_estimate": 128
+ },
+ {
+  "id": "baum_68e4bb86f3d7d94347cb",
+  "lat": 48.306719,
+  "lon": 14.308021,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 18.0,
+  "age_estimate": 161
+ },
+ {
+  "id": "baum_64207b543502c1a468e3",
+  "lat": 48.29567,
+  "lon": 14.274792,
+  "species": "Acer pseudoplatanus",
+  "height_m": 26.0,
+  "crown_m": 18.0,
+  "age_estimate": 126
+ },
+ {
+  "id": "baum_b6af07d925960d05f3c5",
+  "lat": 48.295102,
+  "lon": 14.270655,
+  "species": "Tilia cordata",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_9480b11d6490af46705d",
+  "lat": 48.314863,
+  "lon": 14.297356,
+  "species": "Fraxinus excelsior",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 112
+ },
+ {
+  "id": "baum_58c186533dbc50ca969f",
+  "lat": 48.314817,
+  "lon": 14.296821,
+  "species": "Fagus sylvatica",
+  "height_m": 21.0,
+  "crown_m": 18.0,
+  "age_estimate": 168
+ },
+ {
+  "id": "baum_4e74d3cbd7bde0e73222",
+  "lat": 48.290344,
+  "lon": 14.28474,
+  "species": "Acer platanoides",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_6a246b88c997e812d393",
+  "lat": 48.293377,
+  "lon": 14.272577,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_d8f7f809ed56861a1d67",
+  "lat": 48.290822,
+  "lon": 14.284783,
+  "species": "Acer platanoides",
+  "height_m": 20.0,
+  "crown_m": 18.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_69472525c214e12b10b6",
+  "lat": 48.284758,
+  "lon": 14.280814,
+  "species": "Platanus hispanica",
+  "height_m": 28.0,
+  "crown_m": 18.0,
+  "age_estimate": 170
+ },
+ {
+  "id": "baum_2bddb21d7a196348bcbf",
+  "lat": 48.30917,
+  "lon": 14.291066,
+  "species": "Acer pseudoplatanus",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 153
+ },
+ {
+  "id": "baum_b68de93429adb59cf446",
+  "lat": 48.312722,
+  "lon": 14.294757,
+  "species": "Tilia cordata",
+  "height_m": 22.0,
+  "crown_m": 18.0,
+  "age_estimate": 230
+ },
+ {
+  "id": "baum_696f14ea288aee9cd443",
+  "lat": 48.305621,
+  "lon": 14.298292,
+  "species": "Tilia cordata",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 143
+ },
+ {
+  "id": "baum_bf20e6b04b18fbbab93a",
+  "lat": 48.293845,
+  "lon": 14.273637,
+  "species": "Tilia cordata",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_6a133045f896bbaf2be3",
+  "lat": 48.287114,
+  "lon": 14.296558,
+  "species": "Tilia cordata",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 85
+ },
+ {
+  "id": "baum_c073998526721d4b9b46",
+  "lat": 48.290418,
+  "lon": 14.284842,
+  "species": "Acer platanoides",
+  "height_m": 23.0,
+  "crown_m": 17.0,
+  "age_estimate": 104
+ },
+ {
+  "id": "baum_e5ed8b5c0ede7f9f1e7f",
+  "lat": 48.296731,
+  "lon": 14.307491,
+  "species": "Platanus hispanica",
+  "height_m": 16.0,
+  "crown_m": 17.0,
+  "age_estimate": 101
+ },
+ {
+  "id": "baum_624deaff626547af9de2",
+  "lat": 48.296583,
+  "lon": 14.279806,
+  "species": "Tilia cordata",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 85
+ },
+ {
+  "id": "baum_301e1513f6938f3c8687",
+  "lat": 48.30656,
+  "lon": 14.307706,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_5e5195ec6c2662aee791",
+  "lat": 48.308131,
+  "lon": 14.277253,
+  "species": "Quercus rubra",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 133
+ },
+ {
+  "id": "baum_540e83550a27b3a582d3",
+  "lat": 48.290415,
+  "lon": 14.285127,
+  "species": "Acer platanoides",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_748e1e925c6535621314",
+  "lat": 48.310576,
+  "lon": 14.281369,
+  "species": "Tilia sp.",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 77
+ },
+ {
+  "id": "baum_1522a7e105b9130d48da",
+  "lat": 48.293945,
+  "lon": 14.273612,
+  "species": "Tilia cordata",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 96
+ },
+ {
+  "id": "baum_165ab373d787fd5a7599",
+  "lat": 48.306589,
+  "lon": 14.299794,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 94
+ },
+ {
+  "id": "baum_d0b74b0caf7bfcd0ab37",
+  "lat": 48.295396,
+  "lon": 14.283047,
+  "species": "Quercus robur",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 128
+ },
+ {
+  "id": "baum_f5393e0b165ec3d010a2",
+  "lat": 48.291003,
+  "lon": 14.28612,
+  "species": "Acer platanoides",
+  "height_m": 30.0,
+  "crown_m": 17.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_fbf494a4a6ff06b71f08",
+  "lat": 48.300839,
+  "lon": 14.301249,
+  "species": "Robinia pseudoacacia",
+  "height_m": 9.0,
+  "crown_m": 17.0,
+  "age_estimate": 63
+ },
+ {
+  "id": "baum_53e4b829ebce51b14361",
+  "lat": 48.300866,
+  "lon": 14.286112,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_880de86dfb3d501669c1",
+  "lat": 48.305348,
+  "lon": 14.297573,
+  "species": "Ginkgo biloba",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 173
+ },
+ {
+  "id": "baum_0a154bebc7c30683d038",
+  "lat": 48.317183,
+  "lon": 14.291371,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 17.0,
+  "age_estimate": 86
+ },
+ {
+  "id": "baum_9b7078bdd828dbd159e5",
+  "lat": 48.303696,
+  "lon": 14.285383,
+  "species": "Paulownia tomentosa",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 165
+ },
+ {
+  "id": "baum_5d382dd513d92cd0af35",
+  "lat": 48.302163,
+  "lon": 14.277065,
+  "species": "Quercus robur",
+  "height_m": 26.0,
+  "crown_m": 17.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_2913ce64b9df2a5825f6",
+  "lat": 48.295353,
+  "lon": 14.292601,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 17.0,
+  "age_estimate": 134
+ },
+ {
+  "id": "baum_26175a80ba3457af7208",
+  "lat": 48.294793,
+  "lon": 14.277644,
+  "species": "Tilia cordata",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_014eecd7db6fbc7ff9ee",
+  "lat": 48.302525,
+  "lon": 14.277934,
+  "species": "Tilia sp.",
+  "height_m": 26.0,
+  "crown_m": 17.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_a77a4614dbecc74463eb",
+  "lat": 48.288801,
+  "lon": 14.277594,
+  "species": "Betula pendula",
+  "height_m": 23.0,
+  "crown_m": 17.0,
+  "age_estimate": 82
+ },
+ {
+  "id": "baum_2e023b21bc6cd7966aab",
+  "lat": 48.306497,
+  "lon": 14.307597,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_3fa9b2b714f576020722",
+  "lat": 48.306613,
+  "lon": 14.307815,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_cbeadf2184c75ffc5256",
+  "lat": 48.296938,
+  "lon": 14.276688,
+  "species": "Fagus sylvatica",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 353
+ },
+ {
+  "id": "baum_3c3ceec1aed84a52224a",
+  "lat": 48.291102,
+  "lon": 14.285635,
+  "species": "Aesculus hippocastanum",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_f391fbb52329369866f3",
+  "lat": 48.295605,
+  "lon": 14.291541,
+  "species": "Acer platanoides",
+  "height_m": 19.0,
+  "crown_m": 17.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_84df2fc22c4b610e2793",
+  "lat": 48.306393,
+  "lon": 14.307377,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 138
+ },
+ {
+  "id": "baum_e923cb5ba59ceceacfff",
+  "lat": 48.295742,
+  "lon": 14.279351,
+  "species": "Fagus sylvatica",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 175
+ },
+ {
+  "id": "baum_e0420a5780a4d6d4108b",
+  "lat": 48.298089,
+  "lon": 14.315861,
+  "species": "Fagus sylvatica",
+  "height_m": 19.0,
+  "crown_m": 17.0,
+  "age_estimate": 131
+ },
+ {
+  "id": "baum_733d8878ece8aaecf8c1",
+  "lat": 48.301573,
+  "lon": 14.276158,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 17.0,
+  "age_estimate": 192
+ },
+ {
+  "id": "baum_5a33d1572f275444aff1",
+  "lat": 48.305937,
+  "lon": 14.306508,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_0755ad25409c22755eb6",
+  "lat": 48.289663,
+  "lon": 14.285716,
+  "species": "Betula pendula",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 92
+ },
+ {
+  "id": "baum_52c7d9ae89afbda778d5",
+  "lat": 48.313311,
+  "lon": 14.289773,
+  "species": "Salix alba",
+  "height_m": 14.0,
+  "crown_m": 17.0,
+  "age_estimate": 62
+ },
+ {
+  "id": "baum_d9816618ffc69881da61",
+  "lat": 48.305877,
+  "lon": 14.299874,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 88
+ },
+ {
+  "id": "baum_43397c75757d4a36dc19",
+  "lat": 48.297216,
+  "lon": 14.317017,
+  "species": "Fagus sylvatica",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 295
+ },
+ {
+  "id": "baum_327d13460fcb22b592bf",
+  "lat": 48.306286,
+  "lon": 14.307174,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_46f3cc0651f03097abb5",
+  "lat": 48.290903,
+  "lon": 14.284369,
+  "species": "Fagus sylvatica",
+  "height_m": 28.0,
+  "crown_m": 17.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_7f27470ad3ed411b3c08",
+  "lat": 48.306678,
+  "lon": 14.307922,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_f3f82562a41b3478cf7a",
+  "lat": 48.3025,
+  "lon": 14.277499,
+  "species": "Acer pseudoplatanus",
+  "height_m": 28.0,
+  "crown_m": 17.0,
+  "age_estimate": 165
+ },
+ {
+  "id": "baum_a2ab7b9fc82cf9d5a030",
+  "lat": 48.309509,
+  "lon": 14.29899,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 123
+ },
+ {
+  "id": "baum_38855dc7ba94a8b51f6c",
+  "lat": 48.29643,
+  "lon": 14.282518,
+  "species": "Quercus robur",
+  "height_m": 26.0,
+  "crown_m": 17.0,
+  "age_estimate": 157
+ },
+ {
+  "id": "baum_9ba26d233aa1f6543ed0",
+  "lat": 48.296352,
+  "lon": 14.282727,
+  "species": "Tilia cordata",
+  "height_m": 27.0,
+  "crown_m": 17.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_68490324abcbe2a2981c",
+  "lat": 48.310199,
+  "lon": 14.281317,
+  "species": "Tilia sp.",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 85
+ },
+ {
+  "id": "baum_18d2a8fa2e3e4d461ebd",
+  "lat": 48.305789,
+  "lon": 14.299885,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_32c07cf590afd5da66bd",
+  "lat": 48.31109,
+  "lon": 14.293187,
+  "species": "Acer campestre",
+  "height_m": 16.0,
+  "crown_m": 17.0,
+  "age_estimate": 66
+ },
+ {
+  "id": "baum_de466be0e98320c0b099",
+  "lat": 48.298336,
+  "lon": 14.316446,
+  "species": "Fagus sylvatica",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 78
+ },
+ {
+  "id": "baum_ef43bbcc1b71387a9a41",
+  "lat": 48.302107,
+  "lon": 14.300239,
+  "species": "Ailanthus altissima",
+  "height_m": 15.0,
+  "crown_m": 17.0,
+  "age_estimate": 127
+ },
+ {
+  "id": "baum_718c4301dbdd6c96a6ae",
+  "lat": 48.295088,
+  "lon": 14.281433,
+  "species": "Fagus sylvatica",
+  "height_m": 15.0,
+  "crown_m": 17.0,
+  "age_estimate": 75
+ },
+ {
+  "id": "baum_4c821e43f1bf496a7308",
+  "lat": 48.294256,
+  "lon": 14.279258,
+  "species": "Quercus robur",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_f9ee99b0b87c8b3b27ec",
+  "lat": 48.289979,
+  "lon": 14.286885,
+  "species": "Acer campestre",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_23aca4f982b107dd7d00",
+  "lat": 48.298885,
+  "lon": 14.282003,
+  "species": "Tilia cordata",
+  "height_m": 25.0,
+  "crown_m": 17.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_e87f623447a8ed4de0d2",
+  "lat": 48.301765,
+  "lon": 14.300566,
+  "species": "Platanus hispanica",
+  "height_m": 17.0,
+  "crown_m": 17.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_0fb356f0e65607be9521",
+  "lat": 48.300106,
+  "lon": 14.312409,
+  "species": "Ailanthus altissima",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_90985f89391dfc4cb6a3",
+  "lat": 48.286518,
+  "lon": 14.296303,
+  "species": "Acer platanoides",
+  "height_m": 16.0,
+  "crown_m": 17.0,
+  "age_estimate": 175
+ },
+ {
+  "id": "baum_4bd2b7b7b704b5d31bf6",
+  "lat": 48.305629,
+  "lon": 14.299916,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 96
+ },
+ {
+  "id": "baum_0441f22f4c889704ea58",
+  "lat": 48.305355,
+  "lon": 14.300254,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 89
+ },
+ {
+  "id": "baum_21c7fff45ac9c70d1ea8",
+  "lat": 48.305509,
+  "lon": 14.281578,
+  "species": "Tilia sp.",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 90
+ },
+ {
+  "id": "baum_5ec6b4ce3739a22a89a9",
+  "lat": 48.302875,
+  "lon": 14.272535,
+  "species": "Catalpa bignonioides",
+  "height_m": 12.0,
+  "crown_m": 17.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_69b86d400061c1cf3274",
+  "lat": 48.290497,
+  "lon": 14.28489,
+  "species": "Fraxinus excelsior",
+  "height_m": 30.0,
+  "crown_m": 17.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_2e253172a56e06872f32",
+  "lat": 48.302145,
+  "lon": 14.30312,
+  "species": "Platanus hispanica",
+  "height_m": 17.0,
+  "crown_m": 17.0,
+  "age_estimate": 128
+ },
+ {
+  "id": "baum_667a3c092dc32975c192",
+  "lat": 48.314922,
+  "lon": 14.297354,
+  "species": "Tilia cordata",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 101
+ },
+ {
+  "id": "baum_3c176ac59b42614940de",
+  "lat": 48.305711,
+  "lon": 14.299906,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_e66309538cb44df5a513",
+  "lat": 48.290197,
+  "lon": 14.286127,
+  "species": "Fagus sylvatica",
+  "height_m": 34.0,
+  "crown_m": 17.0,
+  "age_estimate": 141
+ },
+ {
+  "id": "baum_e844c7fedd15d81a2aa8",
+  "lat": 48.286938,
+  "lon": 14.299804,
+  "species": "Tilia cordata",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 87
+ },
+ {
+  "id": "baum_01608461a4eedd522fa3",
+  "lat": 48.289814,
+  "lon": 14.285635,
+  "species": "Betula pendula",
+  "height_m": 22.0,
+  "crown_m": 17.0,
+  "age_estimate": 60
+ },
+ {
+  "id": "baum_5f26768f36360542aad6",
+  "lat": 48.284913,
+  "lon": 14.295688,
+  "species": "Aesculus sp.",
+  "height_m": 17.0,
+  "crown_m": 17.0,
+  "age_estimate": 187
+ },
+ {
+  "id": "baum_48288495a584103f566f",
+  "lat": 48.305438,
+  "lon": 14.299932,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 17.0,
+  "age_estimate": 89
+ },
+ {
+  "id": "baum_649cd0a1f32eda2934c0",
+  "lat": 48.290616,
+  "lon": 14.285709,
+  "species": "Paulownia tomentosa",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_d1ca379127d98951efa3",
+  "lat": 48.300798,
+  "lon": 14.285558,
+  "species": "Platanus hispanica",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_6d26721aa7f0bbb58163",
+  "lat": 48.285287,
+  "lon": 14.304715,
+  "species": "Quercus rubra",
+  "height_m": 18.0,
+  "crown_m": 17.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_bc2077d9e8d7f033e6d6",
+  "lat": 48.297768,
+  "lon": 14.284035,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 17.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_7f631a306ecd6751e8c2",
+  "lat": 48.301151,
+  "lon": 14.273955,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 17.0,
+  "age_estimate": 172
+ },
+ {
+  "id": "baum_cdac96a4e7c7c38b6132",
+  "lat": 48.295223,
+  "lon": 14.278983,
+  "species": "Pinus sp.",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_d0e1eeb952b9f7bb5ba6",
+  "lat": 48.2979,
+  "lon": 14.291246,
+  "species": "Acer platanoides",
+  "height_m": 16.0,
+  "crown_m": 17.0,
+  "age_estimate": 190
+ },
+ {
+  "id": "baum_fd19a1a6856eb3dce0dc",
+  "lat": 48.289662,
+  "lon": 14.285891,
+  "species": "Platanus hispanica",
+  "height_m": 24.0,
+  "crown_m": 17.0,
+  "age_estimate": 190
+ },
+ {
+  "id": "baum_547185aad956f3e420a0",
+  "lat": 48.294076,
+  "lon": 14.274046,
+  "species": "Tilia cordata",
+  "height_m": 27.0,
+  "crown_m": 17.0,
+  "age_estimate": 73
+ },
+ {
+  "id": "baum_7e889020a16f844b5a4e",
+  "lat": 48.28941,
+  "lon": 14.284822,
+  "species": "Acer campestre",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 82
+ },
+ {
+  "id": "baum_6031d6989da703245db6",
+  "lat": 48.29508,
+  "lon": 14.297259,
+  "species": "Gleditsia triacanthos",
+  "height_m": 15.0,
+  "crown_m": 16.0,
+  "age_estimate": 87
+ },
+ {
+  "id": "baum_7d4e4fb8552a3a546703",
+  "lat": 48.300988,
+  "lon": 14.294849,
+  "species": "Gleditsia triacanthos",
+  "height_m": 12.0,
+  "crown_m": 16.0,
+  "age_estimate": 54
+ },
+ {
+  "id": "baum_5d0bd902bf1090e005cd",
+  "lat": 48.2851,
+  "lon": 14.285553,
+  "species": "Acer platanoides",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_208ae4272f1f8028417e",
+  "lat": 48.294887,
+  "lon": 14.278198,
+  "species": "Tilia cordata",
+  "height_m": 28.0,
+  "crown_m": 16.0,
+  "age_estimate": 170
+ },
+ {
+  "id": "baum_08193977f223d7a5efef",
+  "lat": 48.289557,
+  "lon": 14.27451,
+  "species": "Fagus sylvatica",
+  "height_m": 26.0,
+  "crown_m": 16.0,
+  "age_estimate": 77
+ },
+ {
+  "id": "baum_e159c70eee04fe014f6c",
+  "lat": 48.291518,
+  "lon": 14.285239,
+  "species": "Aesculus hippocastanum",
+  "height_m": 23.0,
+  "crown_m": 16.0,
+  "age_estimate": 160
+ },
+ {
+  "id": "baum_1fc63aa31808c65a42ce",
+  "lat": 48.294475,
+  "lon": 14.279002,
+  "species": "Tilia cordata",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_1cb668f67adb9cf3875c",
+  "lat": 48.305168,
+  "lon": 14.299968,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_a9c52aad518ef556708b",
+  "lat": 48.312086,
+  "lon": 14.294384,
+  "species": "Tilia cordata",
+  "height_m": 19.0,
+  "crown_m": 16.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_2cf158a3fd4f4030b30a",
+  "lat": 48.305883,
+  "lon": 14.306399,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_23ad4298d860d7b2a656",
+  "lat": 48.306618,
+  "lon": 14.300105,
+  "species": "Platanus hispanica",
+  "height_m": 16.0,
+  "crown_m": 16.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_0c46ab240adf9a33c0f2",
+  "lat": 48.308257,
+  "lon": 14.299448,
+  "species": "Platanus hispanica",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_2975565eaf8abdc22a00",
+  "lat": 48.309938,
+  "lon": 14.291969,
+  "species": "Pinus strobus",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_4b72b182100748da06bf",
+  "lat": 48.297126,
+  "lon": 14.313473,
+  "species": "Betula pendula",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_d83be27cc022fc83e807",
+  "lat": 48.306149,
+  "lon": 14.299839,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 75
+ },
+ {
+  "id": "baum_5c565c6f715f444972c3",
+  "lat": 48.307436,
+  "lon": 14.29962,
+  "species": "Platanus hispanica",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 90
+ },
+ {
+  "id": "baum_e1a3e0919bf543b6e895",
+  "lat": 48.314129,
+  "lon": 14.297947,
+  "species": "Populus nigra",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_e403320ecdfcc18c618f",
+  "lat": 48.290499,
+  "lon": 14.28651,
+  "species": "Fraxinus excelsior",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_688e8ba7d802aa9b9a19",
+  "lat": 48.305073,
+  "lon": 14.299986,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 106
+ },
+ {
+  "id": "baum_38085cdcd4069745f078",
+  "lat": 48.31686,
+  "lon": 14.286272,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 80
+ },
+ {
+  "id": "baum_a678ba309fc6b68e56fd",
+  "lat": 48.309567,
+  "lon": 14.299333,
+  "species": "Sophora (syn. S japonica (syn. ja",
+  "height_m": 24.0,
+  "crown_m": 16.0,
+  "age_estimate": 122
+ },
+ {
+  "id": "baum_dea4a7fe0de51ce41a9f",
+  "lat": 48.300039,
+  "lon": 14.311841,
+  "species": "Tilia sp.",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 96
+ },
+ {
+  "id": "baum_57f08c672dbf065d29ce",
+  "lat": 48.296807,
+  "lon": 14.282071,
+  "species": "Tilia cordata",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_55337ccb0a505ac52cc5",
+  "lat": 48.300801,
+  "lon": 14.294953,
+  "species": "Gleditsia triacanthos",
+  "height_m": 15.0,
+  "crown_m": 16.0,
+  "age_estimate": 52
+ },
+ {
+  "id": "baum_343a3b35b753fcdb5385",
+  "lat": 48.297042,
+  "lon": 14.282598,
+  "species": "Aesculus hippocastanum",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_09b49f112c00e3d06346",
+  "lat": 48.296934,
+  "lon": 14.277937,
+  "species": "Castanea sativa",
+  "height_m": 17.0,
+  "crown_m": 16.0,
+  "age_estimate": 250
+ },
+ {
+  "id": "baum_ec4661eac73fac3109a4",
+  "lat": 48.294685,
+  "lon": 14.28039,
+  "species": "Quercus robur",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 142
+ },
+ {
+  "id": "baum_b29742c97067db2dc023",
+  "lat": 48.309806,
+  "lon": 14.297874,
+  "species": "Fagus sylvatica",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 200
+ },
+ {
+  "id": "baum_2420dd763fb405ba627e",
+  "lat": 48.29504,
+  "lon": 14.283659,
+  "species": "Parrotia persica",
+  "height_m": 15.0,
+  "crown_m": 16.0,
+  "age_estimate": 125
+ },
+ {
+  "id": "baum_2fda3e125d445909aba9",
+  "lat": 48.289834,
+  "lon": 14.284789,
+  "species": "Acer platanoides",
+  "height_m": 14.0,
+  "crown_m": 16.0,
+  "age_estimate": 97
+ },
+ {
+  "id": "baum_ce43339a0ed43e1fbb5d",
+  "lat": 48.288907,
+  "lon": 14.277064,
+  "species": "Betula pendula",
+  "height_m": 24.0,
+  "crown_m": 16.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_371a73b9fb611c21a9f0",
+  "lat": 48.295466,
+  "lon": 14.278897,
+  "species": "Platanus hispanica",
+  "height_m": 27.0,
+  "crown_m": 16.0,
+  "age_estimate": 143
+ },
+ {
+  "id": "baum_fee849c26f18c5a53ca7",
+  "lat": 48.301717,
+  "lon": 14.303587,
+  "species": "Ailanthus altissima",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 136
+ },
+ {
+  "id": "baum_909deab85abaead47bdc",
+  "lat": 48.314583,
+  "lon": 14.29651,
+  "species": "Pterocarya fraxinifolia",
+  "height_m": 15.0,
+  "crown_m": 16.0,
+  "age_estimate": 144
+ },
+ {
+  "id": "baum_d295cc7c40e778a3ad80",
+  "lat": 48.29645,
+  "lon": 14.282393,
+  "species": "Tilia cordata",
+  "height_m": 26.0,
+  "crown_m": 16.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_22ae19b1d4e3e85b832e",
+  "lat": 48.290506,
+  "lon": 14.285256,
+  "species": "Fraxinus excelsior",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_4f6ba93a0db707dbc7b9",
+  "lat": 48.302003,
+  "lon": 14.276873,
+  "species": "Tilia platyphyllos",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 115
+ },
+ {
+  "id": "baum_fba19bf2f8c8a466a9ae",
+  "lat": 48.301512,
+  "lon": 14.301509,
+  "species": "Acer saccharinum",
+  "height_m": 17.0,
+  "crown_m": 16.0,
+  "age_estimate": 118
+ },
+ {
+  "id": "baum_e623569a36ebd1f75a5b",
+  "lat": 48.290169,
+  "lon": 14.28647,
+  "species": "Acer platanoides",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 102
+ },
+ {
+  "id": "baum_27a17bca0324985b2383",
+  "lat": 48.294267,
+  "lon": 14.279639,
+  "species": "Tilia cordata",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 90
+ },
+ {
+  "id": "baum_0ed3dddfa5ceec7dad7a",
+  "lat": 48.311067,
+  "lon": 14.311286,
+  "species": "Juglans regia",
+  "height_m": 16.0,
+  "crown_m": 16.0,
+  "age_estimate": 98
+ },
+ {
+  "id": "baum_068e2340323255606d78",
+  "lat": 48.294466,
+  "lon": 14.282422,
+  "species": "Acer pseudoplatanus",
+  "height_m": 28.0,
+  "crown_m": 16.0,
+  "age_estimate": 130
+ },
+ {
+  "id": "baum_ef5ad1ed399e755d4418",
+  "lat": 48.290062,
+  "lon": 14.28323,
+  "species": "Fagus sylvatica",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_366f7abba4d8e254f8c7",
+  "lat": 48.2966,
+  "lon": 14.279901,
+  "species": "Tilia cordata",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 95
+ },
+ {
+  "id": "baum_8722e1ff21e0f2751a65",
+  "lat": 48.310249,
+  "lon": 14.29341,
+  "species": "Pinus wallichiana",
+  "height_m": 19.0,
+  "crown_m": 16.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_5a5869dfbbb61e953f8f",
+  "lat": 48.301231,
+  "lon": 14.277263,
+  "species": "Quercus robur",
+  "height_m": 16.0,
+  "crown_m": 16.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_c4f53a84225f36039fd5",
+  "lat": 48.304136,
+  "lon": 14.286497,
+  "species": "Aesculus hippocastanum",
+  "height_m": 27.0,
+  "crown_m": 16.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_009ad4d37cdb42269923",
+  "lat": 48.294422,
+  "lon": 14.280852,
+  "species": "Acer pseudoplatanus",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 73
+ },
+ {
+  "id": "baum_8af0ebe43e7a3b7086b0",
+  "lat": 48.286957,
+  "lon": 14.296432,
+  "species": "Tilia cordata",
+  "height_m": 17.0,
+  "crown_m": 16.0,
+  "age_estimate": 99
+ },
+ {
+  "id": "baum_a7826c5085b175a1b796",
+  "lat": 48.28919,
+  "lon": 14.277099,
+  "species": "Salix sp.",
+  "height_m": 12.0,
+  "crown_m": 16.0,
+  "age_estimate": 105
+ },
+ {
+  "id": "baum_67d02176a630f610407c",
+  "lat": 48.290299,
+  "lon": 14.285563,
+  "species": "Acer platanoides",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_bb9a09d023fc5b54a52a",
+  "lat": 48.302085,
+  "lon": 14.27887,
+  "species": "Quercus robur",
+  "height_m": 13.0,
+  "crown_m": 16.0,
+  "age_estimate": 87
+ },
+ {
+  "id": "baum_f15ba125e906e82e2ec3",
+  "lat": 48.30641,
+  "lon": 14.299803,
+  "species": "Platanus hispanica",
+  "height_m": 19.0,
+  "crown_m": 16.0,
+  "age_estimate": 79
+ },
+ {
+  "id": "baum_2debefdc1439a3cb7b4d",
+  "lat": 48.310503,
+  "lon": 14.281364,
+  "species": "Tilia sp.",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 79
+ },
+ {
+  "id": "baum_0136a92620021e65b6ad",
+  "lat": 48.304496,
+  "lon": 14.279871,
+  "species": "Tilia sp.",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 127
+ },
+ {
+  "id": "baum_6752df3d277b37d1f6e1",
+  "lat": 48.29471,
+  "lon": 14.277939,
+  "species": "Acer pseudoplatanus",
+  "height_m": 25.0,
+  "crown_m": 16.0,
+  "age_estimate": 126
+ },
+ {
+  "id": "baum_b1e31daa78eb84836909",
+  "lat": 48.306075,
+  "lon": 14.300173,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 100
+ },
+ {
+  "id": "baum_980c6637fd2478131934",
+  "lat": 48.314573,
+  "lon": 14.296196,
+  "species": "Pterocarya fraxinifolia",
+  "height_m": 16.0,
+  "crown_m": 16.0,
+  "age_estimate": 53
+ },
+ {
+  "id": "baum_81abfe7caadf494ab672",
+  "lat": 48.30597,
+  "lon": 14.299862,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 81
+ },
+ {
+  "id": "baum_b621be9798625ce3535f",
+  "lat": 48.316803,
+  "lon": 14.282944,
+  "species": "Platanus hispanica",
+  "height_m": 12.0,
+  "crown_m": 16.0,
+  "age_estimate": 139
+ },
+ {
+  "id": "baum_6227c8ef6b27c60b2a6c",
+  "lat": 48.295213,
+  "lon": 14.280049,
+  "species": "Fagus sylvatica",
+  "height_m": 26.0,
+  "crown_m": 16.0,
+  "age_estimate": 132
+ },
+ {
+  "id": "baum_22b431ea60149d6bee10",
+  "lat": 48.303953,
+  "lon": 14.291362,
+  "species": "Paulownia tomentosa",
+  "height_m": 19.0,
+  "crown_m": 16.0,
+  "age_estimate": 185
+ },
+ {
+  "id": "baum_a3241e2a5345a56cd20d",
+  "lat": 48.290962,
+  "lon": 14.30148,
+  "species": "Platanus hispanica",
+  "height_m": 16.0,
+  "crown_m": 16.0,
+  "age_estimate": 109
+ },
+ {
+  "id": "baum_328d20070d97e9695057",
+  "lat": 48.316576,
+  "lon": 14.291552,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 110
+ },
+ {
+  "id": "baum_760a9d6f5d4883c8b59b",
+  "lat": 48.306165,
+  "lon": 14.306942,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 96
+ },
+ {
+  "id": "baum_2ffb0ae1c01659b5ea36",
+  "lat": 48.291333,
+  "lon": 14.315283,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 145
+ },
+ {
+  "id": "baum_c64d0124a7f71cc2fddf",
+  "lat": 48.286799,
+  "lon": 14.296296,
+  "species": "Tilia cordata",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 91
+ },
+ {
+  "id": "baum_d1d5636367e38913b4a8",
+  "lat": 48.296637,
+  "lon": 14.276519,
+  "species": "Acer pseudoplatanus",
+  "height_m": 24.0,
+  "crown_m": 16.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_bc20edb52945217770b0",
+  "lat": 48.296584,
+  "lon": 14.279712,
+  "species": "Tilia cordata",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 87
+ },
+ {
+  "id": "baum_b19932b3f687756961fe",
+  "lat": 48.313604,
+  "lon": 14.295175,
+  "species": "Tilia tomentosa",
+  "height_m": 19.0,
+  "crown_m": 16.0,
+  "age_estimate": 121
+ },
+ {
+  "id": "baum_5a10264ed82d724c8976",
+  "lat": 48.316743,
+  "lon": 14.28307,
+  "species": "Platanus hispanica",
+  "height_m": 17.0,
+  "crown_m": 16.0,
+  "age_estimate": 142
+ },
+ {
+  "id": "baum_4d0c21427660b223e4ad",
+  "lat": 48.295442,
+  "lon": 14.291605,
+  "species": "Fagus sylvatica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 137
+ },
+ {
+  "id": "baum_d5ae3fc184e2626d83e3",
+  "lat": 48.297838,
+  "lon": 14.315873,
+  "species": "Fagus sylvatica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 139
+ },
+ {
+  "id": "baum_b93df8c661ddffbd3f3d",
+  "lat": 48.316763,
+  "lon": 14.286488,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 76
+ },
+ {
+  "id": "baum_d15abba809b59b95f805",
+  "lat": 48.3138,
+  "lon": 14.295542,
+  "species": "Fraxinus excelsior",
+  "height_m": 23.0,
+  "crown_m": 16.0,
+  "age_estimate": 92
+ },
+ {
+  "id": "baum_ed35c20ce8d5a7c572bc",
+  "lat": 48.295828,
+  "lon": 14.279831,
+  "species": "Fagus sylvatica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 48
+ },
+ {
+  "id": "baum_39ff866660f7807430dd",
+  "lat": 48.285241,
+  "lon": 14.282606,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 85
+ },
+ {
+  "id": "baum_f9dadb1b0a2dfca81b07",
+  "lat": 48.310179,
+  "lon": 14.281536,
+  "species": "Tilia sp.",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 90
+ },
+ {
+  "id": "baum_4042950dec23ec81c77a",
+  "lat": 48.308373,
+  "lon": 14.299422,
+  "species": "Platanus hispanica",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 98
+ },
+ {
+  "id": "baum_5f045db0687c67318495",
+  "lat": 48.291296,
+  "lon": 14.285633,
+  "species": "Fagus sylvatica",
+  "height_m": 30.0,
+  "crown_m": 16.0,
+  "age_estimate": 135
+ },
+ {
+  "id": "baum_15bb6f924cef321075a1",
+  "lat": 48.308631,
+  "lon": 14.299647,
+  "species": "Acer pseudoplatanus",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_b76510f1d81c3b98854f",
+  "lat": 48.309944,
+  "lon": 14.293632,
+  "species": "Prunus serrulata",
+  "height_m": 11.0,
+  "crown_m": 16.0,
+  "age_estimate": 155
+ },
+ {
+  "id": "baum_3cba7fa5e5e1a2d63308",
+  "lat": 48.317455,
+  "lon": 14.306817,
+  "species": "Juglans regia",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 106
+ },
+ {
+  "id": "baum_7869e3a165c1817d9aef",
+  "lat": 48.284819,
+  "lon": 14.300272,
+  "species": "Acer pseudoplatanus",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 190
+ },
+ {
+  "id": "baum_ca7a8ac2e3a70da2d482",
+  "lat": 48.301506,
+  "lon": 14.273885,
+  "species": "Carpinus betulus",
+  "height_m": 24.0,
+  "crown_m": 16.0,
+  "age_estimate": 120
+ },
+ {
+  "id": "baum_116805426ec070fd3470",
+  "lat": 48.301566,
+  "lon": 14.274269,
+  "species": "Fagus sylvatica",
+  "height_m": 28.0,
+  "crown_m": 16.0,
+  "age_estimate": 137
+ },
+ {
+  "id": "baum_4166ef15affe89df797c",
+  "lat": 48.316808,
+  "lon": 14.286387,
+  "species": "Platanus hispanica",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 75
+ },
+ {
+  "id": "baum_5cfd928ad64641eeab2d",
+  "lat": 48.308832,
+  "lon": 14.299244,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 99
+ },
+ {
+  "id": "baum_fb65e8bde80bc5432c5a",
+  "lat": 48.30922,
+  "lon": 14.299105,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 103
+ },
+ {
+  "id": "baum_84e4a2c17501d603cd9a",
+  "lat": 48.313292,
+  "lon": 14.295372,
+  "species": "Quercus robur",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 119
+ },
+ {
+  "id": "baum_ce409a90158420fa1e73",
+  "lat": 48.310041,
+  "lon": 14.292988,
+  "species": "Tilia cordata",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 117
+ },
+ {
+  "id": "baum_8ae90c965e538c808057",
+  "lat": 48.298414,
+  "lon": 14.301931,
+  "species": "Quercus rubra",
+  "height_m": 15.0,
+  "crown_m": 16.0,
+  "age_estimate": 107
+ },
+ {
+  "id": "baum_0a809c5b2d1e9474c507",
+  "lat": 48.30793,
+  "lon": 14.299508,
+  "species": "Platanus hispanica",
+  "height_m": 21.0,
+  "crown_m": 16.0,
+  "age_estimate": 103
+ },
+ {
+  "id": "baum_77ce9da542fe540148ba",
+  "lat": 48.314028,
+  "lon": 14.297942,
+  "species": "Populus nigra",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 93
+ },
+ {
+  "id": "baum_3eb2b34b334893981c26",
+  "lat": 48.312135,
+  "lon": 14.294425,
+  "species": "Carpinus betulus",
+  "height_m": 20.0,
+  "crown_m": 16.0,
+  "age_estimate": 140
+ },
+ {
+  "id": "baum_a7554a948c9d65c6accc",
+  "lat": 48.297599,
+  "lon": 14.290729,
+  "species": "Aesculus hippocastanum",
+  "height_m": 18.0,
+  "crown_m": 16.0,
+  "age_estimate": 124
+ },
+ {
+  "id": "baum_e987a75a40d7bd55e4df",
+  "lat": 48.295549,
+  "lon": 14.28115,
+  "species": "Carpinus betulus",
+  "height_m": 22.0,
+  "crown_m": 16.0,
+  "age_estimate": 90
+ }
+]

@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://j2vlmdri0wbh"]
+
+[ext_resource type="Script" path="res://scripts/chat_panel.gd" id="1"]
+
+[node name="ChatPanel" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+custom_minimum_size = Vector2(0, 320)
+size_flags_vertical = 3
+
+[node name="Rows" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Rows"]
+text = "Stadtgespraech"
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 3
+
+[node name="Status" type="Label" parent="Rows"]
+text = " "
+custom_minimum_size = Vector2(0, 20)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="Messages" type="ScrollContainer" parent="Rows"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+custom_minimum_size = Vector2(0, 100)
+
+[node name="History" type="VBoxContainer" parent="Rows/Messages"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Typing" type="Label" parent="Rows"]
+custom_minimum_size = Vector2(0, 20)
+theme_override_font_sizes/font_size = 13
+
+[node name="Decisions" type="VBoxContainer" parent="Rows"]
+theme_override_constants/separation = 6
+
+[node name="Composer" type="HBoxContainer" parent="Rows"]
+
+[node name="Input" type="LineEdit" parent="Rows/Composer"]
+size_flags_horizontal = 3
+placeholder_text = "Dein Anliegen ..."
+max_length = 2000
+custom_minimum_size = Vector2(0, 42)
+
+[node name="Send" type="Button" parent="Rows/Composer"]
+custom_minimum_size = Vector2(46, 42)
