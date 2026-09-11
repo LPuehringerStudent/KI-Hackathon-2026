@@ -1,28 +1,24 @@
 # AGENTS.md — Instructions for coding agents on this team
 
-## Track assignments — read before picking up any task
+## Track assignments — read before picking up any task (SPRINT 2, from 2026-09-11 ~12:30)
 
-Each agent owns ONE track. Do not start tasks outside your track; coordinate in
-the team chat instead. The plan (`docs/superpowers/plans/2026-09-11-buergermeister-spiel-godot.md`)
-defines the tasks and the Shared Interfaces contracts — follow them exactly.
+Each agent owns ONE track. All work builds on `main` — one state, rebase/merge
+`main` into your branch before pushing. Sprint rule in CONTRIBUTING.md: headless
+tests green + 15 min without objection = author merges.
 
-| Agent | Track | Owns (Kanban issues) | Why |
-|-------|-------|----------------------|-----|
-| **GPT Astra 6** | C — Dialogue & UI | #1 scaffold, #8 proxy client, #9 dialogue, #10 panels, #11 wiring/build | Most skilled with Godot MCP — scene building/editor work |
-| **Claude Opus 5** | B — Game Core | #6 scoring, #7 day machine | Pure logic + TDD; strongest at meticulous algorithmic code |
-| **Kimi 2.8** | A — Map & Data | #2 extraction, #3 map baking, #4 data loader, #5 map view | Geo/data pipeline + visual verification of the baked map |
+| Agent | Track | Owns | Notes |
+|-------|-------|------|-------|
+| **Kimi 2.8** | A — Visuals | isometric 2.5D map rework (render_map.py + map_view transform), day-tint per day, marker/UI visual polish | Map files (render_map.py, map_view.gd, map_meta.json) are exclusively Track A — nobody else edits them this sprint |
+| **Claude Opus 5** | B — Gameplay depth | airquality Day-3 modifier in game_state.gd, balance tuning from playtest feedback, edge-case hardening + tests | game_state.gd + its tests are exclusively Track B |
+| **GPT Astra 6** | C — Demo & Pitch | export builds (Linux/Windows), playtest checklist, README run instructions, pitch deck + demo script, fallback voice top-up | main.gd, scenes, dialogue.gd, http_client.gd stay Track C |
 
+- Sprint plan: `docs/superpowers/plans/2026-09-11-sprint2-polish.md`
+- Coordination: append to `Kimi-Opus.md` (docs PR) — do NOT commit to main directly.
 - **Mistral (via proxy):** shared grunt worker for ALL agents — commit
   messages, PR descriptions, text drafts. Never a track owner.
-- Each agent pairs with its track's human teammate; the human reviews PRs per
-  CONTRIBUTING.md.
-- **Kickoff order:** Astra starts #1 (scaffold) immediately — it is the
-  critical path everything plugs into. Opus starts #6, Kimi starts #2; both
-  are independent of the scaffold until Task 4.
-- **Godot MCP:** ALL agents have it — but Track C's scenes stay Astra's job
-  (ownership, not access). Tracks A and B verify headless
-  (`godot --headless --path game/godot --quit` — see plan) and must not
-  hand-edit `.tscn` scene files that C owns.
+- **Godot MCP:** ALL agents have it; still verify headless
+  (`godot --headless --path game/godot -s res://tests/run_tests.gd`).
+- Pitch is Saturday ~16:00. Objections beat merges.
 
 ## Cheap-task offload via the local Mistral proxy
 

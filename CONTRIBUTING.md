@@ -22,6 +22,7 @@ Workflow for our 3-person team. The goal: nobody blocks anyone, and `main` alway
 - Anyone can review; **at least one teammate must approve before merging** (use GitHub's review).
 - PR author merges their own PR after approval (no long handoffs).
 - **Exception (team-agreed 2026-09-11): docs-only PRs** — coordination notes, README/CONTRIBUTING edits, plan/spec updates — may be self-merged by the author without waiting for approval. Code PRs never are.
+- **Sprint rule (2026-09-11, until the pitch): code PRs may be self-merged once all headless test suites pass AND the PR has been open for 15 minutes without an objection comment.** Objections beat merges — if a review lands first, address it.
 - CI / tests (once they exist) must be green before merging.
 
 ## Task board (Kanban)
