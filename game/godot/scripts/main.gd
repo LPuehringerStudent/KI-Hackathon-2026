@@ -22,11 +22,21 @@ var verdict: Control
 var _generation := 0
 var _voice_busy := false
 var _resolved := {}
+var menu: Control
+var started := false
 
 
 func _ready() -> void:
 	theme = UITheme.create()
 	RenderingServer.set_default_clear_color(Color("f3f5f4"))
+	_show_menu()
+
+
+func _start_game() -> void:
+	if started:
+		return
+	started = true
+	menu.queue_free()
 	dialogue = Dialogue.new()
 	add_child(dialogue)
 	meters = MetersScene.instantiate()
@@ -50,6 +60,59 @@ func _ready() -> void:
 	map_view.entity_clicked.connect(select_entity)
 	_refresh()
 	_initial_entity.call_deferred()
+
+
+func _show_menu() -> void:
+	menu = ColorRect.new()
+	menu.name = "StartMenu"
+	menu.color = Color("f3f5f4")
+	add_child(menu)
+	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	menu.add_child(center)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var rows := VBoxContainer.new()
+	rows.custom_minimum_size = Vector2(420, 0)
+	rows.add_theme_constant_override("separation", 16)
+	center.add_child(rows)
+	var title := Label.new()
+	title.text = "Bürgermeister:in fürs Festival"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.add_theme_font_size_override("font_size", 38)
+	rows.add_child(title)
+	var subtitle := Label.new()
+	subtitle.text = "Drei Tage. Eine Stadt. Viele Stimmen."
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_color_override("font_color", Color("238573"))
+	subtitle.add_theme_font_size_override("font_size", 19)
+	rows.add_child(subtitle)
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 18
+	rows.add_child(spacer)
+	var start := Button.new()
+	start.text = "Festival starten"
+	start.custom_minimum_size = Vector2(0, 52)
+	start.add_theme_font_size_override("font_size", 19)
+	start.pressed.connect(_start_game)
+	rows.add_child(start)
+	var help := Button.new()
+	help.text = "So funktioniert das Spiel"
+	help.custom_minimum_size.y = 42
+	rows.add_child(help)
+	var help_text := Label.new()
+	help_text.text = "Waehle einen Ort auf der Karte, sprich mit ihm und triff Entscheidungen. Deine Werte veraendern sich live."
+	help_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	help_text.visible = false
+	rows.add_child(help_text)
+	help.pressed.connect(func() -> void: help_text.visible = not help_text.visible)
+	var quit := Button.new()
+	quit.text = "Beenden"
+	quit.custom_minimum_size.y = 42
+	quit.pressed.connect(func() -> void: get_tree().quit())
+	rows.add_child(quit)
+	start.grab_focus()
 
 
 func _initial_entity() -> void:

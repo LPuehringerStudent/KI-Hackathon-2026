@@ -9,7 +9,8 @@ func _run() -> void:
 	var ui = load("res://scenes/main.tscn").instantiate()
 	root.add_child(ui)
 	current_scene = ui
-	ui.dialogue.voices = null
+	if ui.started:
+		ui.dialogue.voices = null
 	await create_timer(0.3).timeout
 	var args := OS.get_cmdline_user_args()
 	if args.has("--tree"):
@@ -34,7 +35,7 @@ func _run() -> void:
 	var sample := picture.get_pixel(picture.get_width() / 2, picture.get_height() / 2)
 	print("CAPTURE %s %dx%d result=%d center=%s" % [output, picture.get_width(), picture.get_height(), error, sample])
 	var issues := 0
-	if not ui.finished:
+	if ui.started and not ui.finished:
 		var panels: Array[Control] = [ui.meters, ui.day_bar, ui.chat]
 		for index in range(panels.size() - 1):
 			if panels[index].get_global_rect().end.y > panels[index + 1].get_global_rect().position.y + 1:
