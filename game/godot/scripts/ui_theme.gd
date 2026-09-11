@@ -8,9 +8,12 @@ static func create() -> Theme:
 		theme.set_color("font_color", kind, Color("253b33"))
 	theme.set_color("font_hover_color", "Button", Color("253b33"))
 	theme.set_color("font_pressed_color", "Button", Color("253b33"))
+	theme.set_color("font_focus_color", "Button", Color("253b33"))
+	theme.set_color("font_hover_pressed_color", "Button", Color("253b33"))
 	theme.set_color("font_disabled_color", "Button", Color("7e8a84"))
 	theme.set_color("font_uneditable_color", "LineEdit", Color("7e8a84"))
 	theme.set_color("caret_color", "LineEdit", Color("238573"))
+	theme.set_color("font_placeholder_color", "LineEdit", Color("77877e"))
 	for kind in ["Button", "LineEdit"]:
 		for state in ["normal", "hover", "pressed", "disabled", "read_only"]:
 			var style := StyleBoxFlat.new()

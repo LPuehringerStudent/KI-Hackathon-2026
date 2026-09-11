@@ -25,6 +25,7 @@ func _run() -> void:
 	check(day.get_node("Rows/Next").text == "Abschluss", "day three offers verdict")
 	var chat = load("res://scenes/chat_panel.tscn").instantiate()
 	root.add_child(chat)
+	chat.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	chat.size = Vector2(440, 500)
 	chat.open_entity({"id": "tree-1", "name": "Linde", "type": "tree"}, [{"id": "keep", "label": "Stehen lassen", "cost": 0}])
 	chat.message_submitted.connect(func(_text: String) -> void: submitted += 1)
