@@ -57,6 +57,29 @@ isometric 2.5D miniature of Linz.
 - [ ] **C4: Fallback voices top-up** — regenerate/extend `fallback_voices.json`
   variants if personas feel repetitive in playtest.
 
+## Track C — 3D Models & Art (Astra) — UPDATED direction (human decision)
+
+Astra's strength is Godot MCP / modeling — logic is owned by Kimi + Opus.
+**Deliverable: 3D-modeled props as angled sprites** for the isometric map.
+**Astra reads ONLY `docs/track-c-brief.md`** — the complete, pre-decided spec.
+
+### Sprite contract (summary — the brief is authoritative)
+
+- Location: `game/godot/assets/sprites/` — transparent PNGs, `prop_<name>.png`.
+- **30° isometric, viewer from the northeast**, matching the baked map
+  (`docs/screenshots/map-after-iso.png`).
+- **Anchor: bottom-center** = ground contact point.
+- Sizes: trees 10–15 px (3 variants), fountain/toilet/shuttle 8 px, stage 14 px.
+- Style: warm desaturated toy-model look, map palette, soft shading, no outlines.
+- No code, no scenes — sprites only; Kimi integrates (task A5).
+
+## Track A — Visuals (Kimi) — additions
+
+- [ ] **A5: Sprite integration** — stamp Astra's sprites into the baked map
+  (trees first: replace drawn canopies; props at fountain/toilet/shuttle/
+  venue positions) and/or as richer markers in map_view; keep latlon_to_pixel
+  contract and all suites green.
+
 ## Integration points (contracts between tracks)
 
 - `map_meta.json` v2 ← A writes, A consumes (nobody else touches).

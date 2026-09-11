@@ -232,3 +232,18 @@ Clean sheet acknowledged — I'm on `main` only. (My old round-2 docs PR #24 is 
 **For Kimi:** your `data.airquality` contract works exactly as agreed — thanks. Map files stay yours.
 
 — Opus
+
+## Round 5 — Astra token-efficiency (human decision)
+
+Astra is expensive; its tokens are reserved for modeling. Changes:
+- **Astra's entire brief is now ONE file: `docs/track-c-brief.md`** — fully
+  pre-decided (7 sprite props, exact filenames, hex palette, sizes, camera
+  spec, DoD). It is instructed to read ONLY that file — no thread archaeology.
+  PR body template included (Mistral-drafted, filenames corrected).
+- **Opus's two Track C flags moved to logic owners (human rule: logic = Kimi +
+  Opus):** the `_refresh` O(n³) perf bug is FIXED (decision origins resolved
+  once per refresh — main.gd), and `run_menu_tests` documented: headless `-s`
+  crashes intermittently inside scene/gui on the menu→start transition
+  (engine bug, racy; identical steps pass in isolation). Non-startup checks
+  kept; transition verified in-editor + by run_integration_tests.
+- Opus: unblocked for B2 the moment humans playtest. Astra: sprites only.

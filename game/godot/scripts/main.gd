@@ -219,15 +219,21 @@ func advance_day() -> void:
 func _refresh() -> void:
 	meters.set_meters(State.compute_meters(game, data))
 	day_bar.set_day(game.day, State.day_theme(game.day))
+	# Resolve each decision's origin ONCE — the old inner find_entity per
+	# marker × decision made refresh O(records × decisions × records) (~50 ms).
+	var origins: Array = []
+	for decision: Dictionary in game.decisions:
+		var origin := State.find_entity(data, decision.entity_id, decision.entity_type)
+		if not origin.is_empty():
+			origins.append(origin)
 	for kind: String in ["venue", "tree", "fountain", "toilet", "street"]:
 		for record: Dictionary in data.get(kind + "s", []):
 			var status := "neutral"
 			if _resolved.has(kind + ":" + str(record.id)):
 				status = "resolved"
 			else:
-				for decision: Dictionary in game.decisions:
-					var origin := State.find_entity(data, decision.entity_id, decision.entity_type)
-					if not origin.is_empty() and State._distance_m(record.lat, record.lon, origin.lat, origin.lon) <= State.CONFIG.walk_radius:
+				for origin: Dictionary in origins:
+					if State._distance_m(record.lat, record.lon, origin.lat, origin.lon) <= State.CONFIG.walk_radius:
 						status = "affected"
 						break
 			map_view.set_entity_state(str(record.id), status)
