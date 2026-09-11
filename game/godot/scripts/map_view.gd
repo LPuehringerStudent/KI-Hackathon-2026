@@ -87,7 +87,7 @@ func set_zoom(z: float) -> void:
 	if _meta.is_empty():
 		return
 	var old_zoom := _zoom
-	_zoom = clampf(z, 0.6, 3.0)
+	_zoom = clampf(z, 0.3, 3.0)
 	if is_equal_approx(old_zoom, _zoom):
 		return
 	var base := Vector2(float(_meta.width), float(_meta.height))

@@ -14,6 +14,16 @@ func _ready() -> void:
 	$Rows/Composer/Input.text_submitted.connect(func(_text: String) -> void: _submit())
 	$Rows/Composer/Send.text = "Senden"
 	$Rows/Composer/Send.tooltip_text = "Nachricht senden"
+	# decisions live in a height-capped ScrollContainer so the composer never
+	# gets pushed off-screen on entities with many options
+	var decisions_box: VBoxContainer = $Rows/Decisions
+	$Rows.remove_child(decisions_box)
+	var scroll := ScrollContainer.new()
+	scroll.name = "DecisionsScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.add_child(decisions_box)
+	$Rows.add_child(scroll)
+	$Rows.move_child(scroll, 4)  # where Decisions sat: after Typing
 	# header row: title only (no icon — read as an emoji in playtests)
 	var title: Label = $Rows/Title
 	$Rows.remove_child(title)
@@ -33,7 +43,7 @@ func open_entity(value: Dictionary, decisions: Array) -> void:
 	$Rows/Composer/Input.clear()
 	for child in $Rows/Messages/History.get_children():
 		child.free()
-	for child in $Rows/Decisions.get_children():
+	for child in $Rows/DecisionsScroll/Decisions.get_children():
 		child.free()
 	for decision: Dictionary in decisions:
 		var button := Button.new()
@@ -42,7 +52,10 @@ func open_entity(value: Dictionary, decisions: Array) -> void:
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.pressed.connect(func() -> void: decision_selected.emit(str(decision.id)))
-		$Rows/Decisions.add_child(button)
+		$Rows/DecisionsScroll/Decisions.add_child(button)
+	# cap the visible chip area (5 chips ≈ 250 px); scrolls inside beyond that
+	$Rows/DecisionsScroll.custom_minimum_size.y = minf(
+		$Rows/DecisionsScroll/Decisions.get_combined_minimum_size().y, 250.0)
 	set_status("")
 	set_busy(false)
 
@@ -68,7 +81,7 @@ func set_busy(value: bool) -> void:
 	$Rows/Typing.text = "Antwort kommt ..." if value else ""
 	$Rows/Composer/Input.editable = not value and not entity.is_empty() and not _resolved
 	$Rows/Composer/Send.disabled = value or entity.is_empty() or _resolved
-	for button: Button in $Rows/Decisions.get_children():
+	for button: Button in $Rows/DecisionsScroll/Decisions.get_children():
 		button.disabled = _resolved
 
 
