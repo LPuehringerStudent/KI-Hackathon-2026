@@ -78,13 +78,13 @@ func _meters_on_day_three(state: Dictionary, data: Dictionary) -> Dictionary:
 	return GS.compute_meters(s, data)
 
 
-## Balance against main.gd's verdict thresholds (read-only use of Track C's verdict_title).
+## Balance against the verdict tiers (GameState.verdict_title, which main.gd delegates to).
 func test_real_data_verdicts() -> void:
 	var data := _load_data()
 	if data.is_empty():
 		print("  SKIP test_real_data_verdicts: no extracted data in %s yet" % DATA_DIR)
 		return
-	var verdict_title: Callable = preload("res://scripts/main.gd").verdict_title
+	var verdict_title: Callable = GS.verdict_title
 
 	# Doing nothing is judged neutral, whatever the Hitzetag weather.
 	for air: Variant in [null, { "pm10": 6.7 }, { "pm10": 35.0 }, { "pm10": 50.0 }]:
@@ -109,7 +109,21 @@ func test_real_data_verdicts() -> void:
 		var state: Dictionary = GS.create()
 		GS.decide(state, GS.find_entity(data, single[1], single[0]), single[2])
 		var title: String = verdict_title.call(_meters_on_day_three(state, data))
-		check(title != "Volksnahe Stadtplanung", "a single %s on %s %s already wins the best title" % [single[2], single[0], single[1]])
+		check(title not in ["Volksnahe Stadtplanung", "Goldene:r Bürgermeister:in"], "a single %s on %s %s already wins a top title" % [single[2], single[0], single[1]])
+		check(title != "Stadt in Schieflage", "a single %s on %s %s already ruins the city" % [single[2], single[0], single[1]])
+
+	# The new middle tier is reachable with a couple of real decisions: two shuttles at the two
+	# biggest venue clusters.
+	var solid_or_better := false
+	for first: Dictionary in data.venues:
+		for second: Dictionary in data.venues:
+			if solid_or_better or str(first.id) >= str(second.id):
+				continue
+			var state: Dictionary = GS.create()
+			GS.decide(state, GS.find_entity(data, first.id, "venue"), "shuttle")
+			GS.decide(state, GS.find_entity(data, second.id, "venue"), "shuttle")
+			solid_or_better = verdict_title.call(_meters_on_day_three(state, data)) in ["Solide Verwaltung", "Gastgeber:in der Stadt", "Volksnahe Stadtplanung"]
+	check(solid_or_better, "two shuttles should be able to lift the city to at least 'Solide Verwaltung'")
 
 
 ## Mentor pack on real data: purchases at headline venues and pricing must visibly matter.

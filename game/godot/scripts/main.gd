@@ -318,13 +318,6 @@ func _show_verdict() -> void:
 	restart.grab_focus()
 
 
+## Tier logic lives in GameState.verdict_title (tested there).
 static func verdict_title(m: Dictionary) -> String:
-	if m.attendance > 66 and m.money > 66 and m.happiness > 66:
-		return "Volksnahe Stadtplanung"
-	if m.money > 66 and m.happiness < 50:
-		return "Effizienz-Tyrann:in"
-	if m.happiness > 66 and m.money < 50:
-		return "Beliebt, aber pleite"
-	if m.attendance > 66:
-		return "Gastgeber:in der Stadt"
-	return "Stadt im Gleichgewicht"
+	return State.verdict_title(m)

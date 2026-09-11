@@ -105,6 +105,15 @@ const AIR_CLEAN_PM10 := 20.0
 const AIR_POLLUTED_PM10 := 50.0
 const AIR_MODIFIER := 10.0
 
+## Verdict tiers on the final meters (0..100), checked in the order of verdict_title().
+## Probe on the real extract: the best reachable weakest meter is ~68 (clean air), so a literal
+## "all >= 80" gold tier would never show — gold is the best title plus a high average instead.
+const VERDICT_HIGH := 66.0      # > : strong meter (existing endings)
+const VERDICT_LOW := 50.0       # < : weak meter (existing endings)
+const VERDICT_GOLD_AVERAGE := 70.0
+const VERDICT_SOLID := 55.0     # >= on every meter
+const VERDICT_CRISIS := 35.0    # < on any meter
+
 ## Mentor pack — food trucks & security at headline venues (events >= HEADLINE_MIN_EVENTS).
 ## Demand per venue = ceil(event_weight / PURCHASE_UNIT_EVENT_WEIGHT) units per kind, of which
 ## BASELINE_UNITS_PER_VENUE already exist (the city's usual vendors and stewards). The
@@ -255,6 +264,29 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 		"money": clampf(_money_score(state, attendance) * pricing.money, 0.0, 100.0),
 		"happiness": clampf(happiness, 0.0, 100.0),
 	}
+
+
+## German ending title for final meters { attendance, money, happiness } (missing meters count as 0).
+static func verdict_title(meters: Dictionary) -> String:
+	var attendance := float(meters.get("attendance", 0.0))
+	var money := float(meters.get("money", 0.0))
+	var happiness := float(meters.get("happiness", 0.0))
+	var weakest := minf(attendance, minf(money, happiness))
+	if weakest > VERDICT_HIGH and (attendance + money + happiness) / 3.0 >= VERDICT_GOLD_AVERAGE:
+		return "Goldene:r Bürgermeister:in"
+	if weakest > VERDICT_HIGH:
+		return "Volksnahe Stadtplanung"
+	if money > VERDICT_HIGH and happiness < VERDICT_LOW:
+		return "Effizienz-Tyrann:in"
+	if happiness > VERDICT_HIGH and money < VERDICT_LOW:
+		return "Beliebt, aber pleite"
+	if attendance > VERDICT_HIGH:
+		return "Gastgeber:in der Stadt"
+	if weakest < VERDICT_CRISIS:
+		return "Stadt in Schieflage"
+	if weakest >= VERDICT_SOLID:
+		return "Solide Verwaltung"
+	return "Stadt im Gleichgewicht"
 
 
 ## Happiness modifier from the cached PM10 reading: +AIR_MODIFIER (clean) .. -AIR_MODIFIER (polluted)
