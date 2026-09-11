@@ -48,7 +48,7 @@ var _layer_game := {}
 var _selection := {}          # id -> dot, multi-select via Ctrl+click
 var _selection_type := ""
 var _bulk_bar: HBoxContainer = null
-var _tip: PanelContainer = null
+var _tip: Label = null
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -78,14 +78,20 @@ func _ready() -> void:
 		_map_rect.texture = tex
 	_add_layer_controls()
 	_add_zoom_controls()
-	_tip = PanelContainer.new()
-	var tip_label := Label.new()
-	tip_label.name = "L"
-	tip_label.add_theme_font_size_override("font_size", 12)
-	_tip.add_child(tip_label)
+	_tip = Label.new()
+	_tip.add_theme_font_size_override("font_size", 12)
+	_tip.add_theme_color_override("font_color", Color.WHITE)
+	var tip_bg := StyleBoxFlat.new()
+	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
+	tip_bg.set_corner_radius_all(4)
+	tip_bg.content_margin_left = 8.0
+	tip_bg.content_margin_right = 8.0
+	tip_bg.content_margin_top = 5.0
+	tip_bg.content_margin_bottom = 5.0
+	_tip.add_theme_stylebox_override("normal", tip_bg)
 	_tip.visible = false
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_tip)  # PanelContainer: full rect, we position manually
+	add_child(_tip)  # positioned manually in _position_tip
 	refresh()
 
 
@@ -529,7 +535,6 @@ func _info_line(entity: Dictionary, entity_type: String) -> String:
 func _show_tip(dot: TextureButton) -> void:
 	if _tip == null:
 		return
-	var label: Label = _tip.get_node("L")
 	var text := str(dot.tooltip_text)
 	var info := str(dot.get_meta("info", ""))
 	if not info.is_empty():
@@ -539,7 +544,7 @@ func _show_tip(dot: TextureButton) -> void:
 		var layer_value := _layer_value_at(ll.x, ll.y)
 		if not layer_value.is_empty():
 			text += "\n" + layer_value
-	label.text = text
+	_tip.text = text
 	_tip.visible = true
 	_position_tip()
 
