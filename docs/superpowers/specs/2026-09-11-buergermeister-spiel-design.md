@@ -30,7 +30,8 @@ Each day has a distinct worry that re-weights the same underlying datasets
 | 3 — Hitzetag | Shade & climate | trees, air quality, drinking fountains | Heat + air quality; the trees become the main negotiation partners |
 
 A day clock drives the arc. Decisions and scores persist across days.
-Final: transparent "Linz Index" verdict + shareable summary.
+Final: the three mayor meters (attendance, net money, happiness) with a mayor
+title verdict + shareable summary.
 
 ## Core interaction loop
 
@@ -62,13 +63,27 @@ Preprocessing: `tools/extract_innenstadt.py` filters these by bounding box
 - LLM path: browser → `mistral-proxy` (127.0.0.1:8377) → OpenRouter; model `mistralai/mistral-medium-3-5`
 - Serve with `python3 -m http.server` (ES modules require http, not file://)
 
-## Scoring ("Linz Index") v1
+## Scoring: three mayor meters
 
-Transparent, data-only formula, shown to the player:
-- Service coverage: share of venue-event-weighted demand within walking distance (haversine, 300 m) of open service points (toilets/fountains)
-- Mobility: shuttle stops within 250 m of high-density venues without transit nearby
-- Environment: tree canopy preserved (trees kept vs. cut) + heat-day shade near venues
-- Each day contributes; final score = weighted sum, weights shown in UI
+The final verdict shows three meters everyone understands. Only happiness is
+directly computable from the datasets; the other two are simulation outputs
+fed by real data plus declared constants (all constants shown in the UI —
+"real data in, honest model on top"):
+
+- **Besucher:innen (attendance):** demand = event-weighted venue data from the
+  festival calendar. Mobility/coverage decisions determine the realized share
+  (reachable venue ≈ full demand, poorly connected venue = fraction).
+- **Geld (net money):** declared starting city budget − declared unit costs of
+  decisions + attendance × declared average visitor spend (constant justified
+  by the tourism dataset: arrivals/overnights in Linz).
+- **Zufriedenheit (happiness):** composite of real-data metrics — walking
+  distance to open toilets/fountains (300 m haversine), heat-day shade from
+  the tree register, trees kept vs. cut, air quality reading.
+
+Components per day: service coverage (Day 2), mobility reach (Day 1),
+environment/shade (Day 3). Meters update live after each decision; the
+final verdict shows all three plus the mayor title earned (e.g.
+"Beliebt aber pleite" / "Reich aber unbeliebt" quadrant endings).
 
 ## Error handling / demo robustness
 
