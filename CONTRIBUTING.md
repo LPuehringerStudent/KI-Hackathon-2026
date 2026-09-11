@@ -27,7 +27,7 @@ Workflow for our 3-person team. The goal: nobody blocks anyone, and `main` alway
 
 We track work on the GitHub project board
 **"KI-Hackathon 2026 — Bürgermeister:in fürs Festival"**
-(https://github.com/users/LPuehringerStudent/projects/10 — columns: Todo, In Progress, Done).
+(https://github.com/users/LPuehringerStudent/projects/11 — columns: Todo, In Progress, Done).
 
 - Every task is a GitHub issue on the board. Pick your next task, **assign
   yourself**, and move it to **In Progress**.
