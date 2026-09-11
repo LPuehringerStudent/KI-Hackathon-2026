@@ -5,7 +5,7 @@ const Dialogue := preload("res://scripts/dialogue.gd")
 
 ## Visible on the start menu and the verdict screen so feedback can always
 ## name its build. Bump on every merged feature batch; git-tag main to match.
-const VERSION := "1.4.0"
+const VERSION := "1.6.1"
 const UITheme := preload("res://scripts/ui_theme.gd")
 const MapScene := preload("res://scenes/map_view.tscn")
 const MetersScene := preload("res://scenes/meters.tscn")
