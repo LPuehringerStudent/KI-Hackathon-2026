@@ -39,3 +39,7 @@ temp/
 # target/
 # bin/
 # out/
+
+# Local secrets
+API-Keys.txt
+mistral-proxy/keys.json
