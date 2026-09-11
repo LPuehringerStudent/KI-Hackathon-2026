@@ -22,11 +22,9 @@ const MARKER_COLORS := {
 	"street": Color("#5f6b78"),
 }
 
-const DAY_TINTS := [
-	Color.WHITE,                    # Tag 1 — neutral
-	Color(0.92, 0.97, 1.08),        # Tag 2 — cool morning
-	Color(1.08, 0.86, 0.70),        # Tag 3 — Hitzetag glow
-]
+const TRANSITION_NIGHT := Color(0.05, 0.09, 0.22, 0.78)
+const TRANSITION_DUSK := Color(0.45, 0.30, 0.38, 0.45)
+const TRANSITION_DAWN := Color(0.95, 0.82, 0.62, 0.35)
 
 var markers := {}
 
@@ -167,13 +165,46 @@ func latlon_to_pixel(lat: float, lon: float) -> Vector2:
 	return Vector2(sx, sy)
 
 
-## Day tint for the baked map (Tag 1 neutral, Tag 2 cool, Tag 3 Hitzetag).
-## Track C calls this on day change; markers stay untinted for readability.
-func set_day_tint(day: int) -> void:
-	if _map_rect == null:
+## Gameplay lighting stays constant by design (playtest feedback): no
+## per-day tint jumps. Day changes are signalled by play_day_transition()
+## instead. Kept as an API no-op so main.gd's refresh contract is unchanged.
+func set_day_tint(_day: int) -> void:
+	if _map_rect != null:
+		_map_rect.modulate = Color.WHITE
+
+
+var transition_busy := false
+
+
+## Day/night cycle interlude played when "Nächster Tag" is pressed: dusk ->
+## night -> dawn -> day. Await it; callers advance the game state after it
+## returns. Input stays live, but re-entries are ignored while playing.
+## Synchronous: drives a scene-tree tween and invokes on_finished when the
+## cycle ends. No coroutines anywhere — safe from fire-and-forget GC and from
+## Godot 4.7's "async functions must be awaited" runtime check (signals and
+## tests call this directly).
+func play_day_transition(speed := 1.0, on_finished := Callable()) -> void:
+	if transition_busy:
 		return
-	var index := clampi(day - 1, 0, DAY_TINTS.size() - 1)
-	_map_rect.modulate = DAY_TINTS[index]
+	transition_busy = true
+	var overlay := ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0)
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(overlay)
+	var tween := overlay.create_tween()
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(overlay, "color", TRANSITION_DUSK, 0.7 / speed)
+	tween.tween_property(overlay, "color", TRANSITION_NIGHT, 0.7 / speed)
+	tween.tween_interval(0.45 / speed)  # hold the night
+	tween.tween_property(overlay, "color", TRANSITION_DAWN, 0.6 / speed)
+	tween.tween_property(overlay, "color", Color(0, 0, 0, 0), 0.6 / speed)
+	tween.finished.connect(func() -> void:
+		overlay.queue_free()
+		transition_busy = false
+		if on_finished.is_valid():
+			on_finished.call()
+	)
 
 
 func _add_marker(entity: Dictionary, entity_type: String) -> void:
