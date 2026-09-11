@@ -63,4 +63,12 @@ func _check_map_view(data: Dictionary) -> void:
 	mv.refresh_badges({})
 	await process_frame
 	check(mv._badges.is_empty(), "badges clear on empty purchases")
+	# purchased shuttles appear on the map, clear on empty
+	var venue: Dictionary = data.venues[0]
+	mv.update_shuttles([{ "lat": venue.lat, "lon": venue.lon }])
+	await process_frame
+	check(mv._shuttle_markers.size() == 1, "shuttle marker appears after purchase")
+	mv.update_shuttles([])
+	await process_frame
+	check(mv._shuttle_markers.is_empty(), "shuttle markers clear when none")
 	mv.queue_free()
