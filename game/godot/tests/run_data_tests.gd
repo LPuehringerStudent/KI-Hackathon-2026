@@ -111,6 +111,10 @@ func _check_map_view(data: Dictionary) -> void:
 		"security layer builds a visible overlay")
 	check(mv._layer_value_at(float(venue2.lat), float(venue2.lon)).contains("Sicherheit"),
 		"layer hover reports the venue security value")
+	var mid_lat := (float(data.meta.bounds.lat_min) + float(data.meta.bounds.lat_max)) / 2.0
+	var mid_lon := (float(data.meta.bounds.lon_min) + float(data.meta.bounds.lon_max)) / 2.0
+	check(mv._layer_value_at(mid_lat, mid_lon).contains("Sicherheitslage"),
+		"security layer answers on empty map too (continuous surface)")
 	mv.set_layer_mode("stadt")
 	await process_frame
 	check(not mv._layer_rect.visible, "stadt mode hides the overlay")

@@ -49,6 +49,7 @@ var _selection := {}          # id -> dot, multi-select via Ctrl+click
 var _selection_type := ""
 var _bulk_bar: HBoxContainer = null
 var _tip: Label = null
+var _marker_tip := false
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -272,16 +273,26 @@ func _layer_value_at(lat: float, lon: float) -> String:
 	var game := _layer_game
 	match _layer_mode:
 		"sicherheit":
-			var best := ""
-			var best_d := 1e9
+			# continuous coverage surface: distance-weighted around all venues, so
+			# every point of the map answers, not just venue doorsteps
+			var acc := 0.0
+			var wsum := 0.0
+			var nearest := ""
+			var nearest_d := 1e9
 			for venue: Dictionary in data.get("venues", []):
 				var d := _dist_m(lat, lon, float(venue.lat), float(venue.lon))
-				if d < best_d:
-					best_d = d
-					var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
-					var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
-					best = "%s: Sicherheit %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
-			return best if best_d <= 250.0 else "kein Handlungsort in der Nähe"
+				var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
+				var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
+				if d < nearest_d:
+					nearest_d = d
+					nearest = "%s: %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
+				var w := maxf(0.0, 1.0 - d / 500.0)
+				if w > 0.0:
+					acc += w * clampf(float(units) / float(demand), 0.0, 1.0)
+					wsum += w
+			if wsum <= 0.0:
+				return "kein Spielort in 500 m — hier zählt Sicherheit wenig"
+			return "Sicherheitslage %d%%  ·  nächster Ort: %s" % [int(100.0 * acc / wsum), nearest]
 		"luft":
 			var pm := float(data.get("airquality", {}).get("pm10", -1.0))
 			if pm < 0.0:
@@ -318,13 +329,19 @@ func _on_layer_hover(event: InputEvent) -> void:
 		if _scroll != null:
 			_scroll.gui.release_focus()
 	if event is InputEventMouseMotion:
-		_hide_tip()  # any motion over empty map dismisses a stuck marker bubble
+		if not _marker_tip:
+			_hide_tip()  # dismiss stuck bubbles only when no marker tip is up
 		if _dragging:
 			_scroll.scroll_horizontal -= int(event.relative.x)
 			_scroll.scroll_vertical -= int(event.relative.y)
+		var latlon := pixel_to_latlon(event.position)
 		if _layer_readout != null:
-			var latlon := pixel_to_latlon(event.position)
 			_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
+		if _layer_mode != "stadt" and not _marker_tip and _tip != null:
+			# layer values follow the cursor, bubble-style
+			_tip.text = _layer_value_at(latlon.x, latlon.y)
+			_tip.visible = true
+			_position_tip()
 
 
 func _add_layer_controls() -> void:
@@ -581,10 +598,12 @@ func _show_tip(dot: TextureButton) -> void:
 			text += "\n" + layer_value
 	_tip.text = text
 	_tip.visible = true
+	_marker_tip = true
 	_position_tip()
 
 
 func _hide_tip() -> void:
+	_marker_tip = false
 	if _tip != null:
 		_tip.visible = false
 
