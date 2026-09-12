@@ -1,24 +1,30 @@
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
+from PIL import Image, ImageDraw
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "game/godot/assets"
 STEP = 16
-CLEARANCE = 28
+CLEARANCE = 112
+
+
+def water_clearance(city, clearance=CLEARANCE, step=STEP):
+    water = np.all(np.asarray(city.convert("RGB")) == (168, 202, 222), axis=2)
+    integral = np.zeros((city.height + 1, city.width + 1), dtype=np.uint32)
+    np.cumsum(water, axis=0, dtype=np.uint32, out=integral[1:, 1:])
+    np.cumsum(integral[1:, 1:], axis=1, dtype=np.uint32, out=integral[1:, 1:])
+    xs, ys = np.arange(step // 2, city.width, step), np.arange(step // 2, city.height, step)
+    x0, x1 = np.clip(xs - clearance, 0, city.width), np.clip(xs + clearance + 1, 0, city.width)
+    y0, y1 = np.clip(ys - clearance, 0, city.height), np.clip(ys + clearance + 1, 0, city.height)
+    counts = integral[np.ix_(y1, x1)] - integral[np.ix_(y0, x1)] - integral[np.ix_(y1, x0)] + integral[np.ix_(y0, x0)]
+    return Image.fromarray((counts == (clearance * 2 + 1) ** 2).astype(np.uint8) * 255)
 
 
 def main():
     city = Image.open(ASSETS / "innenstadt_map.png").convert("RGB")
-    water = Image.new("L", city.size)
-    water.putdata([255 if pixel == (168, 202, 222) else 0 for pixel in city.getdata()])
-    safe = water
-    for _ in range(CLEARANCE // 2):
-        safe = safe.filter(ImageFilter.MinFilter(5))
-    grid = Image.new("L", (city.width // STEP, city.height // STEP))
-    grid.putdata([safe.getpixel((x * STEP + STEP // 2, y * STEP + STEP // 2))
-                  for y in range(grid.height) for x in range(grid.width)])
+    grid = water_clearance(city)
     grid.save(ASSETS / "boat_clearance.png", optimize=True)
     lights = Image.new("RGBA", city.size)
     draw = ImageDraw.Draw(lights)

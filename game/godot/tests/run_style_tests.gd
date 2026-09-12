@@ -61,11 +61,22 @@ func _run() -> void:
 	if ambience.routes.size() == 2:
 		for a: Vector2 in ambience.routes[0]:
 			for b: Vector2 in ambience.routes[1]:
-				separated = separated and a.distance_to(b) >= 48.0
+				separated = separated and a.distance_to(b) >= ambience.ROUTE_SEPARATION
 	check(separated, "boat routes retain separation for hulls and wakes")
 	var before: float = ambience.followers[0].progress if not ambience.followers.is_empty() else 0.0
 	await create_timer(0.3).timeout
 	check(not ambience.followers.is_empty() and ambience.followers[0].progress > before, "boats move")
+	for index in ambience.followers.size():
+		var follow: PathFollow2D = ambience.followers[index]
+		var curve: Curve2D = follow.get_parent().curve
+		follow.progress = curve.get_baked_length() - 0.15
+		var previous := follow.position
+		ambience._process(0.02)
+		check(follow.position.distance_to(previous) < 2.0, "boat loop has no teleport")
+		check(follow.loop and follow.cubic_interp and follow.modulate.a == 1.0, "boat stays visible on a smooth loop")
+		check(ambience.boats[index].hframes * ambience.boats[index].vframes == 64, "64 modeled boat headings")
+		check(ambience.boats[index].get_rect().size.x * ambience.boats[index].scale.x > 150, "large detailed boat canvas")
+		check(ambience.wakes[index].points.size() == 19, "wake trails the actual route")
 	var count: int = map.markers.size()
 	var sizes := {}
 	for id: String in map.markers:
@@ -84,6 +95,13 @@ func _run() -> void:
 	map.focus_entity(str(ui.selected.id))
 	await create_timer(0.3).timeout
 	await capture("city-day")
+	if not ambience.followers.is_empty():
+		var boat_center: Vector2 = ambience.followers[0].position * map._zoom
+		map._scroll.scroll_horizontal = int(boat_center.x - map._scroll.size.x / 2)
+		map._scroll.scroll_vertical = int(boat_center.y - map._scroll.size.y / 2)
+		await process_frame
+		await capture("riverboat")
+		map.focus_entity(str(ui.selected.id))
 	map.play_day_transition(0.5)
 	await create_timer(3.05).timeout
 	check(float(ambience.light_material.get_shader_parameter("strength")) > 0.8, "window lights turn on at night")

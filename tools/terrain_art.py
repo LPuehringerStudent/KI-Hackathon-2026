@@ -120,7 +120,13 @@ def bridge_paths(segments):
 def paint_bridges(image, segments):
     draw = ImageDraw.Draw(image, "RGBA")
     count = 0
-    for line in bridge_paths(segments):
+    landmark = [part["points"] for part in segments if isinstance(part, dict) and part["name"].startswith("Nibelungen")]
+    ordinary = [part["points"] if isinstance(part, dict) else part for part in segments
+                if not isinstance(part, dict) or not part["name"].startswith("Nibelungen")]
+    if landmark:
+        paint_nibelungen(image, nibelungen_centerline(landmark))
+        count += 1
+    for line in bridge_paths(ordinary):
         if line.length < 12:
             continue
         width = 26 if line.length > 100 else 18
@@ -156,3 +162,83 @@ def paint_bridges(image, segments):
             draw.line([(x, y - 6) for x, y in edge.coords], fill=(234, 241, 226), width=2)
         count += 1
     return count
+
+
+def nibelungen_centerline(segments):
+    lanes = sorted(bridge_paths(segments), key=lambda line: line.length, reverse=True)[:2]
+    reference = lanes[0]
+    aligned = []
+    for lane in lanes:
+        if lane.interpolate(0).distance(reference.interpolate(0)) > lane.interpolate(lane.length).distance(reference.interpolate(0)):
+            lane = LineString(list(lane.coords)[::-1])
+        aligned.append(lane)
+    points = []
+    for i in range(33):
+        samples = [lane.interpolate(i / 32, normalized=True) for lane in aligned]
+        points.append((sum(p.x for p in samples) / len(samples), sum(p.y for p in samples) / len(samples)))
+    return LineString(points)
+
+
+def paint_nibelungen(image, line):
+    draw = ImageDraw.Draw(image, "RGBA")
+    width = max(46, min(78, line.length * 30 / 250))
+    points = []
+    for i in range(65):
+        t = i / 64
+        p = line.interpolate(t, normalized=True)
+        rise = 26 * min(1, t * 14, (1 - t) * 14) + 5 * math.sin(math.pi * t)
+        points.append((p.x, p.y - rise))
+    deck = LineString(points)
+    paint_shape(image, translate(line.buffer(width / 2 + 5, cap_style=2), xoff=6, yoff=10), (40, 74, 85, 100))
+    for fraction in (0.30, 0.70):
+        p = line.interpolate(fraction, normalized=True)
+        before = line.interpolate(fraction - 0.01, normalized=True)
+        after = line.interpolate(fraction + 0.01, normalized=True)
+        angle = math.atan2(after.y - before.y, after.x - before.x)
+        tangent = (math.cos(angle), math.sin(angle))
+        normal = (-tangent[1], tangent[0])
+        base = [(p.x + tangent[0] * along + normal[0] * across,
+                 p.y + tangent[1] * along + normal[1] * across)
+                for along, across in [(-9, -width / 2), (9, -width / 2), (9, width / 2), (-9, width / 2)]]
+        for i, (x, y) in enumerate(base):
+            xx, yy = base[(i + 1) % 4]
+            draw.polygon([(x, y + 10), (xx, yy + 10), (xx, yy - 28), (x, y - 28)],
+                         fill=(175, 173, 155) if i % 2 else (135, 143, 135))
+            for height in (0, 8, 16, 24):
+                draw.line([(x, y - height), (xx, yy - height)], fill=(153, 156, 143), width=2)
+    paint_shape(image, translate(deck.buffer(width / 2, cap_style=2), yoff=10), (76, 95, 88))
+    paint_shape(image, deck.buffer(width / 2, cap_style=2), (226, 225, 207))
+    paint_shape(image, deck.buffer(width / 2 - 7, cap_style=2), (119, 132, 133))
+    for side in (-1, 1):
+        cycle = deck.offset_curve(side * (width / 2 - 10))
+        draw.line(list(cycle.coords), fill=(178, 152, 121), width=4)
+        for offset in (1.5, 4.0):
+            track = deck.offset_curve(side * offset)
+            draw.line(list(track.coords), fill=(77, 91, 91), width=1)
+        lane = deck.offset_curve(side * width * 0.23)
+        for distance in range(18, int(lane.length) - 14, 28):
+            a, b = lane.interpolate(distance), lane.interpolate(distance + 11)
+            draw.line([(a.x, a.y), (b.x, b.y)], fill=(241, 236, 212), width=2)
+        edge = deck.offset_curve(side * (width / 2 - 1))
+        for distance in range(8, int(edge.length) - 8, 18):
+            p = edge.interpolate(distance)
+            draw.line([(p.x, p.y), (p.x, p.y - 5)], fill=(193, 203, 192), width=2)
+        draw.line([(x, y - 5) for x, y in edge.coords], fill=(232, 235, 218), width=2)
+        for distance in range(44, int(edge.length) - 32, 100):
+            p = edge.interpolate(distance)
+            draw.line([(p.x, p.y - 5), (p.x, p.y - 22)], fill=(155, 167, 159), width=2)
+            draw.line([(p.x - side * 5, p.y - 22), (p.x, p.y - 22)], fill=(240, 236, 208), width=3)
+    front = line.offset_curve(width / 2)
+    front_deck = deck.offset_curve(width / 2)
+    if front.centroid.y < line.centroid.y:
+        front = line.offset_curve(-width / 2)
+        front_deck = deck.offset_curve(-width / 2)
+    for start, end in ((0.025, 0.12), (0.88, 0.975)):
+        fractions = [start + (end - start) * i / 8 for i in range(9)]
+        base = [front.interpolate(t, normalized=True) for t in fractions]
+        top = [front_deck.interpolate(t, normalized=True) for t in reversed(fractions)]
+        draw.polygon([(p.x, p.y + 10) for p in base] + [(p.x, p.y + 10) for p in top], fill=(173, 172, 151))
+    for fraction in (0.045, 0.08, 0.92, 0.955):
+        p = front.interpolate(fraction, normalized=True)
+        draw.polygon([(p.x - 5, p.y + 10), (p.x + 5, p.y + 10), (p.x + 5, p.y),
+                      (p.x + 3, p.y - 4), (p.x, p.y - 5), (p.x - 3, p.y - 4), (p.x - 5, p.y)], fill=(83, 95, 83))

@@ -1,11 +1,15 @@
 extends Node2D
 
 const STEP := 16
+const ROUTE_SEPARATION := 224.0
 var routes: Array[PackedVector2Array] = []
 var followers: Array[PathFollow2D] = []
+var boats: Array[Sprite2D] = []
+var wakes: Array[Line2D] = []
 var light_material: ShaderMaterial
 var night_overlay: ColorRect
 var _lights: Sprite2D
+var _elapsed := 0.0
 
 
 func _ready() -> void:
@@ -21,83 +25,107 @@ func _ready() -> void:
 	_build_routes()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_elapsed += delta
 	var strength := 0.0
 	if is_instance_valid(night_overlay):
 		strength = clampf((night_overlay.color.a - 0.45) / 0.33, 0.0, 1.0)
 	light_material.set_shader_parameter("strength", strength)
 	_lights.visible = strength > 0.01
+	for index in followers.size():
+		var follow := followers[index]
+		var curve: Curve2D = follow.get_parent().curve
+		var length := curve.get_baked_length()
+		follow.progress += delta * (24.0 + index * 2.0)
+		var direction := curve.sample_baked(fposmod(follow.progress + 2, length)) - curve.sample_baked(fposmod(follow.progress - 2, length))
+		boats[index].frame = posmod(roundi(direction.angle() / TAU * 64), 64)
+		boats[index].rotation = wrapf(direction.angle() - boats[index].frame * TAU / 64, -PI, PI)
+		boats[index].position.y = sin(_elapsed * 1.7 + index) * 0.65
+		var trail := PackedVector2Array()
+		for point in range(19):
+			trail.append(curve.sample_baked(fposmod(follow.progress - 90 + point * 4, length)))
+		wakes[index].points = trail
+
+
+func _cruise_curve(center: Vector2, angle: float) -> Curve2D:
+	var curve := Curve2D.new()
+	curve.bake_interval = 3.0
+	var major := 210.0
+	var minor := 115.0
+	var k := 0.55228475
+	var points := [Vector2(major, 0), Vector2(0, minor), Vector2(-major, 0), Vector2(0, -minor), Vector2(major, 0)]
+	var handles := [Vector2(0, minor * k), Vector2(-major * k, 0), Vector2(0, -minor * k), Vector2(major * k, 0), Vector2(0, minor * k)]
+	for i in points.size():
+		curve.add_point(center + points[i].rotated(angle), -handles[i].rotated(angle), handles[i].rotated(angle))
+	return curve
 
 
 func _build_routes() -> void:
 	var texture: Texture2D = load("res://assets/boat_clearance.png")
 	var mask := texture.get_image()
-	var grid := AStarGrid2D.new()
-	grid.region = Rect2i(Vector2i.ZERO, mask.get_size())
-	grid.cell_size = Vector2(STEP, STEP)
-	grid.offset = Vector2(STEP, STEP) / 2.0
-	grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
-	grid.update()
 	var water: Array[Vector2i] = []
 	for y in mask.get_height():
 		for x in mask.get_width():
-			var point := Vector2i(x, y)
-			var blocked := mask.get_pixel(x, y).r < 0.9
-			grid.set_point_solid(point, blocked)
-			if not blocked:
-				water.append(point)
-	if water.size() < 20:
-		return
+			if mask.get_pixel(x, y).r > 0.9:
+				water.append(Vector2i(x, y))
 	var center := Vector2(mask.get_size()) / 2.0
 	water.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
 		return Vector2(a).distance_squared_to(center) < Vector2(b).distance_squared_to(center))
-	var directions: Array[Vector2i] = [Vector2i(0, 28), Vector2i(28, 0), Vector2i(0, -28), Vector2i(-28, 0)]
-	for attempt in range(128):
+	for attempt in mini(300, water.size()):
 		if routes.size() == 2:
 			break
-		var start := water[(attempt * 97) % water.size()]
-		var end := start + directions[attempt % directions.size()]
-		if not grid.region.has_point(end):
-			continue
-		if grid.is_point_solid(start) or grid.is_point_solid(end):
-			continue
-		var points := grid.get_point_path(start, end)
-		if points.size() < 16:
-			continue
-		routes.append(points)
-		_add_boat(points, routes.size() - 1)
-		for point in points:
-			var cell := Vector2i((point - grid.offset) / STEP)
-			for dx in range(-3, 4):
-				for dy in range(-3, 4):
-					var nearby := cell + Vector2i(dx, dy)
-					if grid.region.has_point(nearby):
-						grid.set_point_solid(nearby)
+		var origin := Vector2(water[(attempt * 37) % water.size()]) * STEP + Vector2.ONE * STEP / 2.0
+		for angle in [60, 75, 45, 90, 30, 120]:
+			var curve := _cruise_curve(origin, deg_to_rad(angle))
+			var samples := PackedVector2Array()
+			var clear := true
+			for distance in range(0, ceili(curve.get_baked_length()), 4):
+				var point := curve.sample_baked(distance)
+				var cell := Vector2i((point / STEP).floor())
+				if not Rect2i(Vector2i.ZERO, mask.get_size()).has_point(cell) or mask.get_pixelv(cell).r < 0.9:
+					clear = false
+					break
+				for route: PackedVector2Array in routes:
+					for other: Vector2 in route:
+						if point.distance_squared_to(other) < ROUTE_SEPARATION * ROUTE_SEPARATION:
+							clear = false
+							break
+				if not clear:
+					break
+				samples.append(point)
+			if clear:
+				routes.append(samples)
+				_add_boat(curve, routes.size() - 1)
+				break
 
 
-func _add_boat(points: PackedVector2Array, index: int) -> void:
+func _add_boat(curve: Curve2D, index: int) -> void:
 	var path := Path2D.new()
-	path.curve = Curve2D.new()
-	for point in points:
-		path.curve.add_point(point)
+	path.curve = curve
 	add_child(path)
-	var follow := PathFollow2D.new()
-	follow.loop = false
-	follow.cubic_interp = false
-	path.add_child(follow)
-	followers.append(follow)
 	var wake := Line2D.new()
-	wake.points = PackedVector2Array([Vector2(-13, -2), Vector2(-8, 0), Vector2(-13, 2)])
-	wake.width = 1.0
-	wake.default_color = Color(0.88, 0.98, 1.0, 0.55)
-	follow.add_child(wake)
+	wake.width = 17
+	wake.antialiased = true
+	wake.gradient = Gradient.new()
+	wake.gradient.set_color(0, Color(0.8, 0.96, 1, 0))
+	wake.gradient.set_color(1, Color(0.93, 0.99, 1, 0.38))
+	wake.width_curve = Curve.new()
+	wake.width_curve.add_point(Vector2(0, 1))
+	wake.width_curve.add_point(Vector2(1, 0.25))
+	path.add_child(wake)
+	wakes.append(wake)
+	var follow := PathFollow2D.new()
+	follow.loop = true
+	follow.rotates = false
+	follow.cubic_interp = true
+	path.add_child(follow)
+	follow.progress = curve.get_baked_length() * (0.15 + index * 0.2)
+	followers.append(follow)
 	var boat := Sprite2D.new()
-	boat.texture = load("res://assets/sprites/prop_boat.png")
-	boat.rotation = -0.45
+	boat.texture = load("res://assets/sprites/riverboat_directions.png")
+	boat.hframes = 8
+	boat.vframes = 8
+	boat.scale = Vector2(0.8, 0.8)
+	boat.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	follow.add_child(boat)
-	var duration := path.curve.get_baked_length() / (13.0 + index * 2.0)
-	var tween := create_tween().set_loops()
-	tween.tween_property(follow, "progress_ratio", 1.0, duration).from(0.0)
-	tween.tween_property(follow, "modulate:a", 0.0, 0.8)
-	tween.tween_callback(func() -> void: follow.progress_ratio = 0.0)
-	tween.tween_property(follow, "modulate:a", 1.0, 0.8)
+	boats.append(boat)
