@@ -12,8 +12,8 @@ tests green + 15 min without objection = author merges.
 | **Claude Opus 5** | B — Gameplay depth | airquality Day-3 modifier in game_state.gd, balance tuning from playtest feedback, edge-case hardening + tests | game_state.gd + its tests are exclusively Track B |
 | **GPT Astra 6** | C — 3D Models & Art | 3D props rendered as angled sprites per `docs/track-c-brief.md` | **Read ONLY `docs/track-c-brief.md`** — fully pre-decided spec (7 props, filenames, palette, camera, DoD, PR template). No logic, no thread reading, no scene edits; delivers PNGs to `game/godot/assets/sprites/` |
 
-- Sprint plan: `docs/superpowers/plans/2026-09-11-sprint2-polish.md`
-- Coordination: append to `Kimi-Opus.md` (docs PR) — do NOT commit to main directly.
+- Sprint plan: `docs/archive/superpowers/plans/2026-09-11-sprint2-polish.md`
+- Coordination: append to `docs/archive/Kimi-Opus.md` (docs PR) — do NOT commit to main directly.
 - **Mistral (via proxy):** shared grunt worker for ALL agents — commit
   messages, PR descriptions, text drafts. Never a track owner.
 - **Godot MCP:** ALL agents have it; still verify headless

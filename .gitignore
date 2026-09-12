@@ -45,3 +45,7 @@ API-Keys.txt
 mistral-proxy/keys.json
 mistral-proxy/usage.jsonl
 .codex/
+
+# Bridge modeling scratch (Blender MCP experiments, not project files)
+game/godot/assets/models/
+docs/superpowers/specs/2026-09-12-bridge-v2-design.md
