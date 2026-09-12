@@ -321,19 +321,25 @@ static func _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 
 
 var _dragging := false
+var _last_drag_pos := Vector2.ZERO
 
 
 func _on_layer_hover(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_dragging = event.pressed
-		if _scroll != null:
-			_scroll.gui.release_focus()
+		if _dragging:
+			# viewport-space anchor: probe-space relative feeds back (the probe
+			# rides the scrolling map, so the map ran away while dragging)
+			_last_drag_pos = get_global_mouse_position()
 	if event is InputEventMouseMotion:
 		if not _marker_tip:
 			_hide_tip()  # dismiss stuck bubbles only when no marker tip is up
 		if _dragging:
-			_scroll.scroll_horizontal -= int(event.relative.x)
-			_scroll.scroll_vertical -= int(event.relative.y)
+			var g := get_global_mouse_position()
+			var delta := g - _last_drag_pos
+			_last_drag_pos = g
+			_scroll.scroll_horizontal -= int(delta.x)
+			_scroll.scroll_vertical -= int(delta.y)
 		var latlon := pixel_to_latlon(event.position)
 		if _layer_readout != null:
 			_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
