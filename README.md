@@ -86,14 +86,14 @@ python3 tools/check_proxy_client.py godot                                  # pro
 
 ## Team
 
-| Who | GitHub | Track |
-|-----|--------|-------|
-| Laurenz | [LPuehringerStudent](https://github.com/LPuehringerStudent) | Map, data pipeline, integration |
-| Ayan | [ayan2310](https://github.com/ayan2310) | 3D models, art, UI |
-| David | [David-Fruehwirth](https://github.com/David-Fruehwirth) | Game logic, balance |
+| Who | GitHub | AI pair | Track |
+|-----|--------|---------|-------|
+| Laurenz | [LPuehringerStudent](https://github.com/LPuehringerStudent) | Kimi | Map, data pipeline, integration |
+| Ayan | [ayan2310](https://github.com/ayan2310) | Claude | 3D models, art, UI |
+| David | [David-Fruehwirth](https://github.com/David-Fruehwirth) | Codex | Game logic, balance |
 
-Built with three AI agents (Kimi, Claude, GPT) pair-programming each track —
-see `docs/archive/` for the full coordination log.
+Each human–agent pair owned one track and reviewed the others' PRs — see
+`docs/archive/` for the full coordination log.
 
 ## License
 
