@@ -78,22 +78,6 @@ func _ready() -> void:
 		_map_rect.texture = tex
 	_add_layer_controls()
 	_add_zoom_controls()
-	_tip = Label.new()
-	_tip.add_theme_font_size_override("font_size", 11)
-	_tip.add_theme_color_override("font_color", Color.WHITE)
-	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_tip.custom_minimum_size = Vector2(240, 0)  # cap width; wraps instead
-	var tip_bg := StyleBoxFlat.new()
-	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
-	tip_bg.set_corner_radius_all(4)
-	tip_bg.content_margin_left = 6.0
-	tip_bg.content_margin_right = 6.0
-	tip_bg.content_margin_top = 4.0
-	tip_bg.content_margin_bottom = 4.0
-	_tip.add_theme_stylebox_override("normal", tip_bg)
-	_tip.visible = false
-	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_tip)  # positioned manually in _position_tip
 	refresh()
 
 
@@ -101,6 +85,12 @@ func _ready() -> void:
 ## constant screen size; only their map positions scale. The visible center
 ## is preserved across zoom changes.
 func set_zoom(z: float) -> void:
+	set_zoom_at(z, null)
+
+
+## Zoom keeping the given MAP point (4096-space) stationary; null keeps the
+## view center (button zoom).
+func set_zoom_at(z: float, anchor_map_px) -> void:
 	if _meta.is_empty():
 		return
 	var old_zoom := _zoom
@@ -109,7 +99,13 @@ func set_zoom(z: float) -> void:
 		return
 	var base := Vector2(float(_meta.width), float(_meta.height))
 	var view := _scroll.size
-	var center_px := (Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical) + view / 2.0) / old_zoom
+	var anchor_view := Vector2(view.x / 2.0, view.y / 2.0)
+	var anchor: Vector2
+	if anchor_map_px == null:
+		anchor = (Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical) + view / 2.0) / old_zoom
+	else:
+		anchor = anchor_map_px
+		anchor_view = anchor * old_zoom - Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical)
 	_map_root.custom_minimum_size = base * _zoom
 	_map_root.size = base * _zoom
 	_relayout_markers()
@@ -117,8 +113,8 @@ func set_zoom(z: float) -> void:
 	update_purchases(_last_purchases)
 	update_planted_trees(_last_planted)
 	await get_tree().process_frame
-	_scroll.scroll_horizontal = int(center_px.x * _zoom - view.x / 2.0)
-	_scroll.scroll_vertical = int(center_px.y * _zoom - view.y / 2.0)
+	_scroll.scroll_horizontal = int(anchor.x * _zoom - anchor_view.x)
+	_scroll.scroll_vertical = int(anchor.y * _zoom - anchor_view.y)
 
 
 func zoom_in() -> void:
@@ -127,6 +123,20 @@ func zoom_in() -> void:
 
 func zoom_out() -> void:
 	set_zoom(_zoom / 1.25)
+
+
+## Ctrl+wheel: smooth zoom toward the cursor; plain wheel pans (ScrollContainer).
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.ctrl_pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			set_zoom_at(_zoom * 1.15, _event_to_map(event.position))
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			set_zoom_at(_zoom / 1.15, _event_to_map(event.position))
+
+
+func _event_to_map(view_pos: Vector2) -> Vector2:
+	var local := _scroll.get_local_mouse_position()
+	return (local + Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical)) / _zoom
 
 
 func _relayout_markers() -> void:
@@ -299,9 +309,19 @@ static func _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 	return 2.0 * 6371000.0 * asin(minf(1.0, sqrt(a)))
 
 
+var _dragging := false
+
+
 func _on_layer_hover(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_dragging = event.pressed
+		if _scroll != null:
+			_scroll.gui.release_focus()
 	if event is InputEventMouseMotion:
 		_hide_tip()  # any motion over empty map dismisses a stuck marker bubble
+		if _dragging:
+			_scroll.scroll_horizontal -= int(event.relative.x)
+			_scroll.scroll_vertical -= int(event.relative.y)
 		if _layer_readout != null:
 			var latlon := pixel_to_latlon(event.position)
 			_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
@@ -354,6 +374,22 @@ func _add_zoom_controls() -> void:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.pressed.connect(Callable(self, spec[1]))
 		box.add_child(btn)
+	_tip = Label.new()
+	_tip.add_theme_font_size_override("font_size", 11)
+	_tip.add_theme_color_override("font_color", Color.WHITE)
+	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip.custom_minimum_size = Vector2(240, 0)  # cap width; wraps instead
+	var tip_bg := StyleBoxFlat.new()
+	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
+	tip_bg.set_corner_radius_all(4)
+	tip_bg.content_margin_left = 6.0
+	tip_bg.content_margin_right = 6.0
+	tip_bg.content_margin_top = 4.0
+	tip_bg.content_margin_bottom = 4.0
+	_tip.add_theme_stylebox_override("normal", tip_bg)
+	_tip.visible = false
+	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(_tip)  # plain Control: manual size/position survive
 	var layers := HBoxContainer.new()
 	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	layers.position = Vector2(8, 8)
@@ -379,14 +415,6 @@ func _add_zoom_controls() -> void:
 			if on:
 				set_layer_mode(mode))
 		layers.add_child(btn)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.ctrl_pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			zoom_in()
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			zoom_out()
 
 
 ## (Re)build all markers from the loaded data.
@@ -492,7 +520,10 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	else:
 		marker_size = TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
 		dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], int(marker_size))
-	dot.set_meta("ename", str(entity.get("name", id)))
+	var display_name := str(entity.get("name", ""))
+	if display_name.is_empty() or display_name == id:
+		display_name = str(entity.get("species", entity_type.capitalize()))
+	dot.set_meta("ename", display_name)
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
 	dot.set_meta("msize", marker_size)
 	dot.set_meta("etype", entity_type)

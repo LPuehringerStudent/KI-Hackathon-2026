@@ -35,7 +35,7 @@ SPRITES_DIR = ROOT / "game" / "godot" / "assets" / "sprites"
 DATA_JSON = ROOT / "game" / "godot" / "data"
 
 BOUNDS = (48.284, 48.318, 14.270, 14.320)  # lat_min, lat_max, lon_min, lon_max
-SIZE = 4096
+SIZE = 8192
 COS_A = math.cos(math.radians(30.0))
 SIN_A = math.sin(math.radians(30.0))
 TOP_MARGIN = 110    # px above the horizon for venue pillars
@@ -211,7 +211,7 @@ def load_sprites():
 
 # Integration-side size control: 1.0 = native sprite pixels (the brief's
 # targets are authored at final size). Tune here, not by re-modeling.
-SPRITE_SCALE = 1.0
+SPRITE_SCALE = 2.0  # bake doubled: sprites keep their ground proportion
 
 
 def paste_sprite(base, sprite, cx, ground_y):
