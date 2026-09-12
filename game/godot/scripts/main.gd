@@ -180,13 +180,30 @@ func _show_menu() -> void:
 	help.text = "So funktioniert das Spiel"
 	help.custom_minimum_size.y = 42
 	rows.add_child(help)
-	var help_text := Label.new()
-	help_text.text = "Waehle einen Ort auf der Karte, sprich mit ihm und triff Entscheidungen. Deine Werte veraendern sich live."
-	help_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	help_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	help_text.visible = false
-	rows.add_child(help_text)
-	help.pressed.connect(func() -> void: help_text.visible = not help_text.visible)
+	var help_panel := PanelContainer.new()
+	var help_lines := VBoxContainer.new()
+	help_lines.add_theme_constant_override("separation", 4)
+	var hints := [
+		"Du bist Bürgermeister:in für drei Festivaltage.",
+		"1. Klicke Orte auf der Karte an und sprich mit ihnen.",
+		"2. Jede Entscheidung zeigt vorher ihre Wirkung (≈ +2 Zuf · −800 €).",
+		"3. Beachte Besucher:innen, Geld und Zufriedenheit — und das Budget.",
+		"4. Erfülle das tägliche Bürgeranliegen: Bonus plus Zuschuss.",
+		"5. Kartenmodi (links oben) zeigen Sicherheit, Luft und Versorgung.",
+		"6. Strg+Klick wählt mehrere Orte für dieselbe Aktion.",
+		"Am Ende entscheidet deine Gesamtnote von 0 bis 100.",
+	]
+	for line: String in hints:
+		var label := Label.new()
+		label.text = line
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		label.add_theme_font_size_override("font_size", 13)
+		help_lines.add_child(label)
+	help_panel.add_child(help_lines)
+	help_panel.visible = false
+	rows.add_child(help_panel)
+	help.pressed.connect(func() -> void: help_panel.visible = not help_panel.visible)
 	var quit := Button.new()
 	quit.text = "Beenden"
 	quit.custom_minimum_size.y = 42
