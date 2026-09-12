@@ -72,7 +72,7 @@ func test_real_data_balance() -> void:
 
 	var best_street := 0.0
 	for street: Dictionary in data.streets:
-		best_street = maxf(best_street, _after(data, "street", street.id, "pedestrian").attendance - fresh.attendance)
+		best_street = maxf(best_street, _after(data, "street", street.id, "carfree").attendance - fresh.attendance)
 	check(best_street >= 1.0, "some pedestrian street should add >= 1 attendance, best %.1f" % best_street)
 
 
@@ -108,7 +108,7 @@ func test_real_data_verdicts() -> void:
 	for venue: Dictionary in data.venues:
 		singles.append(["venue", venue.id, "shuttle"])
 	for street: Dictionary in data.streets:
-		singles.append(["street", street.id, "pedestrian"])
+		singles.append(["street", street.id, "carfree"])
 	for type: String in ["fountain", "toilet"]:
 		for service: Dictionary in data[type + "s"]:
 			singles.append([type, service.id, "relocate"])
@@ -210,7 +210,7 @@ func test_real_data_endings() -> void:
 	var tree := ["talk", "baum_53e4b829ebce51b14361", "talk"]  # plane tree at the Mariendom; wc_18 = toilet "Promenade" (a street shares the name)
 	# The demo answers two of the three Bürgeranliegen; a third planting tips it into gold.
 	var demo_day_one := [["venue", "Lentos Kunstmuseum", "shuttle"], ["venue", "OK Platz", "shuttle"],
-		["street", "Hauptplatz", "pedestrian"], fair]
+		["street", "Hauptplatz", "carfree"], fair]
 	# Day 2 is the first incident day: the demo answers it with security at the two busiest venues.
 	var demo_day_two := [fair, ["toilet", "Stadtpark Huemerstraße", "relocate"], ["toilet", "Promenade", "close"],
 		["venue", "Ars Electronica Center", "security"], ["venue", "OK Platz", "security"]]
