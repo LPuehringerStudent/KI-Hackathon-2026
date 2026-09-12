@@ -50,6 +50,7 @@ var _selection := {}          # id -> dot, multi-select via Ctrl+click
 var _selection_type := ""
 var _bulk_bar: HBoxContainer = null
 var _tip: Label = null
+var _marker_tip := false
 var _purchase_markers: Array = []
 var _last_shuttles: Array = []
 var _last_purchases: Dictionary = {}
@@ -88,22 +89,6 @@ func _ready() -> void:
 		_map_root.add_child(_ambience)
 	_add_layer_controls()
 	_add_zoom_controls()
-	_tip = Label.new()
-	_tip.add_theme_font_size_override("font_size", 11)
-	_tip.add_theme_color_override("font_color", Color.WHITE)
-	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_tip.custom_minimum_size = Vector2(240, 0)  # cap width; wraps instead
-	var tip_bg := StyleBoxFlat.new()
-	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
-	tip_bg.set_corner_radius_all(4)
-	tip_bg.content_margin_left = 6.0
-	tip_bg.content_margin_right = 6.0
-	tip_bg.content_margin_top = 4.0
-	tip_bg.content_margin_bottom = 4.0
-	_tip.add_theme_stylebox_override("normal", tip_bg)
-	_tip.visible = false
-	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_tip)  # positioned manually in _position_tip
 	refresh()
 
 
@@ -111,6 +96,12 @@ func _ready() -> void:
 ## constant screen size; only their map positions scale. The visible center
 ## is preserved across zoom changes.
 func set_zoom(z: float) -> void:
+	set_zoom_at(z, null)
+
+
+## Zoom keeping the given MAP point (4096-space) stationary; null keeps the
+## view center (button zoom).
+func set_zoom_at(z: float, anchor_map_px) -> void:
 	if _meta.is_empty():
 		return
 	var old_zoom := _zoom
@@ -119,7 +110,13 @@ func set_zoom(z: float) -> void:
 		return
 	var base := Vector2(float(_meta.width), float(_meta.height))
 	var view := _scroll.size
-	var center_px := (Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical) + view / 2.0) / old_zoom
+	var anchor_view := Vector2(view.x / 2.0, view.y / 2.0)
+	var anchor: Vector2
+	if anchor_map_px == null:
+		anchor = (Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical) + view / 2.0) / old_zoom
+	else:
+		anchor = anchor_map_px
+		anchor_view = anchor * old_zoom - Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical)
 	_map_root.custom_minimum_size = base * _zoom
 	_map_root.size = base * _zoom
 	if _ambience != null:
@@ -129,8 +126,8 @@ func set_zoom(z: float) -> void:
 	update_purchases(_last_purchases)
 	update_planted_trees(_last_planted)
 	await get_tree().process_frame
-	_scroll.scroll_horizontal = int(center_px.x * _zoom - view.x / 2.0)
-	_scroll.scroll_vertical = int(center_px.y * _zoom - view.y / 2.0)
+	_scroll.scroll_horizontal = int(anchor.x * _zoom - anchor_view.x)
+	_scroll.scroll_vertical = int(anchor.y * _zoom - anchor_view.y)
 
 
 func zoom_in() -> void:
@@ -139,6 +136,20 @@ func zoom_in() -> void:
 
 func zoom_out() -> void:
 	set_zoom(_zoom / 1.25)
+
+
+## Ctrl+wheel: smooth zoom toward the cursor; plain wheel pans (ScrollContainer).
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.ctrl_pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			set_zoom_at(_zoom * 1.15, _event_to_map(event.position))
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			set_zoom_at(_zoom / 1.15, _event_to_map(event.position))
+
+
+func _event_to_map(view_pos: Vector2) -> Vector2:
+	var local := _scroll.get_local_mouse_position()
+	return (local + Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical)) / _zoom
 
 
 func _relayout_markers() -> void:
@@ -298,16 +309,26 @@ func _layer_value_at(lat: float, lon: float) -> String:
 	var game := _layer_game
 	match _layer_mode:
 		"sicherheit":
-			var best := ""
-			var best_d := 1e9
+			# continuous coverage surface: distance-weighted around all venues, so
+			# every point of the map answers, not just venue doorsteps
+			var acc := 0.0
+			var wsum := 0.0
+			var nearest := ""
+			var nearest_d := 1e9
 			for venue: Dictionary in data.get("venues", []):
 				var d := _dist_m(lat, lon, float(venue.lat), float(venue.lon))
-				if d < best_d:
-					best_d = d
-					var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
-					var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
-					best = "%s: Sicherheit %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
-			return best if best_d <= 250.0 else "kein Handlungsort in der Nähe"
+				var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
+				var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
+				if d < nearest_d:
+					nearest_d = d
+					nearest = "%s: %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
+				var w := maxf(0.0, 1.0 - d / 500.0)
+				if w > 0.0:
+					acc += w * clampf(float(units) / float(demand), 0.0, 1.0)
+					wsum += w
+			if wsum <= 0.0:
+				return "kein Spielort in 500 m — hier zählt Sicherheit wenig"
+			return "Sicherheitslage %d%%  ·  nächster Ort: %s" % [int(100.0 * acc / wsum), nearest]
 		"luft":
 			var pm := float(data.get("airquality", {}).get("pm10", -1.0))
 			if pm < 0.0:
@@ -335,12 +356,34 @@ static func _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 	return 2.0 * 6371000.0 * asin(minf(1.0, sqrt(a)))
 
 
+var _dragging := false
+var _last_drag_pos := Vector2.ZERO
+
+
 func _on_layer_hover(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_dragging = event.pressed
+		if _dragging:
+			# viewport-space anchor: probe-space relative feeds back (the probe
+			# rides the scrolling map, so the map ran away while dragging)
+			_last_drag_pos = get_global_mouse_position()
 	if event is InputEventMouseMotion:
-		_hide_tip()  # any motion over empty map dismisses a stuck marker bubble
+		if not _marker_tip:
+			_hide_tip()  # dismiss stuck bubbles only when no marker tip is up
+		if _dragging:
+			var g := get_global_mouse_position()
+			var delta := g - _last_drag_pos
+			_last_drag_pos = g
+			_scroll.scroll_horizontal -= int(delta.x)
+			_scroll.scroll_vertical -= int(delta.y)
+		var latlon := pixel_to_latlon(event.position)
 		if _layer_readout != null:
-			var latlon := pixel_to_latlon(event.position)
 			_layer_readout.text = _layer_value_at(latlon.x, latlon.y)
+		if _layer_mode != "stadt" and not _marker_tip and _tip != null:
+			# layer values follow the cursor, bubble-style
+			_tip.text = _layer_value_at(latlon.x, latlon.y)
+			_tip.visible = true
+			_position_tip()
 
 
 func _add_layer_controls() -> void:
@@ -390,6 +433,22 @@ func _add_zoom_controls() -> void:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.pressed.connect(Callable(self, spec[1]))
 		box.add_child(btn)
+	_tip = Label.new()
+	_tip.add_theme_font_size_override("font_size", 11)
+	_tip.add_theme_color_override("font_color", Color.WHITE)
+	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip.custom_minimum_size = Vector2(240, 0)  # cap width; wraps instead
+	var tip_bg := StyleBoxFlat.new()
+	tip_bg.bg_color = Color(0.13, 0.15, 0.19, 0.92)
+	tip_bg.set_corner_radius_all(4)
+	tip_bg.content_margin_left = 6.0
+	tip_bg.content_margin_right = 6.0
+	tip_bg.content_margin_top = 4.0
+	tip_bg.content_margin_bottom = 4.0
+	_tip.add_theme_stylebox_override("normal", tip_bg)
+	_tip.visible = false
+	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(_tip)  # plain Control: manual size/position survive
 	var layers := HBoxContainer.new()
 	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	layers.position = Vector2(8, 8)
@@ -415,14 +474,6 @@ func _add_zoom_controls() -> void:
 			if on:
 				set_layer_mode(mode))
 		layers.add_child(btn)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.ctrl_pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			zoom_in()
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			zoom_out()
 
 
 ## (Re)build all markers from the loaded data.
@@ -536,7 +587,10 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	else:
 		marker_size = TREE_MARKER_SIZE if entity_type == "tree" else MARKER_SIZE
 		dot.texture_normal = _make_dot(MARKER_COLORS[entity_type], int(marker_size))
-	dot.set_meta("ename", str(entity.get("name", id)))
+	var display_name := str(entity.get("name", ""))
+	if display_name.is_empty() or display_name == id:
+		display_name = str(entity.get("species", entity_type.capitalize()))
+	dot.set_meta("ename", display_name)
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
 	dot.set_meta("msize", marker_size)
 	dot.set_meta("etype", entity_type)
@@ -593,10 +647,12 @@ func _show_tip(dot: TextureButton) -> void:
 			text += "\n" + layer_value
 	_tip.text = text
 	_tip.visible = true
+	_marker_tip = true
 	_position_tip()
 
 
 func _hide_tip() -> void:
+	_marker_tip = false
 	if _tip != null:
 		_tip.visible = false
 
