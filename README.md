@@ -1,4 +1,4 @@
-# KI-Hackathon 2026
+# Stimmen der Stadt
 
 Project by Team Arbeitszeitbetrug for the KI-Hackathon at the Grand Garage, Tabakfabrik Linz — 2026-09-11.
 

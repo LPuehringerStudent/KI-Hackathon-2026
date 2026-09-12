@@ -1,10 +1,10 @@
 ---
 marp: true
-title: Bürgermeister:in fürs Festival
+title: Stimmen der Stadt
 paginate: true
 ---
 
-# Bürgermeister:in fürs Festival
+# Stimmen der Stadt
 
 **Drei Tage. Eine Stadt. Viele Stimmen.**
 
