@@ -122,7 +122,21 @@ func _add_boat(curve: Curve2D, index: int) -> void:
 	follow.progress = curve.get_baked_length() * (0.15 + index * 0.2)
 	followers.append(follow)
 	var boat := Sprite2D.new()
-	boat.texture = load("res://assets/sprites/riverboat_directions.png")
+	# graceful degradation: a stale import cache must not spam errors —
+	# fall back to the raw file, and skip the boat if it cannot be read
+	var boat_path := "res://assets/sprites/riverboat_directions.png"
+	var boat_tex: Texture2D = null
+	if ResourceLoader.exists(boat_path):
+		boat_tex = load(boat_path)
+	if boat_tex == null:
+		# unimported (stale cache / fresh clone): read the raw file instead
+		var img := Image.load_from_file(boat_path)
+		if img != null:
+			boat_tex = ImageTexture.create_from_image(img)
+	if boat_tex == null:
+		push_warning("city_ambience: riverboat_directions.png not loadable — run 'godot --headless --path game/godot --import'")
+		return
+	boat.texture = boat_tex
 	boat.hframes = 8
 	boat.vframes = 8
 	boat.scale = Vector2(0.8, 0.8)
