@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pitch deck for Buergermeister:in fuers Festival - three days of Linz, built from real open data.">
+<title>Stadttopia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root {
+  /* palette taken from the game's own render: garden ground, moss UI, Danube, roof clay */
+  --ground: #eef4f0;
+  --ground-2: #e3ebe5;
+  --paper: #fbfdfc;
+  --ink: #1b2a26;
+  --ink-soft: #55665f;
+  --moss: #1f7a68;
+  --moss-lift: #2c9d86;
+  --danube: #3aa6d8;
+  --roof: #bd6449;
+  --alarm: #cf4a38;
+  --sand: #ded5c0;
+  --line: rgba(27, 42, 38, 0.14);
+  --plate: rgba(251, 253, 252, 0.94);
+  --scrim: linear-gradient(100deg, rgba(8, 20, 17, .92) 0%, rgba(8, 20, 17, .78) 34%, rgba(8, 20, 17, .3) 66%, rgba(8, 20, 17, .05) 100%);
+  --on-scrim: #f2f7f4;
+  --on-scrim-soft: #bfd2cb;
+  --shadow: 0 18px 50px -28px rgba(12, 30, 25, .55);
+  --step: clamp(.95rem, .55rem + .9vw, 1.25rem);
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101b19;
+    --ground-2: #16241f;
+    --paper: #182724;
+    --ink: #e7f0eb;
+    --ink-soft: #9db1a9;
+    --moss: #3fb69b;
+    --moss-lift: #58cdb2;
+    --danube: #58bbe8;
+    --roof: #d98063;
+    --alarm: #e8654f;
+    --sand: #4b5a4a;
+    --line: rgba(231, 240, 235, 0.16);
+    --plate: rgba(16, 27, 25, 0.9);
+    --on-scrim: #eef5f1;
+    --on-scrim-soft: #a9c0b8;
+    --shadow: 0 18px 50px -28px rgba(0, 0, 0, .75);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #101b19;
+  --ground-2: #16241f;
+  --paper: #182724;
+  --ink: #e7f0eb;
+  --ink-soft: #9db1a9;
+  --moss: #3fb69b;
+  --moss-lift: #58cdb2;
+  --danube: #58bbe8;
+  --roof: #d98063;
+  --alarm: #e8654f;
+  --line: rgba(231, 240, 235, 0.16);
+  --plate: rgba(16, 27, 25, 0.9);
+  --on-scrim: #eef5f1;
+  --on-scrim-soft: #a9c0b8;
+  --shadow: 0 18px 50px -28px rgba(0, 0, 0, .75);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: var(--step);
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+img { max-width: 100%; }
+
+/* ---------- deck frame ---------- */
+
+.deck {
+  position: relative;
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 3px 1fr auto;
+  background: var(--ground);
+}
+
+.rail {
+  background: var(--ground-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.rail span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--moss), var(--moss-lift));
+  transform-origin: left center;
+  transform: scaleX(var(--progress, .11));
+  transition: transform .55s cubic-bezier(.22, .8, .26, 1);
+  width: 100%;
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: opacity .55s cubic-bezier(.4, 0, .2, 1), visibility 0s linear .55s;
+}
+
+.slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity .55s cubic-bezier(.4, 0, .2, 1), visibility 0s;
+}
+
+/* content rises in as a slide takes the stage; the first slide is already active on load */
+.plate > *,
+.tiles > *,
+.pair > * {
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform .55s cubic-bezier(.22, .8, .26, 1), opacity .45s ease;
+}
+
+.slide.is-active .plate > *,
+.slide.is-active .tiles > *,
+.slide.is-active .pair > * {
+  transform: none;
+  opacity: 1;
+}
+
+.slide.is-active .plate > :nth-child(2) { transition-delay: .07s; }
+.slide.is-active .plate > :nth-child(3) { transition-delay: .13s; }
+.slide.is-active .plate > :nth-child(4) { transition-delay: .19s; }
+.slide.is-active .tiles > :nth-child(n) { transition-delay: calc(var(--i, 0) * .045s); }
+.slide.is-active .pair > :nth-child(2) { transition-delay: .12s; }
+
+.bleed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.035);
+  transition: transform 6s ease-out;
+}
+
+.slide.is-active .bleed { transform: scale(1); }
+
+.slide--cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slide--cover .plate,
+.slide--cover .inset,
+.slide--cover .hint { z-index: 2; }
+
+/* ---------- typography ---------- */
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .72rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--moss);
+  margin: 0;
+}
+
+.slide--cover .eyebrow { color: var(--moss-lift); }
+
+h1, h2 {
+  font-family: Archivo, "Archivo", "Helvetica Neue", sans-serif;
+  font-stretch: 118%;
+  font-weight: 800;
+  letter-spacing: -.015em;
+  line-height: 1.02;
+  text-wrap: balance;
+  margin: 0;
+}
+
+h1 { font-size: clamp(2.2rem, 1rem + 4.6vw, 4.6rem); }
+h2 { font-size: clamp(1.7rem, .9rem + 3vw, 3.1rem); }
+
+.lead {
+  font-size: clamp(1.05rem, .8rem + 1vw, 1.5rem);
+  margin: 0;
+  max-width: 30ch;
+  color: var(--ink-soft);
+}
+
+.slide--cover .lead { color: var(--on-scrim-soft); }
+
+.slide--cover h1,
+.slide--cover h2 { color: var(--on-scrim); }
+
+.credit {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .76rem;
+  letter-spacing: .06em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.slide--cover .credit { color: var(--on-scrim-soft); }
+
+/* ---------- layouts ---------- */
+
+.plate {
+  position: relative;
+  display: grid;
+  gap: clamp(.8rem, .5rem + .8vw, 1.4rem);
+  align-content: center;
+  justify-items: start;
+  padding: clamp(1.6rem, 1rem + 3vw, 4.5rem);
+  padding-block: clamp(2rem, 1rem + 3vw, 4.5rem);
+  max-width: 44rem;
+  height: 100%;
+}
+
+.slide--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(1rem, .5rem + 2vw, 3rem);
+  padding-inline: 0;
+}
+
+.shot {
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  padding-inline: clamp(1rem, .4rem + 2vw, 3rem);
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.slide--panel {
+  display: grid;
+  align-content: center;
+  gap: clamp(1.2rem, .6rem + 2vw, 2.4rem);
+  padding: clamp(1.6rem, 1rem + 3vw, 4rem);
+  padding-block: clamp(2rem, 1rem + 3vw, 4rem);
+  background:
+    radial-gradient(80% 120% at 12% 0%, color-mix(in oklab, var(--moss) 9%, transparent), transparent 60%),
+    var(--ground);
+}
+
+.slide--demo {
+  display: grid;
+  place-content: center;
+  background:
+    radial-gradient(60% 90% at 50% 50%, color-mix(in oklab, var(--moss) 14%, transparent), transparent 70%),
+    var(--ground);
+}
+
+.slide--demo .plate {
+  height: auto;
+  justify-items: center;
+  text-align: center;
+  padding: clamp(1.6rem, 1rem + 3vw, 4rem);
+}
+
+.slide--demo h2 {
+  font-size: clamp(2.6rem, 1.2rem + 7vw, 7rem);
+  font-stretch: 125%;
+  letter-spacing: -.02em;
+}
+
+.slide--demo h2::after {
+  content: "";
+  display: block;
+  width: 38%;
+  height: 6px;
+  margin: clamp(.8rem, .4rem + 1vw, 1.6rem) auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--moss), var(--moss-lift));
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: clamp(.5rem, .3rem + .6vw, .9rem);
+  width: 100%;
+}
+
+.tile {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: clamp(.7rem, .5rem + .5vw, 1rem);
+  display: grid;
+  gap: .15rem;
+}
+
+.tile b {
+  font-family: Archivo, sans-serif;
+  font-stretch: 112%;
+  font-size: clamp(1.4rem, 1rem + 1.6vw, 2.3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.tile span {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.tile:nth-child(1) b { color: var(--moss); }
+.tile:nth-child(4) b { color: var(--danube); }
+.tile:nth-child(6) b { color: var(--roof); }
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: clamp(.8rem, .4rem + 1.2vw, 1.6rem);
+  align-items: start;
+}
+
+.pair figure {
+  margin: 0;
+  display: grid;
+  gap: .5rem;
+}
+
+.pair img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.pair figcaption {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.beats {
+  display: grid;
+  gap: .55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 34ch;
+}
+
+.beats li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .6rem;
+  align-items: baseline;
+  color: var(--ink-soft);
+}
+
+.slide--cover .beats li { color: var(--on-scrim-soft); }
+
+.beats li::before {
+  content: "";
+  width: .5rem;
+  height: .5rem;
+  border-radius: 2px;
+  background: var(--moss);
+  transform: translateY(-1px);
+}
+
+.beats li:nth-child(2)::before { background: var(--danube); }
+.beats li:nth-child(3)::before { background: var(--roof); }
+
+.meterchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.chip {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .38rem .7rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.chip--a { border-color: color-mix(in oklab, var(--alarm) 45%, var(--line)); }
+.chip--b { border-color: color-mix(in oklab, var(--sand) 60%, var(--line)); }
+.chip--c { border-color: color-mix(in oklab, var(--moss) 45%, var(--line)); }
+
+.inset {
+  position: absolute;
+  right: clamp(1rem, .5rem + 2vw, 3rem);
+  bottom: clamp(1rem, .5rem + 2vw, 3rem);
+  width: min(34%, 20rem);
+  border-radius: 12px;
+  border: 2px solid rgba(242, 247, 244, .5);
+  box-shadow: 0 20px 45px -20px rgba(0, 0, 0, .7);
+  display: block;
+}
+
+.names {
+  display: grid;
+  gap: .3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.names li {
+  font-family: Archivo, sans-serif;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: clamp(1.3rem, .9rem + 2vw, 2.4rem);
+  line-height: 1.12;
+  color: var(--ink);
+}
+
+.names li span { color: var(--moss); }
+
+.sources {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .68rem;
+  letter-spacing: .06em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .6rem clamp(1rem, .5rem + 2vw, 2.6rem);
+  border-top: 1px solid var(--line);
+  background: var(--ground);
+}
+
+.dots {
+  display: flex;
+  gap: .4rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.dot {
+  width: 1.5rem;
+  height: .35rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: var(--line);
+  cursor: pointer;
+  transition: background .3s ease, transform .3s ease;
+}
+
+.dot[aria-current="true"] {
+  background: var(--moss);
+  transform: scaleX(1.25);
+  transform-origin: left center;
+}
+
+.counter {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .75rem;
+  letter-spacing: .08em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.nav {
+  display: flex;
+  gap: .4rem;
+}
+
+.nav button {
+  font: inherit;
+  font-size: .85rem;
+  line-height: 1;
+  padding: .5rem .8rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+
+.nav button:hover { border-color: var(--moss); color: var(--moss); }
+
+.edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.edge--prev { left: 0; }
+.edge--next { right: 0; width: 34%; }
+
+:focus-visible {
+  outline: 3px solid var(--moss-lift);
+  outline-offset: 2px;
+}
+
+.hint {
+  position: absolute;
+  right: clamp(1rem, .5rem + 2vw, 2.6rem);
+  bottom: clamp(1rem, .5rem + 2vw, 2.2rem);
+  z-index: 4;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--on-scrim-soft);
+  background: rgba(10, 24, 20, .45);
+  border: 1px solid rgba(242, 247, 244, .25);
+  border-radius: 999px;
+  padding: .4rem .75rem;
+  transition: opacity .4s ease;
+}
+
+.deck.is-moved .hint { opacity: 0; }
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 860px) {
+  .slide--split {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 1rem;
+    padding-block: 1.4rem;
+  }
+  .plate {
+    height: auto;
+    max-width: none;
+    padding-block: 1.4rem;
+  }
+  .shot { padding-inline: 1rem; }
+  .inset { position: static; width: 100%; margin-top: 1rem; }
+  .edge { display: none; }
+  .slide--cover .plate { background: linear-gradient(0deg, rgba(10, 24, 20, .55), transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="rail"><span id="rail"></span></div>
+
+  <div class="stage" id="stage">
+
+    <!-- 1 — cover -->
+    <section class="slide slide--cover is-active" aria-label="Title">
+      <img class="bleed" src="img/map.webp" alt="Isometric miniature of downtown Linz with the Danube and the Nibelungen bridge">
+      <div class="plate">
+        <p class="eyebrow">AI Hackathon 2026 · Linz</p>
+        <h1>Stadttopia</h1>
+        <p class="lead">Three days. One city. Many voices.</p>
+        <p class="credit">Ayan Muhammed · David Frühwirt · Laurenz Pühringer</p>
+      </div>
+      <p class="hint">→ next</p>
+    </section>
+
+    <!-- 2 — idea -->
+    <section class="slide slide--cover" aria-label="The idea">
+      <img class="bleed" src="img/night.webp" alt="The city at night with lit windows and an open conversation panel">
+      <div class="plate">
+        <p class="eyebrow">The idea</p>
+        <h2>The festival is coming.<br>The city has to carry it.</h2>
+        <p class="lead">Other apps tell you where to go. We hand you the city everyone arrives in.</p>
+      </div>
+    </section>
+
+    <!-- 3 — data -->
+    <section class="slide slide--panel" aria-label="Real data">
+      <div class="plate" style="padding: 0; max-width: 46rem; gap: .7rem;">
+        <p class="eyebrow">Real data</p>
+        <h2>Coordinates become a city.</h2>
+      </div>
+      <div class="tiles">
+        <div class="tile" style="--i:0"><b>20</b><span>Venues</span></div>
+        <div class="tile" style="--i:1"><b>644</b><span>Events</span></div>
+        <div class="tile" style="--i:2"><b>400</b><span>Trees</span></div>
+        <div class="tile" style="--i:3"><b>38</b><span>Drinking fountains</span></div>
+        <div class="tile" style="--i:4"><b>41</b><span>Public toilets</span></div>
+        <div class="tile" style="--i:5"><b>6.7</b><span>PM10 µg/m³</span></div>
+      </div>
+      <div class="pair">
+        <figure>
+          <img src="img/before.webp" alt="Raw map data as a dark outline">
+          <figcaption>Raw data from OpenStreetMap</figcaption>
+        </figure>
+        <figure>
+          <img src="img/after.webp" alt="The same area rendered as a built isometric miniature">
+          <figcaption>The same area, built</figcaption>
+        </figure>
+      </div>
+      <p class="sources">City of Linz open data · Ars Electronica 2026 · Upper Austria air quality (S184 Stadtpark) · OpenStreetMap</p>
+    </section>
+
+    <!-- 4 — voices -->
+    <section class="slide slide--split" aria-label="The city talks">
+      <div class="plate">
+        <p class="eyebrow">The city talks</p>
+        <h2>Every building knows its own data.</h2>
+        <ul class="beats">
+          <li>Click it, talk to it, decide.</li>
+          <li>Every button shows what it gains and costs — before you press it.</li>
+          <li>With no internet, prepared voices answer.</li>
+        </ul>
+      </div>
+      <div class="shot">
+        <img src="img/chat.webp" alt="Chat panel with the Ars Electronica Center and decision buttons showing their preview">
+      </div>
+    </section>
+
+    <!-- 5 — meters -->
+    <section class="slide slide--split" aria-label="Three meters">
+      <div class="plate">
+        <p class="eyebrow">Three meters</p>
+        <h2>Everything has a price.</h2>
+        <div class="meterchips">
+          <span class="chip chip--a">Visitors</span>
+          <span class="chip chip--b">Money</span>
+          <span class="chip chip--c">Happiness</span>
+        </div>
+        <p class="lead">A shuttle brings guests and costs budget. One toilet fewer saves money and upsets the city.</p>
+      </div>
+      <div class="shot">
+        <img src="img/meters.webp" alt="The three meters: visitors 50, money 77, happiness 68">
+      </div>
+    </section>
+
+    <!-- 6 — risk -->
+    <section class="slide slide--cover" aria-label="Day two">
+      <img class="bleed" src="img/risk.webp" alt="Security layer of the map: red areas around the biggest stages">
+      <div class="plate">
+        <p class="eyebrow">Day 2</p>
+        <h2>Too big a crowd.<br>Too little security.</h2>
+        <p class="lead">Red means an incident. Two teams for €800 — and the night stays calm.</p>
+      </div>
+    </section>
+
+    <!-- 7 — ending -->
+    <section class="slide slide--split" aria-label="What the city remembers">
+      <div class="plate">
+        <p class="eyebrow">After three days</p>
+        <h2>What the city remembers.</h2>
+        <p class="lead">No highscore — a title, and the story of what you did: which tree stayed, who got a shuttle, which request you answered.</p>
+      </div>
+      <div class="shot">
+        <img src="img/verdict.webp" alt="Final screen: grade 71, title Gastgeber:in der Stadt, three of three citizen requests answered">
+      </div>
+    </section>
+
+    <!-- 8 — tech -->
+    <section class="slide slide--panel" aria-label="Built">
+      <div class="plate" style="padding: 0; max-width: 46rem;">
+        <p class="eyebrow">Built</p>
+        <h2>Runs offline. Nothing invented.</h2>
+      </div>
+      <div class="tiles">
+        <div class="tile" style="--i:0"><b>4.7</b><span>Godot engine</span></div>
+        <div class="tile" style="--i:1"><b>197</b><span>Automated checks</span></div>
+        <div class="tile" style="--i:2"><b>3</b><span>Days in game</span></div>
+        <div class="tile" style="--i:3"><b>0</b><span>Invented numbers</span></div>
+      </div>
+      <ul class="beats" style="max-width: 46rem;">
+        <li>Voices by Mistral — without a network the city still speaks.</li>
+        <li>Every rule is a named constant, every balance simulated.</li>
+        <li>One Linux build, one file, no setup.</li>
+      </ul>
+    </section>
+
+    <!-- 9 — live demo -->
+    <section class="slide slide--demo" aria-label="Live demo">
+      <div class="plate">
+        <h2>Live Demo</h2>
+      </div>
+    </section>
+
+    <!-- 10 — team -->
+    <section class="slide slide--panel" aria-label="Thanks">
+      <div class="plate" style="padding: 0; max-width: 46rem;">
+        <p class="eyebrow">Thanks</p>
+        <h2>Three days in Linz.<br>Your turn.</h2>
+        <ul class="names">
+          <li>Ayan Muhammed</li>
+          <li>David Frühwirt</li>
+          <li>Laurenz Pühringer</li>
+        </ul>
+        <p class="sources">Data: City of Linz (CC BY 4.0) · Map: © OpenStreetMap contributors (ODbL)</p>
+      </div>
+    </section>
+
+  </div>
+
+  <button class="edge edge--prev" id="prev-zone" aria-label="Previous slide"></button>
+  <button class="edge edge--next" id="next-zone" aria-label="Next slide"></button>
+
+  <div class="hud">
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">01 / 10</span>
+    <div class="nav">
+      <button id="prev" type="button">←</button>
+      <button id="next" type="button">→</button>
+      <button id="full" type="button">Full screen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var deck = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var dotsBox = document.getElementById("dots");
+  var counter = document.getElementById("counter");
+  var rail = document.getElementById("rail");
+  var current = 0;
+
+  slides.forEach(function (slide, i) {
+    var dot = document.createElement("button");
+    dot.className = "dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", "Slide " + (i + 1));
+    dot.addEventListener("click", function () { go(i); });
+    dotsBox.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(dotsBox.children);
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  function go(index) {
+    var next = Math.max(0, Math.min(slides.length - 1, index));
+    if (next !== current) deck.classList.add("is-moved");
+    slides[current].classList.remove("is-active");
+    current = next;
+    slides[current].classList.add("is-active");
+    slides[current].scrollTop = 0;
+    dots.forEach(function (dot, i) { dot.setAttribute("aria-current", i === current ? "true" : "false"); });
+    counter.textContent = pad(current + 1) + " / " + pad(slides.length);
+    rail.style.setProperty("--progress", (current + 1) / slides.length);
+  }
+
+  document.getElementById("next").addEventListener("click", function () { go(current + 1); });
+  document.getElementById("prev").addEventListener("click", function () { go(current - 1); });
+  document.getElementById("next-zone").addEventListener("click", function () { go(current + 1); });
+  document.getElementById("prev-zone").addEventListener("click", function () { go(current - 1); });
+
+  document.getElementById("full").addEventListener("click", function () {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  });
+
+  window.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") { go(current + 1); event.preventDefault(); }
+    else if (event.key === "ArrowLeft" || event.key === "PageUp") { go(current - 1); event.preventDefault(); }
+    else if (event.key === "Home") { go(0); }
+    else if (event.key === "End") { go(slides.length - 1); }
+    else if (event.key === "f" || event.key === "F") { document.getElementById("full").click(); }
+  });
+
+  var touchX = null;
+  document.addEventListener("touchstart", function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 55) go(current + (dx < 0 ? 1 : -1));
+    touchX = null;
+  }, { passive: true });
+
+  go(0);
+})();
+</script>
+</body>
+</html>
