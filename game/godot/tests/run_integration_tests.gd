@@ -118,6 +118,15 @@ func _run() -> void:
 	check(("tree:" + str(tree.id)) in ui.game.consulted, "talking to the tree is remembered")
 	ui.apply_decision("trim")
 	check(ui.game.day == 3 and ui.game.decisions[-1].decision_id == "trim", "day three tree trimmed")
+	var petition: Dictionary = State.petition_for_day(ui.game, ui.data, 3)
+	check(ui.day_bar.petition_label.text.contains(petition.title), "day bar shows today's Bürgeranliegen: %s" % ui.day_bar.petition_label.text)
+	ui.select_entity(str(petition.venue_id), "venue")
+	await settle()
+	ui.apply_decision("plant")
+	ui.apply_decision("plant")
+	check(State.petition_for_day(ui.game, ui.data, 3).fulfilled, "planting twice at the asked venue fulfils the petition")
+	check(ui.chat.get_node("Rows/Status").text.begins_with("Anliegen erfüllt"), "chat confirms it: %s" % ui.chat.get_node("Rows/Status").text)
+	check(ui.day_bar.petition_label.text.begins_with("✓"), "day bar flips to fulfilled")
 	ui.select_entity(venue.id, "venue")
 	await settle()
 	ui.apply_decision("foodtruck")
@@ -130,6 +139,8 @@ func _run() -> void:
 	check(ui.finished and ui.verdict.visible, "final verdict visible")
 	var subtitle: Label = ui.verdict.find_child("Subtitle", true, false)
 	check(subtitle != null and subtitle.text.contains("wurde nur zurückgeschnitten"), "verdict subtitle tells the tree's story: %s" % (subtitle.text if subtitle else "missing"))
+	var wishes: Label = ui.verdict.find_child("Petitions", true, false)
+	check(wishes != null and wishes.text == "2 von 3 Bürgeranliegen erfüllt", "verdict counts the petitions: %s" % (wishes.text if wishes else "missing"))
 	var score_found := false
 	for child: Node in ui.verdict.get_child(0).get_child(0).get_children():
 		if child is Label and child.text.begins_with("Gesamtnote"):

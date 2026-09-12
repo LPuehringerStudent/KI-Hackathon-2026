@@ -149,8 +149,9 @@ func test_decide_and_money_meter_count_costs_once() -> void:
 	var state: Dictionary = GS.create()
 	GS.decide(state, GS.find_entity(data, "v1", "venue"), "shuttle")
 	var m: Dictionary = GS.compute_meters(state, data)
-	# shuttle cost counted once: (start - 1800 + SHUTTLE_REACH * max income) / (start + max income)
-	check(is_equal_approx(m.money, (100.0 * (GS.CONFIG.start_budget - 1800.0 + GS.SHUTTLE_REACH * GS.MAX_VISITOR_INCOME) / (GS.CONFIG.start_budget + GS.MAX_VISITOR_INCOME))), "cost counted once, got %s" % m.money)
+	# The single fixture venue is also the day-1 Bürgeranliegen, so the shuttle earns its grant:
+	# (start - 1800 + SHUTTLE_REACH * max income + PETITION_GRANT) / (start + max income)
+	check(is_equal_approx(m.money, (100.0 * (GS.CONFIG.start_budget - 1800.0 + GS.SHUTTLE_REACH * GS.MAX_VISITOR_INCOME + GS.PETITION_GRANT) / (GS.CONFIG.start_budget + GS.MAX_VISITOR_INCOME))), "cost counted once, got %s" % m.money)
 
 
 func test_changing_a_decision_is_allowed_and_costs_again() -> void:

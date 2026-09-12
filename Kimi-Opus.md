@@ -365,3 +365,50 @@ Playtest verdict: "plain, random score, half the decisions senseless." Spec:
 4. Tests: preview deltas correct direction for cut/shuttle/plant; no keep remains in any catalogue; plant cap enforced; planted tree raises shade score.
 
 Demo gate as always. Kimi takes P2 (map modes), P3 (multi-select), P4 (crisp sprites) in parallel.
+
+## Round 8 — Security risk model + decision meaning (human-approved)
+
+Playtest: "objects don't provide meaningful actions — pay money AND get a
+stat reduction. Security map mode shows red where no security is needed.
+Do we have a model?" Decision: deterministic incidents.
+
+### 1. Risk model (game_state.gd, pure + tested)
+
+- `SECURITY_RISK_FULL_CROWD := 15.0`  # event_weight at which an uncovered
+  venue hits max risk
+- `SECURITY_INCIDENT_THRESHOLD := 0.7`
+- `static func security_risk(venue: Dictionary, security_units: int) -> float`
+  — risk = clamp01((1 − coverage) × event_weight / SECURITY_RISK_FULL_CROWD),
+  coverage = clamp01(units / demand), demand = maxi(1, round(event_weight/8)).
+  **Track A calls this for the map layer — keep the name/signature.**
+- `static func security_incidents(state: Dictionary, data: Dictionary) -> Array`
+  — deterministic, idempotent: [{venue_id, venue_name, risk}] for venues with
+  risk >= SECURITY_INCIDENT_THRESHOLD. Same inputs → same output.
+- Incidents apply in compute_meters: per incident venue happiness −6,
+  attendance −4, caps −18 / −12 (constants named). Keep the small per-unit
+  shortfall penalty (−1 per missing unit, cap −8) so pre-incident coverage
+  still nudges meters.
+- main.gd (yours, logic rule): after each day change, if
+  security_incidents is non-empty → chat.set_status with the first one:
+  "⚠ Vorfall am <Namen>: zu wenig Security für die Menge." 
+
+### 2. Decision meaning (constants tuned with your sim; every change in the PR)
+
+- Sperrstunde verlängern: make it clearly worth it at event venues —
+  raise the attendance/reach bonus, trim the happiness penalty (target:
+  a positive-sum choice for >=10-weight venues, mildly negative elsewhere).
+- Venue personas state demand (dialogue prompt addition, Track C file but
+  logic rule covers you): include "Erwartete Gäste: ~<event_weight*40>".
+  Text-only, no dialogue.gd restructure.
+
+### 3. Tests
+
+security_risk math (0 coverage × full crowd ≈ 1.0; full coverage = 0);
+incident threshold boundary; determinism (two calls, same result);
+incident penalties idempotent under repeated compute_meters; shortfall
+penalty still applies pre-incident. test_balance_real_data stays green —
+expect to retune: an untouched city on Day 2+ at headline venues now
+INCURS incidents (that's the intended pressure).
+
+Demo gate as always. Kimi recolors the Sicherheit layer on
+`security_risk` after this lands.

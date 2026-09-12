@@ -277,6 +277,7 @@ func send_message(text: String) -> void:
 func apply_decision(id: String) -> void:
 	if finished or selected.is_empty() or _resolved.has(_key(selected)):
 		return
+	var petition_before: bool = State.petition_for_day(game, data, game.day).get("fulfilled", false)
 	if not State.decide(game, selected, id):
 		chat.set_status("Diese Entscheidung ist nicht verfuegbar.")
 		return
@@ -289,7 +290,11 @@ func apply_decision(id: String) -> void:
 	var entry: Dictionary = State._catalogue_entry(selected.get("type", ""), id)
 	if not entry.is_empty():
 		chat.add_message("Entscheidung", "%s / %d EUR" % [entry.label, int(entry.cost)])
-	chat.set_status(_venue_status(selected) if str(selected.get("type", "")) == "venue" else "Entscheidung festgehalten.")
+	var petition := State.petition_for_day(game, data, game.day)
+	if petition.get("fulfilled", false) and not petition_before:
+		chat.set_status("Anliegen erfüllt: %s" % petition.get("title", ""))
+	else:
+		chat.set_status(_venue_status(selected) if str(selected.get("type", "")) == "venue" else "Entscheidung festgehalten.")
 	if stays_open:
 		chat.set_decisions(_decision_chips(selected))
 	_refresh()
@@ -378,6 +383,7 @@ func _refresh() -> void:
 	day_bar.set_day(game.day, State.day_theme(game.day))
 	map_view.set_day_tint(game.day)
 	day_bar.set_pricing(State.pricing_for_day(game, game.day))
+	day_bar.set_petition(State.petition_for_day(game, data, game.day))
 	map_view.refresh_badges(game.get("purchases", {}))
 	map_view.update_purchases(game.get("purchases", {}))
 	map_view.update_shuttles(game.get("shuttles", []))
@@ -445,6 +451,15 @@ func _show_verdict() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 24)
 	rows.add_child(title)
+	var petitions := State.petitions_until(game, data, State.LAST_DAY)
+	var fulfilled: int = petitions.filter(func(p): return p.fulfilled).size()
+	var wishes := Label.new()
+	wishes.name = "Petitions"
+	wishes.text = "%d von %d Bürgeranliegen erfüllt" % [fulfilled, petitions.size()]
+	wishes.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	wishes.add_theme_font_size_override("font_size", 15)
+	wishes.add_theme_color_override("font_color", Color("238573") if fulfilled > 0 else Color("6b6257"))
+	rows.add_child(wishes)
 	var subtitle := Label.new()
 	subtitle.name = "Subtitle"
 	subtitle.text = State.verdict_subtitle(game, data)
