@@ -168,7 +168,7 @@ func _show_menu() -> void:
 	rows.add_theme_constant_override("separation", 16)
 	center.add_child(rows)
 	var title := Label.new()
-	title.text = "Bürgermeister:in fürs Festival"
+	title.text = "Stimmen der Stadt"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 36)
