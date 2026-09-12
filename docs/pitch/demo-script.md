@@ -1,6 +1,6 @@
 # Demo-Skript (3 Minuten, Deutsch)
 
-Demo-Route aus `docs/playtest-checklist.md` §2 — alle Zahlen dort nachgerechnet und von `test_real_data_endings` geprüft.
+Demo-Route aus `docs/playtest-checklist.md` §2 (Bürgeranliegen-Route) — alle Zahlen dort nachgerechnet und von `test_real_data_endings` geprüft.
 Anzeige: **Besucher:innen / Geld / Zufriedenheit**. Luftgüte-Cache: PM10 6,7 (+10 am Hitzetag).
 
 **Vorher (Pit Crew):** Binary starten (`./build/buergermeister.x86_64`) *oder* Editor + F5.
@@ -9,20 +9,22 @@ das Spiel läuft trotzdem vollständig. Bildschirm auf 1600×900 oder größer.
 
 | Zeit | Aktion | Sprechtext |
 |---|---|---|
-| 0:00 | Startmenü sichtbar | „Stellt euch vor, ihr seid Bürgermeister:in von Linz — und morgen beginnt das Ars Electronica Festival. Tausende kommen. Die Stadt muss das tragen." |
-| 0:15 | **Festival starten** | „Linz als Miniatur, gebaut aus offenen Daten: jeder Baum, jede Toilette, jeder Brunnen ist echt. Oben rechts unsere drei Werte — und jede Entscheidung zeigt vorher, was sie kostet und bringt." *(45 / 75 / 65)* |
-| 0:35 | **OK Platz** → *Shuttle* | „Tag eins, Anreise. Ein Shuttle zum OK Platz — Ursulinenhof und OK Linz hängen gleich mit dran: plus neun Besucher:innen, minus 1.800 Euro." *(54 / 72 / 65)* |
-| 0:50 | Straße **Hauptplatz** → *Für Fußgänger sperren*, dann **Faire Preise** | „Der Hauptplatz wird Fußgängerzone. Und faire Ticketpreise: mehr Leute, dafür weniger Geld." *(63 / 67 / 64)* |
-| 1:05 | **Nächster Tag →**, **Faire Preise** | „Tag zwei, Höhepunkt." |
-| 1:10 | **Mozartstraße** → *Fußgänger*; Toilette **Promenade** → *Schließen* | „Noch eine Fußgängerzone — und diese Toilette ist doppelt versorgt, die schließen wir: 300 Euro zurück, ein bisschen Unmut." *(67 / 69 / 62)* |
-| 1:35 | **Nächster Tag →**, **Faire Preise** | „Tag drei: Hitzetag. Die Messstation im Stadtpark meldet saubere Luft — das hebt die Stimmung." *(67 / 69 / 72)* |
-| 1:50 | Baum neben dem **Mariendom** anklicken | „Und jetzt spricht eine Platane am Mariendom. Fällen würde etwas Platz schaffen — aber fast vierzehn Punkte Zufriedenheit kosten. Wir hören ihr zu und lassen sie stehen." |
-| 2:15 | **Ars Electronica Center** → *Sperrstunde verlängern* | „Die Nacht ist kühler — das AEC bleibt länger offen. Mehr Publikum, etwas weniger Ruhe." *(69 / 68 / 69)* |
-| 2:30 | **Abschluss** | „Gesamtnote 68 — **Volksnahe Stadtplanung**. Und das Spiel erzählt, was wir getan haben: *Die Platane nahe Mariendom durfte bleiben.* Golden wäre möglich gewesen: Brunnen klug verlegen, Sperrstunde lassen." |
-| 2:50 | Urteil stehen lassen | „Echte Daten, ein ehrliches Modell, und eine Stadt, die zurückredet. Danke!" |
+| 0:00 | Startmenü | „Stellt euch vor, ihr seid Bürgermeister:in von Linz — und morgen beginnt das Ars Electronica Festival. Tausende kommen. Die Stadt muss das tragen." |
+| 0:15 | **Festival starten** | „Linz als Miniatur aus offenen Daten. Drei Werte oben — und jeden Tag meldet sich die Stadt mit einem Anliegen." *(45 / 75 / 65)* |
+| 0:30 | Anliegen vorlesen | „Tag eins: *Lentos Kunstmuseum — wie kommen die Gäste her?* Das Lentos hängt an keiner anderen Spielstätte." |
+| 0:40 | **Lentos** → *Shuttle* | „Also ein Shuttle. Der Button sagt vorher, was es bringt: vier Besucherpunkte, 1.800 Euro — und zwei Punkte Zufriedenheit, weil wir zugehört haben. Das Anliegen wird grün." *(49 / 74 / 67)* |
+| 1:00 | **OK Platz** → *Shuttle*, **Hauptplatz** → *Fußgänger*, **Faire Preise** | „Noch ein Shuttle für den OK-Platz-Cluster, der Hauptplatz wird Fußgängerzone, faire Preise für alle." *(67 / 66 / 66)* |
+| 1:20 | **Nächster Tag**, **Faire Preise** | „Tag zwei: *Beim C. Bechstein Centrum fehlt eine Toilette.*" |
+| 1:30 | Toilette **Stadtpark Huemerstraße** → *Verlegen* | „Diese Toilette steht, wo niemand feiert — wir verlegen sie dorthin, wo sie fehlt. Anliegen zwei erfüllt, plus Förderung." *(67 / 67 / 70)* |
+| 1:45 | Toilette **Promenade** → *Schließen* | „Und eine doppelt versorgte sperren wir: 300 Euro zurück." *(67 / 68 / 69)* |
+| 2:00 | **Nächster Tag**, **Faire Preise** | „Tag drei, Hitzetag: saubere Luft laut Messstation — und die Stadt bittet um Schatten fürs Ars Electronica Center." *(67 / 68 / 79)* |
+| 2:10 | Baum am **Mariendom** anklicken | „Erst spricht die Platane am Mariendom. Fällen würde Platz schaffen, kostet aber fast vierzehn Punkte. Wir lassen sie stehen." |
+| 2:25 | **AEC** → *Baum pflanzen* | „Stattdessen pflanzen wir. Ein Baum reicht noch nicht — die Vorschau zeigt: der zweite bringt drei Punkte, weil er das Anliegen erfüllt." *(67 / 67 / 81)* |
+| 2:40 | **Abschluss** | „Gesamtnote 72, **Volksnahe Stadtplanung**, zwei von drei Anliegen erfüllt — und das Spiel erzählt es: *Die Platane nahe Mariendom durfte bleiben.* Mit dem zweiten Baum wären wir golden gewesen." |
+| 2:55 | Urteil stehen lassen | „Echte Daten, ein ehrliches Modell, und eine Stadt, die zurückredet. Danke!" |
 
-Showcase für Fragen (60 s extra, Checkliste §4): Brunnen *„Südbahnhof gegenüber RZK Gebäude"* verlegen,
-*„Hauptplatz südliche Grüninsel"* schließen, keine Sperrstunde → **Goldene:r Bürgermeister:in**, Gesamtnote 69.
+Showcase für Fragen (20 s): den zweiten Baum am AEC pflanzen → **67 / 70 / 84**, Gesamtnote 74,
+**Goldene:r Bürgermeister:in**, „3 von 3 Bürgeranliegen erfüllt".
 
 ## Wenn etwas schiefgeht
 
