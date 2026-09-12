@@ -47,7 +47,7 @@ func _meters(state: Dictionary) -> Dictionary:
 func test_catalogue_offers_purchases_only_at_headline_venues() -> void:
 	check(_ids(GS.available_decisions(_entity("H"))) == ["shuttle", "extend", "foodtruck", "security", "plant"],
 		"headline venue decisions: %s" % [_ids(GS.available_decisions(_entity("H")))])
-	check(_ids(GS.available_decisions(_entity("S"))) == ["shuttle", "extend", "plant"],
+	check(_ids(GS.available_decisions(_entity("S"))) == ["shuttle", "extend", "security", "plant"],
 		"small venue decisions: %s" % [_ids(GS.available_decisions(_entity("S")))])
 	for d: Dictionary in GS.available_decisions(_entity("H")):
 		check(d.has("group"), "%s needs a group" % d.id)
@@ -92,23 +92,26 @@ func test_food_trucks_fill_the_shortfall() -> void:
 		"full food coverage removes the food penalty: %+.2f" % (m.happiness - fresh.happiness))
 	# attendance = reach_part * food_factor - security penalty; reach_part is unchanged
 	var fresh_food := lerpf(GS.FOOD_ATTENDANCE_MAX, GS.FOOD_ATTENDANCE_MIN, _fresh_share())
-	var reach_part: float = (fresh.attendance + GS.SECURITY_ATTENDANCE_CAP * _fresh_share()) / fresh_food
-	check(is_equal_approx(m.attendance, reach_part * GS.FOOD_ATTENDANCE_MAX - GS.SECURITY_ATTENDANCE_CAP * _fresh_share()),
+	check(is_equal_approx(m.attendance, fresh.attendance / fresh_food * GS.FOOD_ATTENDANCE_MAX),
 		"food factor goes up to MAX: %.2f -> %.2f" % [fresh.attendance, m.attendance])
 
 
 func test_partial_and_excess_purchases() -> void:
 	var fresh := _meters(GS.create())
+	var demand_h: int = maxi(1, roundi(20.0 / GS.SECURITY_UNITS_PER_WEIGHT))
+	var demand_total: float = demand_h + maxi(1, roundi(10.0 / GS.SECURITY_UNITS_PER_WEIGHT))
 	var one: Dictionary = GS.create()
 	_buy(one, "H", "security", 1)
-	check(is_equal_approx(_meters(one).happiness - fresh.happiness, GS.SECURITY_HAPPINESS_CAP / 4.0), "each of the 4 demanded units is worth a quarter of the cap")
+	check(is_equal_approx(_meters(one).happiness - fresh.happiness, GS.SECURITY_SHORTFALL_CAP / demand_total),
+		"each staffed unit buys back its share of the shortfall: %+.2f" % (_meters(one).happiness - fresh.happiness))
 	var full: Dictionary = GS.create()
-	_buy(full, "H", "security", 4 - GS.BASELINE_UNITS_PER_VENUE)
+	_buy(full, "H", "security", demand_h)
 	var excess: Dictionary = GS.create()
-	_buy(excess, "H", "security", 4 - GS.BASELINE_UNITS_PER_VENUE + 1)
+	_buy(excess, "H", "security", demand_h + 1)
 	check(is_equal_approx(_meters(excess).happiness, _meters(full).happiness), "a unit beyond demand adds nothing but cost")
 	check(_meters(excess).money < _meters(full).money, "excess still costs money")
-	check(is_equal_approx(_meters(full).attendance - fresh.attendance, GS.SECURITY_ATTENDANCE_CAP * _fresh_share()), "full security removes the incident attendance penalty")
+	check(is_equal_approx(_meters(full).happiness - fresh.happiness, GS.SECURITY_SHORTFALL_CAP * demand_h / demand_total),
+		"staffing the big venue clears its share of the shortfall")
 
 
 ## Shortfall share of H before any purchase: (demand 4 - baseline) / 4.
@@ -130,7 +133,8 @@ func test_curfew_extension_trades_happiness_for_attendance() -> void:
 func test_curfew_penalty_is_capped_and_needs_real_venues() -> void:
 	var data := _data()
 	var state: Dictionary = GS.create()
-	for i in 6:
+	var needed: int = ceili(GS.CURFEW_HAPPINESS_CAP / GS.CURFEW_HAPPINESS_PENALTY)
+	for i in needed:
 		data.venues.append({ "id": "v%d" % i, "name": "Bühne %d" % i, "lat": LAT - 0.002 * i, "lon": LON + 0.01, "events": 5, "event_weight": 5 })
 		data.fountains.append({ "id": "fv%d" % i, "lat": LAT - 0.002 * i, "lon": LON + 0.01 })  # keep coverage full,
 		data.toilets.append({ "id": "wv%d" % i, "lat": LAT - 0.002 * i, "lon": LON + 0.01 })    # away from the 0 clamp
@@ -152,11 +156,15 @@ func test_pricing_applies_per_day_and_averages_over_the_festival() -> void:
 	check(not GS.decide(fair, festival, "premium"), "premium already in effect today")
 	check(is_equal_approx(_meters(fair).attendance, fresh.attendance * (1.0 + GS.PRICING.premium.attendance)), "latest choice of the day wins")
 	GS.next_day(fair)
+	# Day 2 carries security incidents, so the unpriced day-2 attendance is the baseline here, not day 1.
+	var day2: Dictionary = GS.create()
+	GS.next_day(day2)
+	var raw_day2: float = _meters(day2).attendance / (1.0 + GS.PRICING.standard.attendance)
 	# Day 2 has no choice yet (standard): the festival average is (premium + standard) / 2.
 	var mixed_factor: float = 1.0 + (GS.PRICING.premium.attendance + GS.PRICING.standard.attendance) / 2.0
-	check(is_equal_approx(_meters(fair).attendance, fresh.attendance * mixed_factor), "unset day counts as standard in the average")
+	check(is_equal_approx(_meters(fair).attendance, raw_day2 * mixed_factor), "unset day counts as standard in the average")
 	check(GS.decide(fair, festival, "premium"), "premium on day 2 is a new choice for that day")
-	check(is_equal_approx(_meters(fair).attendance, fresh.attendance * (1.0 + GS.PRICING.premium.attendance)), "premium on both days")
+	check(is_equal_approx(_meters(fair).attendance, raw_day2 * (1.0 + GS.PRICING.premium.attendance)), "premium on both days")
 
 
 func test_pricing_scales_the_money_meter() -> void:
@@ -177,7 +185,7 @@ func test_no_headline_venues_means_no_food_or_security_effect() -> void:
 	var m: Dictionary = GS.compute_meters(state, data)
 	# 1 isolated venue H (20) + S (10), both ISOLATED_REACH; happiness = base only
 	check(is_equal_approx(m.attendance, 100.0 * GS.ISOLATED_REACH), "no food factor or security penalty without headline venues, got %s" % m.attendance)
-	check(is_equal_approx(m.happiness, GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT), "no food/security happiness penalty, got %s" % m.happiness)
+	check(is_equal_approx(m.happiness, GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT - GS.SECURITY_SHORTFALL_CAP), "no food penalty without headline venues (security fully unstaffed), got %s" % m.happiness)
 
 
 func test_purchase_counts_come_from_the_decision_log() -> void:
