@@ -272,12 +272,19 @@ func _purchases_at(game: Dictionary, venue_id: String) -> Dictionary:
 
 
 func _build_security_layer(img: Image, data: Dictionary, game: Dictionary) -> void:
+	# red = where security is MISSING and the crowd makes it dangerous —
+	# Opus's security_risk (demand × uncovered), not bare coverage
+	var incidents := {}
+	for incident: Dictionary in State.security_incidents(game, data):
+		incidents[str(incident.venue_id)] = true
 	for venue: Dictionary in data.get("venues", []):
-		var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
 		var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
-		var coverage := clampf(float(units) / float(demand), 0.0, 1.0)
-		var color := Color("#e5484d").lerp(Color("#46a758"), coverage)
+		var risk := State.security_risk(venue, units)
+		var color := Color("#46a758").lerp(Color("#e5484d"), risk)
 		_stamp(img, _layer_px(float(venue.lat), float(venue.lon)), 46.0, color, 0.55)
+		if incidents.has(str(venue.id)):
+			# today's trouble: unmistakable bright ring
+			_stamp(img, _layer_px(float(venue.lat), float(venue.lon)), 30.0, Color("#b3261e"), 0.85)
 
 
 func _build_air_layer(img: Image, data: Dictionary, game: Dictionary) -> void:
@@ -320,18 +327,23 @@ func _layer_value_at(lat: float, lon: float) -> String:
 			var nearest_d := 1e9
 			for venue: Dictionary in data.get("venues", []):
 				var d := _dist_m(lat, lon, float(venue.lat), float(venue.lon))
-				var demand: int = maxi(1, int(round(float(venue.get("event_weight", 5)) / 8.0)))
 				var units := int(_purchases_at(game, str(venue.id)).get("security", 0))
 				if d < nearest_d:
 					nearest_d = d
-					nearest = "%s: %d%% (%d/%d Einheiten)" % [venue.name, int(100.0 * units / demand), units, demand]
+					var risk_pct := int(100.0 * State.security_risk(venue, units))
+					var demand: int = maxi(1, roundi(float(venue.event_weight) / State.SECURITY_UNITS_PER_WEIGHT))
+					nearest = "%s: Risiko %d%% (%d/%d Teams)" % [venue.name, risk_pct, units, demand]
 				var w := maxf(0.0, 1.0 - d / 500.0)
 				if w > 0.0:
-					acc += w * clampf(float(units) / float(demand), 0.0, 1.0)
+					acc += w * State.security_risk(venue, units)
 					wsum += w
 			if wsum <= 0.0:
 				return "kein Spielort in 500 m — hier zählt Sicherheit wenig"
-			return "Sicherheitslage %d%%  ·  nächster Ort: %s" % [int(100.0 * acc / wsum), nearest]
+			var base := "Sicherheitslage %d%%  ·  %s" % [int(100.0 * acc / wsum), nearest]
+			var day := int(_layer_game.get("day", 1))
+			if day >= State.SECURITY_INCIDENT_FIRST_DAY and not State.security_incidents(_layer_game, _layer_data).is_empty():
+				return base.replace("Sicherheitslage", "⚠ Vorfall heute — Sicherheitslage")
+			return base
 		"luft":
 			var pm := float(data.get("airquality", {}).get("pm10", -1.0))
 			if pm < 0.0:
