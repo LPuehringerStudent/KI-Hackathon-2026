@@ -19,6 +19,7 @@ const MapScene := preload("res://scenes/map_view.tscn")
 const MetersScene := preload("res://scenes/meters.tscn")
 const DayScene := preload("res://scenes/day_bar.tscn")
 const ChatScene := preload("res://scenes/chat_panel.tscn")
+const CityDock := preload("res://scripts/city_dock.gd")
 
 var data := {}
 var game := {}
@@ -37,6 +38,7 @@ var _resolved := {}
 var _preview_cache := {}
 var menu: Control
 var started := false
+var dock: Control
 
 
 func _ready() -> void:
@@ -93,8 +95,14 @@ func _start_game() -> void:
 	map_view = MapScene.instantiate()
 	$RootSplit/MapSlot.add_child(map_view)
 	map_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	map_view.entity_clicked.connect(select_entity)
+	map_view.entity_clicked.connect(func(id: String, kind: String) -> void:
+		select_entity(id, kind)
+		dock.open_page("chat")
+		map_view.focus_entity(id))
 	map_view.bulk_action_requested.connect(_on_bulk_action)
+	dock = CityDock.new()
+	add_child(dock)
+	dock.setup($RootSplit/PanelSlot, meters, day_bar, chat, map_view)
 	_refresh()
 	_initial_entity.call_deferred()
 
@@ -403,6 +411,7 @@ func _show_verdict() -> void:
 	var results := State.compute_meters(game, data)
 	verdict = ColorRect.new()
 	verdict.name = "Verdict"
+	verdict.z_index = 30
 	verdict.color = Color(0.95, 0.97, 0.96, 0.98)
 	add_child(verdict)
 	verdict.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

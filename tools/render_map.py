@@ -22,9 +22,10 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from PIL import Image, ImageDraw
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Polygon
 from shapely.geometry import box as shapely_box
 from shapely.ops import polygonize, unary_union
+from terrain_art import paint_grass, paint_roads, paint_bridges
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = Path(__file__).resolve().parent / "cache" / "overpass_innenstadt_v2.json"
@@ -256,6 +257,7 @@ def main():
     kind_lines = {k: {"outer": [], "inner": []} for k in
                   ("water", "forest", "park", "grass", "garden")}
     roads = {"road_major": [], "road_minor": [], "pedestrian": []}
+    bridges = []
     buildings = []  # (depth_sy, ground_ring_ccw_px, height_m, roof_color)
     trees = []      # (depth_sy, px, radius)
 
@@ -274,7 +276,10 @@ def main():
                             key = "inner" if m.get("role") == "inner" else "outer"
                             kind_lines[kind][key].append(LineString(pts))
         elif kind in roads:
-            roads[kind].extend(rings_px(el, iso, min_len=2))
+            paths = rings_px(el, iso, min_len=2)
+            roads[kind].extend(paths)
+            if el.get("tags", {}).get("bridge", "no") != "no":
+                bridges.extend(paths)
         elif kind == "building":
             ring = rings_px(el, iso, min_len=4)
             if not ring:
@@ -372,22 +377,15 @@ def main():
     img = Image.new("RGB", (SIZE, SIZE), C_GROUND)
     draw = ImageDraw.Draw(img, "RGBA")
 
-    for kind in ("forest", "park", "grass", "garden"):
-        color = C_FOREST if kind == "forest" else \
-            {"park": C_PARK, "grass": C_GRASS, "garden": C_GARDEN}[kind]
-        for ring in fills[kind]:
-            draw.polygon(ring, fill=color)
+    paint_grass(img, fills)
     for ring in fills["water"]:
         draw.polygon(ring, fill=C_WATER)
         draw.line(ring + [ring[0]], fill=C_WATER_EDGE, width=2)
     for ring in water_holes_px:  # islands: back to ground
         draw.polygon(ring, fill=C_GROUND)
 
-    for kind, width in (("road_minor", 2), ("pedestrian", 4), ("road_major", 5)):
-        color = {"road_minor": C_ROAD_MINOR, "pedestrian": C_PEDESTRIAN,
-                 "road_major": C_ROAD_MAJOR}[kind]
-        for ring in roads[kind]:
-            draw.line(ring, fill=color, width=width, joint="curve")
+    paint_roads(img, roads)
+    bridge_count = paint_bridges(img, bridges)
 
     for v in venues:
         px = iso.pt(float(v["lat"]), float(v["lon"]))
@@ -425,9 +423,35 @@ def main():
                     continue  # edge faces away from the northeast viewer
                 wall = C_WALL_E if y2 > y1 else C_WALL_N
                 draw.polygon([(x1, y1), (x2, y2), (x2, y2 - zoff), (x1, y1 - zoff)], fill=wall)
+                span = math.hypot(x2 - x1, y2 - y1)
+                columns = int(span // 12)
+                floors = int(zoff // 12)
+                if columns > 0 and floors > 0:
+                    for floor in range(floors):
+                        bottom = (floor + 0.25) * zoff / floors
+                        height = min(7, zoff / floors * 0.55)
+                        for column in range(columns):
+                            t = (column + 0.5) / columns
+                            half = min(3.0 / span, 0.23 / columns)
+                            ax, ay = x1 + (x2 - x1) * (t - half), y1 + (y2 - y1) * (t - half)
+                            bx, by = x1 + (x2 - x1) * (t + half), y1 + (y2 - y1) * (t + half)
+                            glass = (78, 116, 130) if y2 > y1 else (59, 89, 104)
+                            draw.polygon([(ax, ay - bottom), (bx, by - bottom),
+                                          (bx, by - bottom - height), (ax, ay - bottom - height)], fill=glass)
+                            draw.line([(ax, ay - bottom), (bx, by - bottom)], fill=(235, 236, 221), width=2)
+                    draw.line([(x1, y1 - zoff + 2), (x2, y2 - zoff + 2)], fill=(239, 234, 218), width=2)
             top = [(x, y - zoff) for x, y in ground]
             draw.polygon(top, fill=roof)
             draw.line(top + [top[0]], fill=C_ROOF_EDGE, width=1)
+            roof_shape = Polygon(top)
+            if roof_shape.is_valid and roof_shape.area > 500:
+                center = roof_shape.representative_point()
+                cx, cy = center.x, center.y
+                skylight = [(cx - 7, cy), (cx, cy - 4), (cx + 7, cy), (cx, cy + 4)]
+                if roof_shape.contains(Polygon(skylight).buffer(4)):
+                    draw.polygon([(x + 1, y + 3) for x, y in skylight], fill=C_ROOF_EDGE)
+                    draw.polygon(skylight, fill=(108, 154, 168))
+                    draw.line(skylight + [skylight[0]], fill=(233, 239, 233), width=2)
 
     for v in venues:
         px = iso.pt(float(v["lat"]), float(v["lon"]))
@@ -455,7 +479,7 @@ def main():
                   "isometric 2.5D render by tools/render_map.py",
     }, indent=1), encoding="utf-8")
 
-    print(f"buildings {len(buildings)}, trees {len(trees)}, venues {len(venues)}")
+    print(f"buildings {len(buildings)}, trees {len(trees)}, venues {len(venues)}, bridges {bridge_count}")
     print(f"saved {OUT_PNG} + {OUT_META}")
     sys.exit(0 if buildings and fills["water"] else 1)
 
