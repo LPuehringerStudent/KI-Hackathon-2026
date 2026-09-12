@@ -2,9 +2,10 @@ extends Node2D
 
 const STEP := 16
 const ROUTE_SEPARATION := 224.0
+const BoatView = preload("res://scripts/riverboat_view.gd")
 var routes: Array[PackedVector2Array] = []
 var followers: Array[PathFollow2D] = []
-var boats: Array[Sprite2D] = []
+var boats: Array[BoatView] = []
 var wakes: Array[Line2D] = []
 var light_material: ShaderMaterial
 var night_overlay: ColorRect
@@ -38,7 +39,7 @@ func _process(delta: float) -> void:
 		var length := curve.get_baked_length()
 		follow.progress += delta * (24.0 + index * 2.0)
 		var direction := curve.sample_baked(fposmod(follow.progress + 6, length), true) - curve.sample_baked(fposmod(follow.progress - 6, length), true)
-		boats[index].material.set_shader_parameter("heading", fposmod(direction.angle() / TAU * 64, 64.0))
+		boats[index].set_heading(direction.angle())
 		var trail := PackedVector2Array()
 		for point in range(19):
 			trail.append(curve.sample_baked(fposmod(follow.progress - 90 + point * 4, length)))
@@ -129,28 +130,6 @@ func _add_boat(curve: Curve2D, index: int) -> void:
 	path.add_child(follow)
 	follow.progress = curve.get_baked_length() * (0.15 + index * 0.2)
 	followers.append(follow)
-	var boat := Sprite2D.new()
-	# graceful degradation: a stale import cache must not spam errors —
-	# fall back to the raw file, and skip the boat if it cannot be read
-	var boat_path := "res://assets/sprites/riverboat_directions.png"
-	var boat_tex: Texture2D = null
-	if ResourceLoader.exists(boat_path):
-		boat_tex = load(boat_path)
-	if boat_tex == null:
-		# unimported (stale cache / fresh clone): read the raw file instead
-		var img := Image.load_from_file(boat_path)
-		if img != null:
-			boat_tex = ImageTexture.create_from_image(img)
-	if boat_tex == null:
-		push_warning("city_ambience: riverboat_directions.png not loadable — run 'godot --headless --path game/godot --import'")
-		return
-	boat.texture = boat_tex
-	boat.hframes = 8
-	boat.vframes = 8
-	boat.scale = Vector2(0.8, 0.8)
-	boat.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	var heading_material := ShaderMaterial.new()
-	heading_material.shader = preload("res://assets/boat_heading.gdshader")
-	boat.material = heading_material
+	var boat := BoatView.new()
 	follow.add_child(boat)
 	boats.append(boat)

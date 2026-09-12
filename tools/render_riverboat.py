@@ -1,4 +1,5 @@
 import math
+import sys
 from pathlib import Path
 
 import bpy
@@ -147,6 +148,12 @@ camera.rotation_euler = (-camera.location).to_track_quat("-Z", "Y").to_euler()
 camera_data.type = "ORTHO"
 camera_data.ortho_scale = 10.3
 scene.camera = camera
+if "--export-model" in sys.argv:
+    bpy.ops.export_scene.gltf(
+        filepath=str(ROOT / "game/godot/assets/sprites/riverboat.glb"),
+        export_format="GLB", export_cameras=False, export_lights=False,
+    )
+    sys.exit(0)
 for frame in range(64):
     heading = frame * math.tau / 64
     boat.rotation_euler.z = math.atan2(-math.sin(heading) / 0.5, math.cos(heading))
