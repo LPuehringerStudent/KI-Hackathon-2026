@@ -49,12 +49,14 @@ const DECISIONS := {
 	"toilet": SERVICE_DECISIONS,
 	"venue": [
 		{ "id": "shuttle", "label": "Shuttle-Haltestelle einrichten", "cost": 1800.0, "adds_shuttle": true, "group": "shuttle" },
-		{ "id": "extend", "label": "Sperrstunde verlängern", "cost": 600.0, "adds_shuttle": false, "group": "curfew" },
+		{ "id": "extend", "label": "Sperrstunde verlängern", "cost": 400.0, "adds_shuttle": false, "group": "curfew" },
 		{ "id": "curfew", "label": "Sperrstunde einhalten", "cost": 0.0, "adds_shuttle": false, "group": "curfew", "requires": "extend" },
 		{ "id": "foodtruck", "label": "Foodtruck bestellen", "cost": 500.0, "adds_shuttle": false, "group": "purchase",
 			"repeatable": true, "headline_only": true, "max": 5 },
+		# Security is offered at *every* venue: incidents can hit any crowd, and a layer that shows red
+		# where nothing can be booked was the playtest complaint.
 		{ "id": "security", "label": "Security-Team buchen", "cost": 400.0, "adds_shuttle": false, "group": "purchase",
-			"repeatable": true, "headline_only": true, "max": 5 },
+			"repeatable": true, "max": 5 },
 		PLANT_DECISION,
 	],
 	"street": [
@@ -165,11 +167,25 @@ const MAX_PURCHASES_PER_VENUE := 5  # food trucks / security; see "max" in the c
 const FOOD_ATTENDANCE_MIN := 0.85
 const FOOD_ATTENDANCE_MAX := 1.05
 const FOOD_HAPPINESS_CAP := 15.0
-const SECURITY_HAPPINESS_CAP := 16.0
-const SECURITY_ATTENDANCE_CAP := 10.0
+## Security risk (Round 8): an uncovered crowd risks an incident. demand = max(1, round(weight/8));
+## risk = (1 - coverage) * weight / SECURITY_RISK_FULL_CROWD, and from SECURITY_INCIDENT_FIRST_DAY on
+## every venue at or above SECURITY_INCIDENT_THRESHOLD has an incident.
+const SECURITY_RISK_FULL_CROWD := 15.0
+const SECURITY_INCIDENT_THRESHOLD := 0.7
+const SECURITY_UNITS_PER_WEIGHT := 12.0
+const SECURITY_INCIDENT_FIRST_DAY := 2
+## Incident penalties are the full scale, applied by the share of event weight under incident: on the
+## real extract 12 of 20 venues start over the threshold, so a flat -6 per venue would sit on the cap
+## from the first day and no single security team could move it (the "pay and nothing happens" trap).
+const INCIDENT_HAPPINESS_CAP := 12.0
+const INCIDENT_ATTENDANCE_CAP := 6.0
+## Pre-incident nudge, by the share of security units still missing (share, not a flat per-unit
+## penalty, for the same reason as the incident caps: 23 of 23 units are missing on day 1, so a flat
+## −1 per unit would sit on its cap and a single team would change nothing).
+const SECURITY_SHORTFALL_CAP := 5.0
 ## Curfew extension per venue: reach bonus for that venue, happiness penalty per venue (capped).
-const CURFEW_REACH_BONUS := 0.25
-const CURFEW_HAPPINESS_PENALTY := 3.0
+const CURFEW_REACH_BONUS := 0.45
+const CURFEW_HAPPINESS_PENALTY := 1.0
 const CURFEW_HAPPINESS_CAP := 12.0
 ## Pricing per day (unset day = standard), averaged over days 1..current: attendance x(1 + attendance),
 ## money meter x money. (Scaling only visitor income made premium strictly worse: 0.88 x 1.15 ~ 1.01.)
@@ -384,15 +400,16 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 
 	var counts := _purchase_counts(state)
 	var food_short := _stock_shortfall(venues, counts, "foodtruck")
-	var security_short := _stock_shortfall(venues, counts, "security")
 	happiness -= FOOD_HAPPINESS_CAP * maxf(food_short, 0.0)
-	happiness -= SECURITY_HAPPINESS_CAP * maxf(security_short, 0.0)
+	happiness -= SECURITY_SHORTFALL_CAP * _security_shortfall_share(venues, counts)
 	happiness -= _curfew_penalty(venues, latest)
+	var incident_share := _incident_weight_share(venues, counts, int(state.get("day", 1)) if _is_number(state.get("day")) else 1)
+	happiness -= INCIDENT_HAPPINESS_CAP * incident_share
 
 	var food_factor := 1.0 if food_short < 0.0 else lerpf(FOOD_ATTENDANCE_MAX, FOOD_ATTENDANCE_MIN, food_short)
 	var pricing := _pricing_factors(state, latest)
 	var attendance := 100.0 * _reachability(state, venues, pedestrian_streets, latest, trees) * food_factor
-	attendance -= SECURITY_ATTENDANCE_CAP * maxf(security_short, 0.0)
+	attendance -= INCIDENT_ATTENDANCE_CAP * incident_share
 	attendance = clampf(attendance * pricing.attendance, 0.0, 100.0)
 
 	return {
@@ -482,6 +499,63 @@ static func _crown_near(venue: Dictionary, trees: Array, latest: Dictionary, pla
 static func _scorable_venues(data: Dictionary) -> Array:
 	return _records(data, "venues").filter(
 		func(v): return _is_number(v.get("event_weight")) and float(v.event_weight) >= 0.0)
+
+
+## Risk (0..1) that a venue's crowd outgrows its security. Track A's Sicherheit layer calls this —
+## keep name and signature. demand = max(1, round(event_weight / SECURITY_UNITS_PER_WEIGHT)).
+static func security_risk(venue: Dictionary, security_units: int) -> float:
+	if not _is_number(venue.get("event_weight")):
+		return 0.0
+	var weight := float(venue.event_weight)
+	var demand := maxi(1, roundi(weight / SECURITY_UNITS_PER_WEIGHT))
+	var coverage := clampf(float(maxi(0, security_units)) / float(demand), 0.0, 1.0)
+	return clampf((1.0 - coverage) * weight / SECURITY_RISK_FULL_CROWD, 0.0, 1.0)
+
+
+## Venues whose risk reached SECURITY_INCIDENT_THRESHOLD, from SECURITY_INCIDENT_FIRST_DAY on:
+## [{ venue_id, venue_name, risk }]. Deterministic and idempotent — same inputs, same list.
+static func security_incidents(state: Dictionary, data: Dictionary) -> Array:
+	return _incidents(_scorable_venues(data), _purchase_counts(state),
+		int(state.get("day", 1)) if _is_number(state.get("day")) else 1)
+
+
+static func _incidents(venues: Array, counts: Dictionary, day: int) -> Array:
+	var incidents: Array = []
+	if day < SECURITY_INCIDENT_FIRST_DAY:
+		return incidents
+	for venue: Dictionary in venues:
+		var units := int(counts.get(str(venue.id), {}).get("security", 0))
+		var risk := security_risk(venue, units)
+		if risk >= SECURITY_INCIDENT_THRESHOLD:
+			incidents.append({ "venue_id": str(venue.id), "venue_name": str(venue.get("name", "")), "risk": risk })
+	return incidents
+
+
+## Share (0..1) of the festival's event weight that sits at a venue with an incident.
+static func _incident_weight_share(venues: Array, counts: Dictionary, day: int) -> float:
+	var total := 0.0
+	for venue: Dictionary in venues:
+		total += float(venue.event_weight)
+	if total <= 0.0:
+		return 0.0
+	var affected := 0.0
+	for incident: Dictionary in _incidents(venues, counts, day):
+		for venue: Dictionary in venues:
+			if str(venue.id) == incident.venue_id:
+				affected += float(venue.event_weight)
+				break
+	return clampf(affected / total, 0.0, 1.0)
+
+
+## Share (0..1) of the festival's security demand that is still unstaffed (demand as in security_risk).
+static func _security_shortfall_share(venues: Array, counts: Dictionary) -> float:
+	var demand_total := 0.0
+	var missing := 0.0
+	for venue: Dictionary in venues:
+		var demand := maxi(1, roundi(float(venue.event_weight) / SECURITY_UNITS_PER_WEIGHT))
+		demand_total += float(demand)
+		missing += float(maxi(0, demand - int(counts.get(str(venue.id), {}).get("security", 0))))
+	return missing / demand_total if demand_total > 0.0 else 0.0
 
 
 ## German ending title for final meters { attendance, money, happiness } (missing meters count as 0).
@@ -609,27 +683,39 @@ static func _last_consulted_tree(game: Dictionary, data: Dictionary, latest: Dic
 	return {}
 
 
-## "2 Foodtrucks und 1 Security-Team am Ars Electronica Center" for the best-stocked venue.
+## "2 Foodtrucks und 1 Security-Team am Ars Electronica Center" for the best-stocked venue -- or
+## "3 Security-Teams an 2 Spielstätten." once the stock is spread over more than one venue.
 static func _purchase_sentence(game: Dictionary, data: Dictionary) -> String:
 	var counts := _purchase_counts(game)
 	var best := {}
 	var best_total := 0
+	var stocked := 0
+	var trucks := 0
+	var teams := 0
 	for venue: Dictionary in _records(data, "venues"):
 		var per_venue: Dictionary = counts.get(str(venue.id), {})
 		var total := int(per_venue.get("foodtruck", 0)) + int(per_venue.get("security", 0))
+		if total <= 0:
+			continue
+		stocked += 1
+		trucks += int(per_venue.get("foodtruck", 0))
+		teams += int(per_venue.get("security", 0))
 		if total > best_total:
 			best_total = total
 			best = venue
 	if best.is_empty():
 		return ""
-	var per_best: Dictionary = counts.get(str(best.id), {})
+	if stocked == 1:
+		var per_best: Dictionary = counts.get(str(best.id), {})
+		trucks = int(per_best.get("foodtruck", 0))
+		teams = int(per_best.get("security", 0))
 	var parts: Array[String] = []
-	var trucks := int(per_best.get("foodtruck", 0))
-	var teams := int(per_best.get("security", 0))
 	if trucks > 0:
 		parts.append("1 Foodtruck" if trucks == 1 else "%d Foodtrucks" % trucks)
 	if teams > 0:
 		parts.append("1 Security-Team" if teams == 1 else "%d Security-Teams" % teams)
+	if stocked > 1:
+		return "%s an %d Spielstätten." % [" und ".join(parts), stocked]
 	return "%s am %s." % [" und ".join(parts), best.get("name", "")]
 
 

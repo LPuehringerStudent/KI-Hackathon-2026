@@ -88,7 +88,8 @@ func _prompt(entity: Dictionary, day: int) -> String:
 		"street":
 			facts = {"Geschichte": str(entity.get("history", "")).left(300)}
 		"venue":
-			facts = {"Veranstaltungen": entity.get("events", 0)}
+			facts = {"Veranstaltungen": entity.get("events", 0),
+				"Erwartete_Gaeste": "~%d" % (int(entity.get("event_weight", 0)) * 40)}
 		"fountain", "toilet":
 			facts = {"Rolle": "Wasser und Sanitaerversorgung am zweiten Festivaltag", "Datenstand": "historischer Schnappschuss, kein aktueller Betriebsnachweis"}
 	var allowed: Array[String] = []

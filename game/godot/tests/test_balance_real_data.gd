@@ -34,13 +34,18 @@ func test_real_data_balance() -> void:
 		check(fresh[key] >= 40.0 and fresh[key] <= 90.0, "fresh %s should leave room both ways (40..90), got %.1f" % [key, fresh[key]])
 
 	# Hitzetag air quality: bounded, day 3 only, and exactly the modifier (fresh happiness has room for +-10).
+	var day2: Dictionary = GS.create()
+	GS.next_day(day2)
 	var day3: Dictionary = GS.create()
 	GS.next_day(day3)
 	GS.next_day(day3)
 	var air := GS.air_quality_modifier(day3, data)
 	check(absf(air) <= GS.AIR_MODIFIER, "air modifier out of bounds: %+.1f" % air)
-	check(is_equal_approx(GS.compute_meters(day3, data).happiness, fresh.happiness + air),
-		"day-3 happiness should be fresh %+.1f air, got %.1f vs %.1f" % [air, GS.compute_meters(day3, data).happiness, fresh.happiness])
+	check(is_equal_approx(GS.air_quality_modifier(day2, data), 0.0), "the Hitzetag modifier is day 3 only")
+	# Day 2 and day 3 carry the same security incidents (both >= SECURITY_INCIDENT_FIRST_DAY), so
+	# the difference between them is exactly the air modifier.
+	check(is_equal_approx(GS.compute_meters(day3, data).happiness, GS.compute_meters(day2, data).happiness + air),
+		"day-3 happiness should be day-2 %+.1f air, got %.1f vs %.1f" % [air, GS.compute_meters(day3, data).happiness, GS.compute_meters(day2, data).happiness])
 	if data.has("airquality"):
 		print("  INFO real air quality: PM10 %s at %s -> day-3 happiness %+.1f" % [data.airquality.get("pm10"), data.airquality.get("station"), air])
 
@@ -86,14 +91,17 @@ func test_real_data_verdicts() -> void:
 		return
 	var verdict_title: Callable = GS.verdict_title
 
-	# Doing nothing is judged neutral, whatever the Hitzetag weather.
+	# Doing nothing is judged neutral in ordinary weather. On the worst Hitzetag the unstaffed crowds
+	# (security incidents from day SECURITY_INCIDENT_FIRST_DAY) plus the air penalty push happiness
+	# below VERDICT_LOW -- intended pressure, but never the crisis ending.
 	for air: Variant in [null, { "pm10": 6.7 }, { "pm10": 35.0 }, { "pm10": 50.0 }]:
 		var d := data.duplicate()
 		d.erase("airquality")
 		if air != null:
 			d["airquality"] = air
 		var title: String = verdict_title.call(_meters_on_day_three(GS.create(), d))
-		check(title == "Stadt im Gleichgewicht", "untouched city with air %s should be neutral, got %s" % [air, title])
+		var allowed := ["Stadt im Gleichgewicht", "Effizienz-Tyrann:in"] if air == { "pm10": 50.0 } else ["Stadt im Gleichgewicht"]
+		check(title in allowed, "untouched city with air %s should be %s, got %s" % [air, allowed, title])
 
 	# No single decision wins the best title (it used to take one shuttle).
 	var singles: Array = []
@@ -137,12 +145,26 @@ func test_real_data_mentor_pack() -> void:
 	var fresh: Dictionary = GS.compute_meters(GS.create(), data)
 	var headline: Array = data.venues.filter(func(v): return float(v.get("events", 0)) >= GS.HEADLINE_MIN_EVENTS)
 	check(headline.size() >= 3, "expected several headline venues, got %d" % headline.size())
+	# Food trucks pay off from day 1; security only bites once the crowds do, so it is measured on the
+	# first incident day. A venue whose risk stays below the threshold still buys back its share of the
+	# understaffing penalty -- smaller, and deliberately so.
+	var day2: Dictionary = GS.create()
+	GS.next_day(day2)
+	var day2_fresh: Dictionary = GS.compute_meters(day2, data)
 	for venue: Dictionary in headline:
-		for kind: String in ["foodtruck", "security"]:
-			var m := _after(data, "venue", venue.id, kind)
-			var moved: float = maxf(m.happiness - fresh.happiness, m.attendance - fresh.attendance)
-			check(moved >= 0.3, "one %s at %s should move a meter by >= 0.3, got %.2f" % [kind, venue.name, moved])
-			check(m.money < fresh.money, "a %s at %s should cost money" % [kind, venue.name])
+		var truck := _after(data, "venue", venue.id, "foodtruck")
+		check(maxf(truck.happiness - fresh.happiness, truck.attendance - fresh.attendance) >= 0.3,
+			"one foodtruck at %s should move a meter by >= 0.3" % venue.name)
+		check(truck.money < fresh.money, "a foodtruck at %s should cost money" % venue.name)
+		var guarded: Dictionary = day2.duplicate(true)
+		check(GS.decide(guarded, GS.find_entity(data, venue.id, "venue"), "security"), "security at %s" % venue.name)
+		var m: Dictionary = GS.compute_meters(guarded, data)
+		var moved: float = maxf(m.happiness - day2_fresh.happiness, m.attendance - day2_fresh.attendance)
+		var at_risk: bool = GS.security_risk(venue, 0) >= GS.SECURITY_INCIDENT_THRESHOLD
+		var floor_moved: float = 0.3 if at_risk else 0.1
+		check(moved >= floor_moved, "one security at %s (risk %.2f) should move a meter by >= %.1f on day 2, got %.2f"
+			% [venue.name, GS.security_risk(venue, 0), floor_moved, moved])
+		check(m.money < day2_fresh.money, "security at %s should cost money" % venue.name)
 	var festival := GS.find_entity(data, "festival", "festival")
 	var fair := _after(data, "festival", "festival", "fair")
 	var premium := _after(data, "festival", "festival", "premium")
@@ -189,12 +211,15 @@ func test_real_data_endings() -> void:
 	# The demo answers two of the three Bürgeranliegen; a third planting tips it into gold.
 	var demo_day_one := [["venue", "Lentos Kunstmuseum", "shuttle"], ["venue", "OK Platz", "shuttle"],
 		["street", "Hauptplatz", "pedestrian"], fair]
-	var demo_day_two := [fair, ["toilet", "Stadtpark Huemerstraße", "relocate"], ["toilet", "Promenade", "close"]]
+	# Day 2 is the first incident day: the demo answers it with security at the two busiest venues.
+	var demo_day_two := [fair, ["toilet", "Stadtpark Huemerstraße", "relocate"], ["toilet", "Promenade", "close"],
+		["venue", "Ars Electronica Center", "security"], ["venue", "OK Platz", "security"]]
 	var routes := {
 		"DEMO -> Volksnahe Stadtplanung": [demo_day_one, demo_day_two,
-			[fair, tree, ["venue", "Ars Electronica Center", "plant"]]],
-		"SHOWCASE -> Goldene:r Bürgermeister:in": [demo_day_one, demo_day_two,
 			[fair, tree, ["venue", "Ars Electronica Center", "plant"], ["venue", "Ars Electronica Center", "plant"]]],
+		"SHOWCASE -> Goldene:r Bürgermeister:in": [demo_day_one, demo_day_two,
+			[fair, tree, ["venue", "Ars Electronica Center", "plant"], ["venue", "Ars Electronica Center", "plant"],
+			["venue", "Ars Electronica Center", "extend"]]],
 		"Effizienz-Tyrann:in": [[], [], [["tree", "baum_1b51840024c31e2584c5", "cut"], ["tree", "baum_22b431ea60149d6bee10", "cut"]]],
 		"Beliebt, aber pleite": [[["venue", "splace", "shuttle"], ["venue", "Kunstuniversität Linz, Hauptplatz 6 (Ostgebäude)", "shuttle"],
 			["venue", "JKU MED Campus (MED Campus I)", "shuttle"], ["venue", "Ars Electronica Center", "shuttle"],

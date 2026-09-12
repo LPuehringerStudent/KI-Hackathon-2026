@@ -29,7 +29,7 @@ func _data(air: Variant = null) -> Dictionary:
 
 
 func _fresh() -> float:
-	return (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M)
+	return (GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M - GS.SECURITY_SHORTFALL_CAP)
 
 
 func _air(pm10: Variant) -> Dictionary:
@@ -88,7 +88,7 @@ func test_bonus_adds_on_top_of_a_full_score() -> void:
 	var data := _data(_air(5.0))
 	var state := _state_on_day(3)
 	data.trees[0].crown_m = 400.0  # full shade
-	var full: float = GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT
+	var full: float = GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT + GS.SHADE_WEIGHT - GS.SECURITY_SHORTFALL_CAP
 	var m: Dictionary = GS.compute_meters(state, data)
 	check(is_equal_approx(m.happiness, minf(100.0, full + GS.AIR_MODIFIER)), "full score plus clean air (clamped), got %s" % m.happiness)
 
@@ -100,7 +100,7 @@ func test_bad_air_can_push_happiness_down_but_not_below_zero() -> void:
 	var state := _state_on_day(3)
 	state.decisions.append({ "entity_id": "t1", "entity_type": "tree", "decision_id": "cut", "day": 3, "cost": 400.0 })
 	# base + shade - air before the cut (fountains/toilets removed)
-	var before := GS.HAPPINESS_BASE + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M - GS.AIR_MODIFIER
+	var before := GS.HAPPINESS_BASE + GS.SHADE_WEIGHT * 12.0 / GS.SHADE_FULL_CROWN_M - GS.AIR_MODIFIER - GS.SECURITY_SHORTFALL_CAP
 	check(is_equal_approx(GS.compute_meters(_state_on_day(3), data).happiness, clampf(before, 0.0, 100.0)), "bad air on day 3 should subtract AIR_MODIFIER")
 	for i in 10:  # enough felled trees next to the venue to go far below zero
 		data.trees.append({ "id": "c%d" % i, "lat": VENUE_LAT, "lon": VENUE_LON + 0.0001, "species": "Acer", "height_m": 9.0, "crown_m": 1.0, "age_estimate": null })
