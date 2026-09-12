@@ -1,4 +1,4 @@
-# Stimmen der Stadt
+# Stadttopia
 
 Project by Team Arbeitszeitbetrug for the KI-Hackathon at the Grand Garage, Tabakfabrik Linz — 2026-09-11.
 
