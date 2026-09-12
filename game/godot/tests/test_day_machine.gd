@@ -62,7 +62,7 @@ func test_available_decisions_per_type() -> void:
 	for type: String in ["fountain", "toilet"]:
 		var entity := { "id": "x", "type": type, "lat": VENUE_LAT, "lon": VENUE_LON }
 		check(_ids(GS.available_decisions(entity)) == ["relocate", "close"], "%s ids (reopen only once closed)" % type)
-	check(_ids(GS.available_decisions(GS.find_entity(data, "v1", "venue"))) == ["shuttle", "extend", "plant"], "venue ids (no purchases below HEADLINE_MIN_EVENTS, curfew only once extended)")
+	check(_ids(GS.available_decisions(GS.find_entity(data, "v1", "venue"))) == ["shuttle", "extend", "security", "plant"], "venue ids (food trucks need a headline venue, curfew only once extended)")
 	check(_ids(GS.available_decisions(GS.find_entity(data, "s1", "street"))) == ["pedestrian", "plant"], "street ids (open only once pedestrian)")
 	check(GS.available_decisions({ "id": "x", "type": "ufo" }).is_empty(), "unknown type has no decisions")
 	check(GS.available_decisions({ "id": "t1" }).is_empty(), "entity without type has no decisions")

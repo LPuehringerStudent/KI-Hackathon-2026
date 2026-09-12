@@ -81,7 +81,10 @@ func test_reward_counts_once_per_petition_and_only_up_to_today() -> void:
 	for state: Dictionary in [control, both]:
 		GS.next_day(state)
 		GS.next_day(state)
-	check(is_equal_approx(GS.compute_meters(control, data).happiness - GS.compute_meters(GS.create(), data).happiness,
+	var untouched: Dictionary = GS.create()  # same day, so incidents and air cancel out
+	GS.next_day(untouched)
+	GS.next_day(untouched)
+	check(is_equal_approx(GS.compute_meters(control, data).happiness - GS.compute_meters(untouched, data).happiness,
 		GS.PETITION_REWARD + 2.0 * GS.PLANT_GREENING_BONUS + GS.SHADE_WEIGHT * 2.0 * GS.PLANTED_CROWN_M / GS.SHADE_FULL_CROWN_M),
 		"on day 3 the plantings also pay the shade petition")
 	check(is_equal_approx(GS.compute_meters(both, data).happiness - GS.compute_meters(control, data).happiness, GS.PETITION_REWARD),

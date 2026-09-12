@@ -373,6 +373,9 @@ func _after_transition() -> void:
 	State.next_day(game)
 	_refresh()
 	day_bar.set_enabled(true)
+	var incidents := State.security_incidents(game, data)
+	if not incidents.is_empty():
+		chat.set_status("⚠ Vorfall am %s: zu wenig Security für die Menge." % incidents[0].venue_name)
 	if not selected.is_empty() and not _resolved.has(_key(selected)):
 		select_entity(str(selected.id), str(selected.type))
 

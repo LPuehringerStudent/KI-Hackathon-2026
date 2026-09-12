@@ -37,7 +37,8 @@ Unser Spiel macht dich verantwortlich für die **Stadt, in der sie ankommen**.
 
 - Verhandeln im Chat (Mistral-Sprachmodell, offline mit vorbereiteten Stimmen)
 - Drei Werte: **Besucher:innen · Geld · Zufriedenheit**
-- Neu: Foodtrucks, Security, Sperrstunde, Ticketpreise
+- Neu: Sicherheitsrisiko pro Bühne — ab Tag 2 gibt es Vorfälle, wo die Menge unbewacht ist
+- Foodtrucks, Security-Teams, Sperrstunde, Ticketpreise
 - Am Ende ein Titel — von **„Stadt in Schieflage"** bis **„Goldene:r Bürgermeister:in"**
 
 ---
@@ -50,13 +51,14 @@ Unser Spiel macht dich verantwortlich für die **Stadt, in der sie ankommen**.
 - **Karte:** isometrische Miniatur aus OpenStreetMap, 3D-modellierte Requisiten
 
 Alle Annahmen sind benannte Konstanten. Die Balance ist **simuliert und getestet**:
-ein unberührtes Linz bleibt neutral, keine Einzelentscheidung gewinnt das Spiel.
+keine Einzelentscheidung gewinnt das Spiel, und wer die Stadt am Festivaltag sich selbst überlässt,
+sieht ab Tag 2 die Folgen — Vorfälle dort, wo die Menge zu groß für die Betreuung ist.
 
 ---
 
 ## Live-Demo & wie es weitergeht
 
-**Demo:** zwei Shuttles → Toilette verlegen → Platane retten → Urteil
+**Demo:** zwei Shuttles → Vorfall an Tag 2 → Security & Toilette → Platane retten → Urteil
 
 **Technik:** Godot 4.7 · Linux-Build · 160 automatisierte Checks · läuft offline
 

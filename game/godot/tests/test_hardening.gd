@@ -87,7 +87,7 @@ func test_numeric_ids_match_their_string_form() -> void:
 	var state: Dictionary = GS.create()
 	state.decisions.append({ "entity_id": 42, "entity_type": "tree", "decision_id": "cut", "day": 1, "cost": 400 })
 	# tree 42 cut next to the venue: no shade, both cut penalties
-	var expected := GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT - GS.CUT_PENALTY - GS.CUT_NEAR_VENUE_PENALTY
+	var expected := GS.HAPPINESS_BASE + GS.FOUNTAIN_WEIGHT + GS.TOILET_WEIGHT - GS.CUT_PENALTY - GS.CUT_NEAR_VENUE_PENALTY - GS.SECURITY_SHORTFALL_CAP
 	check(is_equal_approx(GS.compute_meters(state, data).happiness, expected), "int ids should work, got %s" % GS.compute_meters(state, data).happiness)
 	var entity := GS.find_entity(data, "42", "tree")
 	check(entity.get("type") == "tree", "find_entity should find an int id by its string form")
