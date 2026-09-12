@@ -39,9 +39,13 @@ func _run() -> void:
 	await create_timer(0.8).timeout
 	var snapshot: Dictionary = ui.game.duplicate(true)
 	var map = ui.map_view
+	check(not ui.dock.drawer.visible, "game starts with map and icon rail only")
+	check(map.size.is_equal_approx(ui.size), "map fills the viewport")
 	var ambience = map._ambience
 	check(ambience.routes.size() == 2, "two separated boat routes")
 	var mask: Image = load("res://assets/boat_clearance.png").get_image()
+	check(mask.get_width() * 16 == int(map._meta.width), "boat mask matches native map size")
+	check(ambience._lights.texture.get_width() == int(map._meta.width), "night windows match native map size")
 	var safe := true
 	for route: PackedVector2Array in ambience.routes:
 		for point in route:
@@ -65,8 +69,11 @@ func _run() -> void:
 	await create_timer(0.4).timeout
 	var stable := true
 	for id: String in map.markers:
-		stable = stable and map.markers[id].scale.is_equal_approx(Vector2.ONE)
+		var tree: bool = map.markers[id].get_meta("etype") == "tree"
+		stable = stable and map.markers[id].scale.is_equal_approx(Vector2(1.5, 1.5) if tree else Vector2.ONE)
 		stable = stable and map.markers[id].texture_normal.get_size() == sizes[id]
+		if tree:
+			stable = stable and map.markers[id].texture_normal.get_image().is_invisible()
 	check(stable and count == map.markers.size(), "zoom keeps all markers and fixed icon sizes")
 	await map.set_zoom(0.75)
 	map.focus_entity(str(ui.selected.id))
@@ -80,15 +87,35 @@ func _run() -> void:
 	check(not map.transition_busy, "visual day transition completes")
 	check(ui.game == snapshot, "presentation leaves game state unchanged")
 	check(is_zero_approx(float(ambience.light_material.get_shader_parameter("strength"))), "window lights off by day")
-	var panels: Array[Control] = [ui.meters, ui.day_bar, ui.chat]
-	for i in range(panels.size() - 1):
-		check(panels[i].get_global_rect().end.y <= panels[i + 1].get_global_rect().position.y + 1.0, "sidebar sections do not overlap")
-	var sidebar: ScrollContainer = ui.get_node("RootSplit/PanelSlot")
+	for key: String in ["stats", "day", "chat"]:
+		ui.dock.open_page(key)
+		await create_timer(0.3).timeout
+		check(ui.dock.drawer.visible and ui.dock.pages[key].visible, key + " opens")
+		var visible_pages := 0
+		for page: Control in ui.dock.pages.values():
+			visible_pages += int(page.visible)
+		check(visible_pages == 1, "one drawer page visible")
+		await capture("dock-" + key)
+	var sidebar: ScrollContainer = ui.dock.sidebar
 	sidebar.ensure_control_visible(ui.chat.get_node("Rows/Composer/Input"))
 	await process_frame
 	check(ui.chat.get_node("Rows/Composer").get_global_rect().end.y <= ui.size.y - 20.0, "composer remains reachable inside sidebar")
-	check(ui.get_node("RootSplit").position.y >= 16.0, "map stays inside viewport frame")
+	check(ui.dock.drawer.get_global_rect().end.x <= ui.size.x - 16, "drawer stays inside viewport")
 	await capture("city-layout")
+	ui.dock.close()
+	await create_timer(0.25).timeout
+	check(not ui.dock.drawer.visible, "drawer closes fully")
+	ui.dock.open_page("day")
+	ui.dock.close()
+	ui.dock.open_page("chat")
+	await create_timer(0.3).timeout
+	check(ui.dock.drawer.visible and ui.dock.active_page == "chat", "rapid toggles keep the latest page")
+	map.entity_clicked.emit(str(ui.selected.id), str(ui.selected.type))
+	await process_frame
+	check(ui.dock.active_page == "chat", "map selection keeps conversation open")
+	var marker: Control = map.markers[str(ui.selected.id)]
+	check(marker.global_position.x > ui.dock.drawer.get_global_rect().end.x, "selected place stays outside the drawer")
+	check(ui.game == snapshot, "drawer controls leave game state unchanged")
 	ui.queue_free()
 	await process_frame
 	print("STYLE failures=", failures)

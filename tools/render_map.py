@@ -22,7 +22,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 from PIL import Image, ImageDraw
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Polygon
 from shapely.geometry import box as shapely_box
 from shapely.ops import polygonize, unary_union
 
@@ -425,9 +425,35 @@ def main():
                     continue  # edge faces away from the northeast viewer
                 wall = C_WALL_E if y2 > y1 else C_WALL_N
                 draw.polygon([(x1, y1), (x2, y2), (x2, y2 - zoff), (x1, y1 - zoff)], fill=wall)
+                span = math.hypot(x2 - x1, y2 - y1)
+                columns = int(span // 12)
+                floors = int(zoff // 12)
+                if columns > 0 and floors > 0:
+                    for floor in range(floors):
+                        bottom = (floor + 0.25) * zoff / floors
+                        height = min(7, zoff / floors * 0.55)
+                        for column in range(columns):
+                            t = (column + 0.5) / columns
+                            half = min(3.0 / span, 0.23 / columns)
+                            ax, ay = x1 + (x2 - x1) * (t - half), y1 + (y2 - y1) * (t - half)
+                            bx, by = x1 + (x2 - x1) * (t + half), y1 + (y2 - y1) * (t + half)
+                            glass = (78, 116, 130) if y2 > y1 else (59, 89, 104)
+                            draw.polygon([(ax, ay - bottom), (bx, by - bottom),
+                                          (bx, by - bottom - height), (ax, ay - bottom - height)], fill=glass)
+                            draw.line([(ax, ay - bottom), (bx, by - bottom)], fill=(235, 236, 221), width=2)
+                    draw.line([(x1, y1 - zoff + 2), (x2, y2 - zoff + 2)], fill=(239, 234, 218), width=2)
             top = [(x, y - zoff) for x, y in ground]
             draw.polygon(top, fill=roof)
             draw.line(top + [top[0]], fill=C_ROOF_EDGE, width=1)
+            roof_shape = Polygon(top)
+            if roof_shape.is_valid and roof_shape.area > 500:
+                center = roof_shape.representative_point()
+                cx, cy = center.x, center.y
+                skylight = [(cx - 7, cy), (cx, cy - 4), (cx + 7, cy), (cx, cy + 4)]
+                if roof_shape.contains(Polygon(skylight).buffer(4)):
+                    draw.polygon([(x + 1, y + 3) for x, y in skylight], fill=C_ROOF_EDGE)
+                    draw.polygon(skylight, fill=(108, 154, 168))
+                    draw.line(skylight + [skylight[0]], fill=(233, 239, 233), width=2)
 
     for v in venues:
         px = iso.pt(float(v["lat"]), float(v["lon"]))

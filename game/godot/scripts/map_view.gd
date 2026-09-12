@@ -59,6 +59,7 @@ var _last_planted: Array = []
 var _zoom := 1.0
 var _ambience: Node2D
 var _marker_leaders := {}
+var _map_tools: Array[Control] = []
 
 
 func _ready() -> void:
@@ -161,6 +162,8 @@ func _relayout_markers() -> void:
 		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) / 2.0
 		dot.scale = Vector2.ONE
 		if dot.get_meta("etype") == "tree":
+			dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(12, 38) * _zoom
+			dot.scale = Vector2(_zoom, _zoom)
 			continue
 		var anchor := dot.position
 		for offset in [Vector2.ZERO, Vector2(0, -28), Vector2(28, 0), Vector2(-28, 0), Vector2(0, 28), Vector2(28, -28), Vector2(-28, -28)]:
@@ -421,6 +424,7 @@ func _add_zoom_controls() -> void:
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
 	var box := VBoxContainer.new()
+	_map_tools.append(box)
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	box.position = Vector2(-46, 8)
 	box.add_theme_constant_override("separation", 4)
@@ -450,6 +454,7 @@ func _add_zoom_controls() -> void:
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(_tip)  # plain Control: manual size/position survive
 	var layers := HBoxContainer.new()
+	_map_tools.append(layers)
 	layers.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	layers.position = Vector2(8, 8)
 	layers.add_theme_constant_override("separation", 4)
@@ -556,6 +561,10 @@ func play_day_transition(speed := 1.0, on_finished := Callable()) -> void:
 
 
 func _marker_texture(entity_type: String, _id: String) -> Texture2D:
+	if entity_type == "tree":
+		if not _dot_cache.has("tree_hit"):
+			_dot_cache["tree_hit"] = ImageTexture.create_from_image(Image.create_empty(24, 38, false, Image.FORMAT_RGBA8))
+		return _dot_cache["tree_hit"]
 	var key := "icon_" + entity_type
 	if _dot_cache.has(key):
 		return _dot_cache[key]
@@ -805,6 +814,8 @@ func _make_ring() -> ImageTexture:
 
 
 func _pop_in(dot: TextureButton) -> void:
+	if dot.get_meta("etype") == "tree":
+		return
 	dot.scale = Vector2.ZERO
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -812,7 +823,7 @@ func _pop_in(dot: TextureButton) -> void:
 
 
 func _hover(dot: TextureButton, on: bool) -> void:
-	if dot.disabled:
+	if dot.disabled or dot.get_meta("etype") == "tree":
 		return
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_SPRING)
@@ -845,7 +856,7 @@ func focus_entity(id: String) -> void:
 		return
 	var dot: TextureButton = markers[id]
 	var w: float = dot.get_meta("msize")
-	_scroll.scroll_horizontal = int(dot.position.x + w / 2.0 - _scroll.size.x / 2.0)
+	_scroll.scroll_horizontal = int(dot.position.x + w / 2.0 - (_scroll.size.x + float(get_meta("focus_left_inset", 0.0))) / 2.0)
 	_scroll.scroll_vertical = int(dot.position.y + w / 2.0 - _scroll.size.y / 2.0)
 
 
