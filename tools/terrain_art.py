@@ -179,17 +179,21 @@ def nibelungen_centerline(segments):
     return LineString(points)
 
 
-def paint_nibelungen(image, line):
-    draw = ImageDraw.Draw(image, "RGBA")
-    width = max(46, min(78, line.length * 30 / 250))
+def nibelungen_deck(line):
     points = []
     for i in range(65):
         t = i / 64
         p = line.interpolate(t, normalized=True)
-        rise = 26 * min(1, t * 14, (1 - t) * 14) + 5 * math.sin(math.pi * t)
+        rise = 24 * math.sin(math.pi * t)
         points.append((p.x, p.y - rise))
-    deck = LineString(points)
-    paint_shape(image, translate(line.buffer(width / 2 + 5, cap_style=2), xoff=6, yoff=10), (40, 74, 85, 100))
+    return LineString(points)
+
+
+def paint_nibelungen(image, line):
+    draw = ImageDraw.Draw(image, "RGBA")
+    width = max(42, min(58, line.length * 21 / 250))
+    deck = nibelungen_deck(line)
+    paint_shape(image, translate(line.buffer(width / 2 + 2, cap_style=2), xoff=3, yoff=6), (40, 74, 85, 22))
     for fraction in (0.30, 0.70):
         p = line.interpolate(fraction, normalized=True)
         before = line.interpolate(fraction - 0.01, normalized=True)
@@ -197,16 +201,17 @@ def paint_nibelungen(image, line):
         angle = math.atan2(after.y - before.y, after.x - before.x)
         tangent = (math.cos(angle), math.sin(angle))
         normal = (-tangent[1], tangent[0])
+        pier_top = 24 * math.sin(math.pi * fraction) - 5
         base = [(p.x + tangent[0] * along + normal[0] * across,
                  p.y + tangent[1] * along + normal[1] * across)
-                for along, across in [(-9, -width / 2), (9, -width / 2), (9, width / 2), (-9, width / 2)]]
+                for along, across in [(-7, -width * 0.35), (7, -width * 0.35), (7, width * 0.35), (-7, width * 0.35)]]
         for i, (x, y) in enumerate(base):
             xx, yy = base[(i + 1) % 4]
-            draw.polygon([(x, y + 10), (xx, yy + 10), (xx, yy - 28), (x, y - 28)],
+            draw.polygon([(x, y + 4), (xx, yy + 4), (xx, yy - pier_top), (x, y - pier_top)],
                          fill=(175, 173, 155) if i % 2 else (135, 143, 135))
-            for height in (0, 8, 16, 24):
+            for height in range(0, int(pier_top), 6):
                 draw.line([(x, y - height), (xx, yy - height)], fill=(153, 156, 143), width=2)
-    paint_shape(image, translate(deck.buffer(width / 2, cap_style=2), yoff=10), (76, 95, 88))
+    paint_shape(image, translate(deck.buffer(width / 2, cap_style=2), yoff=5), (96, 114, 105))
     paint_shape(image, deck.buffer(width / 2, cap_style=2), (226, 225, 207))
     paint_shape(image, deck.buffer(width / 2 - 7, cap_style=2), (119, 132, 133))
     for side in (-1, 1):
@@ -237,8 +242,14 @@ def paint_nibelungen(image, line):
         fractions = [start + (end - start) * i / 8 for i in range(9)]
         base = [front.interpolate(t, normalized=True) for t in fractions]
         top = [front_deck.interpolate(t, normalized=True) for t in reversed(fractions)]
-        draw.polygon([(p.x, p.y + 10) for p in base] + [(p.x, p.y + 10) for p in top], fill=(173, 172, 151))
+        draw.polygon([(p.x, p.y + 8) for p in base] + [(p.x, p.y + 5) for p in top], fill=(173, 172, 151))
     for fraction in (0.045, 0.08, 0.92, 0.955):
         p = front.interpolate(fraction, normalized=True)
-        draw.polygon([(p.x - 5, p.y + 10), (p.x + 5, p.y + 10), (p.x + 5, p.y),
-                      (p.x + 3, p.y - 4), (p.x, p.y - 5), (p.x - 3, p.y - 4), (p.x - 5, p.y)], fill=(83, 95, 83))
+        top = front_deck.interpolate(fraction, normalized=True).y + 7
+        height = p.y + 8 - top
+        if height < 4:
+            continue
+        radius = min(4, height * 0.4)
+        draw.polygon([(p.x - radius, p.y + 8), (p.x + radius, p.y + 8),
+                      (p.x + radius, top + radius), (p.x + radius * 0.6, top + 1),
+                      (p.x, top), (p.x - radius * 0.6, top + 1), (p.x - radius, top + radius)], fill=(83, 95, 83))

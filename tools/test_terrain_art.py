@@ -1,9 +1,9 @@
 import unittest
 
 from PIL import Image, ImageDraw
-from shapely.geometry import Polygon
+from shapely.geometry import LineString, Polygon
 
-from terrain_art import bridge_paths, grass_tile, nibelungen_centerline, paint_bridges, paint_roads, paint_shape, tile_patch
+from terrain_art import bridge_paths, grass_tile, nibelungen_centerline, nibelungen_deck, paint_bridges, paint_roads, paint_shape, tile_patch
 from bake_city_ambience import water_clearance
 
 
@@ -67,6 +67,21 @@ class TerrainArtTests(unittest.TestCase):
                 expected = inside and all(image.getpixel((xx, yy)) == (168, 202, 222)
                                           for yy in range(cy - 5, cy + 6) for xx in range(cx - 5, cx + 6))
                 self.assertEqual(mask.getpixel((x, y)) == 255, expected)
+
+    def test_bridge_profile_has_no_ramp_kinks(self):
+        line = LineString([(30, 120), (670, 120)])
+        deck = list(nibelungen_deck(line).coords)
+        self.assertAlmostEqual(deck[0][1], 120)
+        self.assertAlmostEqual(deck[-1][1], 120)
+        second_differences = [abs(deck[i + 1][1] - 2 * deck[i][1] + deck[i - 1][1]) for i in range(1, len(deck) - 1)]
+        self.assertLess(max(second_differences), 0.08)
+
+    def test_bridge_shadow_keeps_water_visible(self):
+        water = (168, 202, 222)
+        image = Image.new("RGB", (340, 180), water)
+        paint_bridges(image, [{"name": "Nibelungenbruecke", "points": [(30, 120), (300, 120)]}])
+        pixel = image.getpixel((165, 148))
+        self.assertLess(max(abs(a - b) for a, b in zip(pixel, water)), 18)
 
 
 if __name__ == "__main__":
