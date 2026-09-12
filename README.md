@@ -64,8 +64,9 @@ python3 mistral-proxy/server.py
 ```
 
 Everything except free-form chat works offline (cache → pre-generated personas).
-A prebuilt Linux binary is at `game/godot/build/buergermeister.x86_64`
-(rebuild anytime with `bash tools/build_game.sh`).
+**Just want to play?** Prebuilt binaries for Linux and Windows are on the
+[Releases page](https://github.com/LPuehringerStudent/KI-Hackathon-2026/releases/latest) —
+download, run, no build needed. Rebuild anytime with `bash tools/build_game.sh`.
 
 ## Tests
 
