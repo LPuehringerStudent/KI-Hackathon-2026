@@ -1,10 +1,10 @@
 ---
 marp: true
-title: Stimmen der Stadt
+title: Stadttopia
 paginate: true
 ---
 
-# Stimmen der Stadt
+# Stadttopia
 
 **Drei Tage. Eine Stadt. Viele Stimmen.**
 
