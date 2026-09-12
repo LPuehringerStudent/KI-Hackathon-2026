@@ -59,7 +59,17 @@ func _cruise_curve(center: Vector2, angle: float) -> Curve2D:
 
 
 func _build_routes() -> void:
-	var texture: Texture2D = load("res://assets/boat_clearance.png")
+	# guard like _add_boat: an unimported asset must not abort ambience
+	var texture: Texture2D = null
+	if ResourceLoader.exists("res://assets/boat_clearance.png"):
+		texture = load("res://assets/boat_clearance.png")
+	if texture == null:
+		var img := Image.load_from_file("res://assets/boat_clearance.png")
+		if img != null:
+			texture = ImageTexture.create_from_image(img)
+	if texture == null:
+		push_warning("city_ambience: boat_clearance.png not loadable — boats disabled")
+		return
 	var mask := texture.get_image()
 	var water: Array[Vector2i] = []
 	for y in mask.get_height():
