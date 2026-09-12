@@ -279,7 +279,7 @@ def main():
             paths = rings_px(el, iso, min_len=2)
             roads[kind].extend(paths)
             if el.get("tags", {}).get("bridge", "no") != "no":
-                bridges.extend(paths)
+                bridges.extend({"name": el.get("tags", {}).get("name", ""), "points": path} for path in paths)
         elif kind == "building":
             ring = rings_px(el, iso, min_len=4)
             if not ring:
@@ -365,13 +365,6 @@ def main():
                 for i, px in enumerate(ring):
                     if i % 12 == 5:  # deterministic spacing along the street
                         ground_objs.append((px[1], "prop", px, sprites["prop_stall"]))
-        # boats on the largest water body
-        if "prop_boat" in sprites and fills["water"]:
-            biggest = max(fills["water"], key=lambda r: abs(signed_area(r)))
-            n = len(biggest)
-            for frac in (0.3, 0.65):
-                p = biggest[int(n * frac)]
-                ground_objs.append((p[1], "prop", p, sprites["prop_boat"]))
     ground_objs.sort(key=lambda o: o[0])
 
     img = Image.new("RGB", (SIZE, SIZE), C_GROUND)

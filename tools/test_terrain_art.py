@@ -1,9 +1,10 @@
 import unittest
 
-from PIL import Image
+from PIL import Image, ImageDraw
 from shapely.geometry import Polygon
 
-from terrain_art import bridge_paths, grass_tile, paint_bridges, paint_roads, paint_shape, tile_patch
+from terrain_art import bridge_paths, grass_tile, nibelungen_centerline, paint_bridges, paint_roads, paint_shape, tile_patch
+from bake_city_ambience import water_clearance
 
 
 class TerrainArtTests(unittest.TestCase):
@@ -44,6 +45,28 @@ class TerrainArtTests(unittest.TestCase):
         self.assertEqual(paint_bridges(image, segments), 1)
         self.assertNotEqual(image.getpixel((120, 62)), water)
         self.assertEqual(image.getpixel((120, 20)), water)
+
+    def test_nibelungen_has_one_shared_deck(self):
+        segments = [[(30, 110), (150, 110)], [(150, 110), (300, 110)],
+                    [(300, 130), (30, 130)]]
+        center = nibelungen_centerline(segments)
+        self.assertAlmostEqual(center.centroid.y, 120)
+        image = Image.new("RGB", (340, 180), (168, 202, 222))
+        count = paint_bridges(image, [{"name": "Nibelungenbruecke", "points": points} for points in segments])
+        self.assertEqual(count, 1)
+        self.assertNotEqual(image.getpixel((165, 90)), (168, 202, 222))
+
+    def test_clearance_matches_full_hull_footprint(self):
+        image = Image.new("RGB", (64, 64), (168, 202, 222))
+        ImageDraw.Draw(image).rectangle((29, 11, 34, 49), fill=(120, 120, 120))
+        mask = water_clearance(image, clearance=5, step=8)
+        for y in range(mask.height):
+            for x in range(mask.width):
+                cx, cy = x * 8 + 4, y * 8 + 4
+                inside = cx >= 5 and cy >= 5 and cx + 5 < 64 and cy + 5 < 64
+                expected = inside and all(image.getpixel((xx, yy)) == (168, 202, 222)
+                                          for yy in range(cy - 5, cy + 6) for xx in range(cx - 5, cx + 6))
+                self.assertEqual(mask.getpixel((x, y)) == 255, expected)
 
 
 if __name__ == "__main__":
