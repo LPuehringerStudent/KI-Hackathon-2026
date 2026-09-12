@@ -363,6 +363,8 @@ h2 { font-size: clamp(1.7rem, .9rem + 3vw, 3.1rem); }
 .pair img {
   display: block;
   width: 100%;
+  max-height: 34vh;      /* keep captions + text on screen at 1080p */
+  object-fit: cover;
   border-radius: 12px;
   border: 1px solid var(--line);
 }
