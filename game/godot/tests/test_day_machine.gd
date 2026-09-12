@@ -63,7 +63,7 @@ func test_available_decisions_per_type() -> void:
 		var entity := { "id": "x", "type": type, "lat": VENUE_LAT, "lon": VENUE_LON }
 		check(_ids(GS.available_decisions(entity)) == ["relocate", "close"], "%s ids (reopen only once closed)" % type)
 	check(_ids(GS.available_decisions(GS.find_entity(data, "v1", "venue"))) == ["shuttle", "extend", "security", "plant"], "venue ids (food trucks need a headline venue, curfew only once extended)")
-	check(_ids(GS.available_decisions(GS.find_entity(data, "s1", "street"))) == ["pedestrian", "plant"], "street ids (open only once pedestrian)")
+	check(_ids(GS.available_decisions(GS.find_entity(data, "s1", "street"))) == ["carfree", "plant"], "street ids (open only once carfree)")
 	check(GS.available_decisions({ "id": "x", "type": "ufo" }).is_empty(), "unknown type has no decisions")
 	check(GS.available_decisions({ "id": "t1" }).is_empty(), "entity without type has no decisions")
 
@@ -78,7 +78,7 @@ func test_decision_shape_and_costs() -> void:
 	check(not costs.has("tree/keep") and costs.get("tree/trim") == 150.0 and costs.get("tree/cut") == 400.0, "tree costs: %s" % costs)
 	check(costs.get("fountain/relocate") == 800.0 and costs.get("fountain/close") == -300.0, "service costs (closing refunds operating costs): %s" % costs)
 	check(costs.get("venue/shuttle") == 1800.0 and costs.get("venue/plant") == 300.0, "venue costs: %s" % costs)
-	check(costs.get("street/pedestrian") == 300.0 and costs.get("street/plant") == 300.0, "street costs: %s" % costs)
+	check(costs.get("street/carfree") == 300.0 and costs.get("street/plant") == 300.0, "street costs: %s" % costs)
 	var shuttle: Dictionary = GS.available_decisions({ "id": "x", "type": "venue" })[0]
 	check(shuttle.adds_shuttle == true, "venue shuttle adds a shuttle")
 
@@ -140,7 +140,7 @@ func test_shuttle_decision_adds_shuttle_at_venue() -> void:
 
 func test_non_shuttle_decision_adds_no_shuttle() -> void:
 	var state: Dictionary = GS.create()
-	GS.decide(state, GS.find_entity(_data(), "s1", "street"), "pedestrian")
+	GS.decide(state, GS.find_entity(_data(), "s1", "street"), "carfree")
 	check(state.shuttles.is_empty(), "street decision must not add shuttles")
 
 

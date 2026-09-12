@@ -60,8 +60,8 @@ const DECISIONS := {
 		PLANT_DECISION,
 	],
 	"street": [
-		{ "id": "pedestrian", "label": "Für Fußgänger sperren", "cost": 300.0, "adds_shuttle": false, "group": "main" },
-		{ "id": "open", "label": "Freigeben", "cost": 50.0, "adds_shuttle": false, "group": "main", "requires": "pedestrian" },
+		{ "id": "carfree", "label": "Für Autos sperren", "cost": 300.0, "adds_shuttle": false, "group": "main" },
+		{ "id": "open", "label": "Freigeben", "cost": 50.0, "adds_shuttle": false, "group": "main", "requires": "carfree" },
 		PLANT_DECISION,
 	],
 	"festival": [
@@ -114,17 +114,17 @@ const PLANT_OFFSET_M := 25.0
 ## redundant services trades happiness for the refund instead of printing money. Below 1 so the
 ## worst single closure on the real extract (wc_m20, −6.1 coverage) stays under the 7.0 balance guard.
 const CLOSED_SERVICE_PENALTY := 0.8
-## A pedestrian zone draws visitors but diverts traffic: small happiness cost per street (capped).
-const PEDESTRIAN_HAPPINESS_PENALTY := 1.0
-const PEDESTRIAN_HAPPINESS_CAP := 4.0
+## A car-free street draws visitors on foot but diverts traffic: small happiness cost per street (capped).
+const CARFREE_HAPPINESS_PENALTY := 1.0
+const CARFREE_HAPPINESS_CAP := 4.0
 
 ## Attendance = event-weighted share of demand realised, by how well each venue is connected.
 const SHUTTLE_REACH := 0.9
 const CLUSTER_REACH := 0.62
 const ISOLATED_REACH := 0.34
 const VENUE_CLUSTER_RADIUS_M := 200.0
-const PEDESTRIAN_REACH_BONUS := 0.15
-const PEDESTRIAN_RADIUS_M := 250.0
+const CARFREE_REACH_BONUS := 0.15
+const CARFREE_RADIUS_M := 250.0
 
 ## Hitzetag air quality (data.airquality, PM10 in µg/m³ from tools/fetch_airquality.py):
 ## <= AIR_CLEAN_PM10 gives +AIR_MODIFIER happiness, >= AIR_POLLUTED_PM10 gives -AIR_MODIFIER,
@@ -378,8 +378,8 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	var latest := _latest_decisions(state)
 	var fountains := _effective_services(_records(data, "fountains"), "fountain", state, latest, venues)
 	var toilets := _effective_services(_records(data, "toilets"), "toilet", state, latest, venues)
-	var pedestrian_streets := _records(data, "streets").filter(
-		func(s): return latest.get(_key("street", s.id)) == "pedestrian")
+	var carfree_streets := _records(data, "streets").filter(
+		func(s): return latest.get(_key("street", s.id)) == "carfree")
 
 	var happiness := HAPPINESS_BASE
 	happiness += FOUNTAIN_WEIGHT * _coverage_score(venues, fountains, CONFIG.walk_radius)
@@ -392,7 +392,7 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	happiness += SHADE_WEIGHT * _shade_score(venues, trees, latest, planted)
 	happiness -= _cut_penalty(venues, trees, latest)
 	happiness += minf(PLANT_GREENING_CAP, PLANT_GREENING_BONUS * planted.size())
-	happiness -= minf(PEDESTRIAN_HAPPINESS_CAP, PEDESTRIAN_HAPPINESS_PENALTY * pedestrian_streets.size())
+	happiness -= minf(CARFREE_HAPPINESS_CAP, CARFREE_HAPPINESS_PENALTY * carfree_streets.size())
 	happiness += air_quality_modifier(state, data)
 	var fulfilled_petitions: int = petitions_until(state, data, int(state.get("day", 1)) if _is_number(state.get("day")) else 1).filter(
 		func(p): return p.fulfilled).size()
@@ -408,7 +408,7 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 
 	var food_factor := 1.0 if food_short < 0.0 else lerpf(FOOD_ATTENDANCE_MAX, FOOD_ATTENDANCE_MIN, food_short)
 	var pricing := _pricing_factors(state, latest)
-	var attendance := 100.0 * _reachability(state, venues, pedestrian_streets, latest, trees) * food_factor
+	var attendance := 100.0 * _reachability(state, venues, carfree_streets, latest, trees) * food_factor
 	attendance -= INCIDENT_ATTENDANCE_CAP * incident_share
 	attendance = clampf(attendance * pricing.attendance, 0.0, 100.0)
 
@@ -805,8 +805,8 @@ static func _cut_penalty(venues: Array, trees: Array, latest: Dictionary) -> flo
 
 ## 0..1: event-weighted reach factor. A shuttle within shuttle_radius gives SHUTTLE_REACH; otherwise
 ## CLUSTER_REACH with another venue within VENUE_CLUSTER_RADIUS_M, else ISOLATED_REACH — plus
-## PEDESTRIAN_REACH_BONUS near a pedestrianised street and CURFEW_REACH_BONUS with extended hours.
-static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: Array, latest: Dictionary = {}, trees: Array = []) -> float:
+## CARFREE_REACH_BONUS near a pedestrianised street and CURFEW_REACH_BONUS with extended hours.
+static func _reachability(state: Dictionary, venues: Array, carfree_streets: Array, latest: Dictionary = {}, trees: Array = []) -> float:
 	var total := 0.0
 	var reached := 0.0
 	var shuttles := _positions(state.get("shuttles"))
@@ -818,8 +818,8 @@ static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: 
 			reach = SHUTTLE_REACH
 		elif _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M):
 			reach = CLUSTER_REACH
-		if _near_any(venue, pedestrian_streets, PEDESTRIAN_RADIUS_M):
-			reach += PEDESTRIAN_REACH_BONUS
+		if _near_any(venue, carfree_streets, CARFREE_RADIUS_M):
+			reach += CARFREE_REACH_BONUS
 		if latest.get(_slot_key("venue", venue.id, "curfew", 0)) == "extend":
 			reach += CURFEW_REACH_BONUS
 		var clearing := 0.0
