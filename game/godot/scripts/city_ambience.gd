@@ -37,10 +37,8 @@ func _process(delta: float) -> void:
 		var curve: Curve2D = follow.get_parent().curve
 		var length := curve.get_baked_length()
 		follow.progress += delta * (24.0 + index * 2.0)
-		var direction := curve.sample_baked(fposmod(follow.progress + 2, length)) - curve.sample_baked(fposmod(follow.progress - 2, length))
-		boats[index].frame = posmod(roundi(direction.angle() / TAU * 64), 64)
-		boats[index].rotation = wrapf(direction.angle() - boats[index].frame * TAU / 64, -PI, PI)
-		boats[index].position.y = sin(_elapsed * 1.7 + index) * 0.65
+		var direction := curve.sample_baked(fposmod(follow.progress + 6, length), true) - curve.sample_baked(fposmod(follow.progress - 6, length), true)
+		boats[index].material.set_shader_parameter("heading", fposmod(direction.angle() / TAU * 64, 64.0))
 		var trail := PackedVector2Array()
 		for point in range(19):
 			trail.append(curve.sample_baked(fposmod(follow.progress - 90 + point * 4, length)))
@@ -141,5 +139,8 @@ func _add_boat(curve: Curve2D, index: int) -> void:
 	boat.vframes = 8
 	boat.scale = Vector2(0.8, 0.8)
 	boat.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var heading_material := ShaderMaterial.new()
+	heading_material.shader = preload("res://assets/boat_heading.gdshader")
+	boat.material = heading_material
 	follow.add_child(boat)
 	boats.append(boat)
