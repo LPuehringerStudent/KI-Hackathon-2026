@@ -14,9 +14,9 @@ func _expect(attendance: float, money: float, happiness: float, expected: String
 
 
 func test_gold_needs_all_strong_and_a_high_average() -> void:
-	_expect(67, 67, 73, "Goldene:r Bürgermeister:in")          # average 69.0 (inclusive)
-	_expect(67, 67, 72.9, "Volksnahe Stadtplanung")             # average 68.97
-	_expect(66, 90, 90, "Solide Verwaltung")                    # 66 is not > 66
+	_expect(68, 68, 80, "Goldene:r Bürgermeister:in")           # average 72.0 (inclusive)
+	_expect(68, 68, 79.9, "Volksnahe Stadtplanung")             # average 71.97
+	_expect(66, 99, 99, "Solide Verwaltung")                    # 66 is not > 66
 
 
 func test_volksnahe_is_strictly_above_66() -> void:

@@ -132,15 +132,25 @@ const AIR_CLEAN_PM10 := 20.0
 const AIR_POLLUTED_PM10 := 50.0
 const AIR_MODIFIER := 10.0
 
+## Bürgeranliegen: one petition per day, always aimed at the venue that currently fails the day's
+## theme (picked from the untouched city, so the target never moves while you play). Fulfilling one
+## — also later than its day — adds PETITION_REWARD happiness.
+const PETITION_REWARD := 2.0
+## Fulfilling a wish also unlocks a citizens' grant, so answering the city partly funds itself.
+const PETITION_GRANT := 1000.0
+## A venue counts as shaded once this much crown diameter stands within SHADE_RADIUS_M.
+const PETITION_SHADE_TARGET_M := 12.0
+
 ## Verdict tiers on the final meters (0..100), checked in the order of verdict_title().
 ## Probe on the real extract: the best reachable weakest meter is ~68 (clean air), so a literal
 ## "all >= 80" gold tier would never show — gold is the best title plus a high average instead.
-## After the P1 audit the best Volksnahe runs average 68–69.4, so gold sits at 69: the scripted demo
-## (avg 68.4) lands on Volksnahe with a better ending still visibly within reach (see
-## test_real_data_endings).
+## With the Bürgeranliegen a good run averages low 70s, so gold moved 69 -> 72: the scripted demo
+## fulfils two wishes (Volksnahe, avg ~71), and the third wish tips it into gold — one decision apart
+## (see test_real_data_endings). "Every meter > 70" was tried and is unreachable: attendance and money
+## trade off directly.
 const VERDICT_HIGH := 66.0      # > : strong meter (existing endings)
 const VERDICT_LOW := 50.0       # < : weak meter (existing endings)
-const VERDICT_GOLD_AVERAGE := 69.0
+const VERDICT_GOLD_AVERAGE := 72.0
 const VERDICT_SOLID := 55.0     # >= on every meter
 const VERDICT_CRISIS := 35.0    # < on any meter
 
@@ -347,8 +357,7 @@ static func day_theme(day: int) -> Dictionary:
 ## Records without an id or a finite lat/lon (and venues without a numeric event_weight) are
 ## ignored, as are malformed decision records — bad data degrades the score, never corrupts it.
 static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
-	var venues := _records(data, "venues").filter(
-		func(v): return _is_number(v.get("event_weight")) and float(v.event_weight) >= 0.0)
+	var venues := _scorable_venues(data)
 	var trees := _records(data, "trees")
 	var latest := _latest_decisions(state)
 	var fountains := _effective_services(_records(data, "fountains"), "fountain", state, latest, venues)
@@ -369,6 +378,9 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	happiness += minf(PLANT_GREENING_CAP, PLANT_GREENING_BONUS * planted.size())
 	happiness -= minf(PEDESTRIAN_HAPPINESS_CAP, PEDESTRIAN_HAPPINESS_PENALTY * pedestrian_streets.size())
 	happiness += air_quality_modifier(state, data)
+	var fulfilled_petitions: int = petitions_until(state, data, int(state.get("day", 1)) if _is_number(state.get("day")) else 1).filter(
+		func(p): return p.fulfilled).size()
+	happiness += PETITION_REWARD * fulfilled_petitions
 
 	var counts := _purchase_counts(state)
 	var food_short := _stock_shortfall(venues, counts, "foodtruck")
@@ -385,9 +397,91 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 
 	return {
 		"attendance": attendance,
-		"money": clampf(_money_score(state, attendance) * pricing.money, 0.0, 100.0),
+		"money": clampf(_money_score(state, attendance, PETITION_GRANT * fulfilled_petitions) * pricing.money, 0.0, 100.0),
 		"happiness": clampf(happiness, 0.0, 100.0),
 	}
+
+
+## The day's petition: { day, kind, title, ask, venue_id, venue_name, fulfilled } — {} when the data
+## has no venue that fails this day's ask.
+static func petition_for_day(state: Dictionary, data: Dictionary, day: int) -> Dictionary:
+	var venues := _scorable_venues(data)
+	var kind: String = ["mobility", "sanitation", "shade"][clampi(day, 1, LAST_DAY) - 1]
+	var target := {}
+	for venue: Dictionary in venues:
+		if _petition_open_at(venue, venues, data, kind) and (target.is_empty() or float(venue.event_weight) > float(target.event_weight)):
+			target = venue
+	if target.is_empty():
+		return {}
+	var name := str(target.get("name", "diese Spielstätte"))
+	# Case-neutral phrasing: venue names carry every gender ("das AEC", "die Kunstuniversität").
+	var texts := {
+		"mobility": ["%s: Wie kommen die Gäste her?" % name, "Eine Shuttle-Haltestelle in %d m Umkreis" % int(CONFIG.shuttle_radius)],
+		"sanitation": ["%s: keine Toilette in Gehweite." % name, "Eine offene Toilette in %d m Umkreis" % int(CONFIG.walk_radius)],
+		"shade": ["%s: kein Schatten für den Hitzetag." % name, "Mindestens %d m Krone in %d m Umkreis" % [int(PETITION_SHADE_TARGET_M), int(SHADE_RADIUS_M)]],
+	}
+	return {
+		"day": clampi(day, 1, LAST_DAY), "kind": kind, "title": texts[kind][0], "ask": texts[kind][1],
+		"venue_id": str(target.id), "venue_name": name,
+		"fulfilled": _petition_fulfilled(target, venues, state, data, kind),
+	}
+
+
+## All petitions up to and including `day`, most recent first — for the day bar and the verdict.
+static func petitions_until(state: Dictionary, data: Dictionary, day: int) -> Array:
+	var list: Array = []
+	for d in range(1, clampi(day, 1, LAST_DAY) + 1):
+		var petition := petition_for_day(state, data, d)
+		if not petition.is_empty():
+			list.append(petition)
+	list.reverse()
+	return list
+
+
+## True while the venue still fails the day's ask in the untouched city (petition selection).
+static func _petition_open_at(venue: Dictionary, venues: Array, data: Dictionary, kind: String) -> bool:
+	match kind:
+		"mobility":
+			return not _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M)
+		"sanitation":
+			return not _near_any(venue, _records(data, "toilets"), CONFIG.walk_radius)
+		"shade":
+			return _crown_near(venue, _records(data, "trees"), {}, []) < PETITION_SHADE_TARGET_M
+	return false
+
+
+static func _petition_fulfilled(venue: Dictionary, venues: Array, state: Dictionary, data: Dictionary, kind: String) -> bool:
+	var latest := _latest_decisions(state)
+	match kind:
+		"mobility":
+			return _near_any(venue, _positions(state.get("shuttles")), CONFIG.shuttle_radius)
+		"sanitation":
+			var toilets := _effective_services(_records(data, "toilets"), "toilet", state, latest, venues)
+			return _near_any(venue, toilets, CONFIG.walk_radius)
+		"shade":
+			return _crown_near(venue, _records(data, "trees"), latest, _planted_trees(state, data)) >= PETITION_SHADE_TARGET_M
+	return false
+
+
+## Crown diameter standing within SHADE_RADIUS_M of one venue (felled 0, trimmed halved, planted counted).
+static func _crown_near(venue: Dictionary, trees: Array, latest: Dictionary, planted: Array) -> float:
+	var crown := 0.0
+	for tree: Dictionary in trees:
+		if not _is_number(tree.get("crown_m")) or _distance_m(venue.lat, venue.lon, tree.lat, tree.lon) > SHADE_RADIUS_M:
+			continue
+		var decision: String = latest.get(_key("tree", tree.id), "")
+		if decision == "cut":
+			continue
+		crown += float(tree.crown_m) * (TRIM_SHADE_FACTOR if decision == "trim" else 1.0)
+	for young: Dictionary in planted:
+		if _distance_m(venue.lat, venue.lon, young.lat, young.lon) <= SHADE_RADIUS_M:
+			crown += float(young.crown_m)
+	return crown
+
+
+static func _scorable_venues(data: Dictionary) -> Array:
+	return _records(data, "venues").filter(
+		func(v): return _is_number(v.get("event_weight")) and float(v.event_weight) >= 0.0)
 
 
 ## German ending title for final meters { attendance, money, happiness } (missing meters count as 0).
@@ -654,12 +748,12 @@ static func _reachability(state: Dictionary, venues: Array, pedestrian_streets: 
 
 ## Net money as 0..100 (unclamped). Costs come from the decision log, not state.budget,
 ## so they are counted once even though decide() also deducts them from budget.
-static func _money_score(state: Dictionary, attendance: float) -> float:
+static func _money_score(state: Dictionary, attendance: float, grants := 0.0) -> float:
 	var costs := 0.0
 	for decision: Dictionary in _decisions(state):
 		costs += float(decision.cost) if _is_number(decision.get("cost")) else 0.0
 	var income: float = attendance / 100.0 * MAX_VISITOR_INCOME * CONFIG.visitor_spend / REFERENCE_SPEND
-	var net: float = CONFIG.start_budget - costs + income
+	var net: float = CONFIG.start_budget - costs + income + grants
 	return 100.0 * net / (CONFIG.start_budget + MAX_VISITOR_INCOME)
 
 

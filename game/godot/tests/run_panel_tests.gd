@@ -23,6 +23,12 @@ func _run() -> void:
 	root.add_child(day)
 	day.set_day(3, {"title": "Tag 3", "focus": "Schatten", "hint": ""})
 	check(day.get_node("Rows/Next").text == "Abschluss", "day three offers verdict")
+	day.set_petition({ "title": "Posthof: kein Schatten für den Hitzetag.", "ask": "Mindestens 12 m Krone", "fulfilled": false })
+	check(day.petition_label.text.begins_with("○ Anliegen: Posthof"), "open petition shown: %s" % day.petition_label.text)
+	day.set_petition({ "title": "Posthof: kein Schatten für den Hitzetag.", "ask": "Mindestens 12 m Krone", "fulfilled": true })
+	check(day.petition_label.text.begins_with("✓"), "fulfilled petition marked: %s" % day.petition_label.text)
+	day.set_petition({})
+	check(day.petition_label.text == "", "no petition, no line")
 	var picked := []
 	day.pricing_selected.connect(func(id: String) -> void: picked.append(id))
 	day.set_pricing("premium")
