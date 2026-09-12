@@ -74,19 +74,19 @@ func _run() -> void:
 		ambience._process(0.02)
 		check(follow.position.distance_to(previous) < 2.0, "boat loop has no teleport")
 		check(follow.loop and follow.cubic_interp and follow.modulate.a == 1.0, "boat stays visible on a smooth loop")
-		check(ambience.boats[index].hframes * ambience.boats[index].vframes == 64, "64 modeled boat headings")
+		check(ambience.boats[index].pivot.get_child_count() == 1, "continuous 3D boat model loaded")
 		check(ambience.boats[index].get_rect().size.x * ambience.boats[index].scale.x > 150, "large detailed boat canvas")
 		check(ambience.wakes[index].points.size() == 19, "wake trails the actual route")
 		var boat: Sprite2D = ambience.boats[index]
-		var last_heading: float = boat.material.get_shader_parameter("heading")
+		var last_heading: float = boat.pivot.rotation.y
 		var smooth := true
 		for step in range(600):
 			ambience._process(1.0 / 60.0)
-			var heading: float = boat.material.get_shader_parameter("heading")
-			smooth = smooth and absf(wrapf(heading - last_heading, -32.0, 32.0)) < 0.1
+			var heading: float = boat.pivot.rotation.y
+			smooth = smooth and absf(wrapf(heading - last_heading, -PI, PI)) < 0.02
 			smooth = smooth and boat.frame == 0 and boat.rotation == 0.0 and boat.position == Vector2.ZERO
 			last_heading = heading
-		check(smooth, "boat headings blend continuously without rotation snaps or bobbing")
+		check(smooth, "boat model turns continuously without sprite frame transitions")
 	var count: int = map.markers.size()
 	var sizes := {}
 	for id: String in map.markers:
