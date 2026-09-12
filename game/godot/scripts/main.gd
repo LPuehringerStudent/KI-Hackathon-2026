@@ -116,10 +116,18 @@ func _show_menu() -> void:
 	add_child(menu)
 	# Astra's miniature backdrop (Track C art); solid color fallback if absent
 	var bg_path := "res://assets/sprites/ui_menu_background.png"
+	var bg_tex: Texture2D = null
 	if ResourceLoader.exists(bg_path):
+		bg_tex = load(bg_path)
+	if bg_tex == null:
+		# stale import cache / fresh clone: read the raw file instead of erroring
+		var img := Image.load_from_file(bg_path)
+		if img != null:
+			bg_tex = ImageTexture.create_from_image(img)
+	if bg_tex != null:
 		menu.color = Color(0, 0, 0, 0)
 		var bg := TextureRect.new()
-		bg.texture = load(bg_path)
+		bg.texture = bg_tex
 		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
