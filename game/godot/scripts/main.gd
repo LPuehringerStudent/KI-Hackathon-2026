@@ -36,6 +36,9 @@ var _generation := 0
 var _voice_busy := false
 var _resolved := {}
 var _preview_cache := {}
+## Geometry derived from `data` once (GameState.build_index): scoring and the decision previews
+## reuse it instead of re-measuring the city on every click. Rebuilt only when the data is reloaded.
+var _index := {}
 var menu: Control
 var started := false
 var dock: Control
@@ -50,23 +53,44 @@ func _ready() -> void:
 
 
 ## Release check without the editor: `buergermeister.x86_64 --headless -- --smoke-test`
-## starts a festival, verifies data, markers, map texture and meters, prints one SMOKE line and
-## exits 0 (ok) or 1.
+## starts a festival, verifies data, markers, map texture, meters and the 3D props, prints one
+## SMOKE line and exits 0 (ok) or 1.
 func _smoke_test() -> void:
 	_start_game()
 	await get_tree().process_frame
 	var meters_ok := false
 	if not game.is_empty():
-		var m := State.compute_meters(game, data)
+		var m := State.compute_meters(game, data, _index)
 		meters_ok = m.has("attendance") and m.has("money") and m.has("happiness")
 	var marker_count: int = map_view.markers.size() if map_view != null else 0
 	var map_rect: TextureRect = map_view.get_node_or_null("Scroll/MapRoot/Map") if map_view != null else null
 	var texture_ok := map_rect != null and map_rect.texture != null
-	var ok: bool = data.get("venues", []).size() > 0 and marker_count > 0 and texture_ok and meters_ok
-	print("SMOKE %s venues=%d trees=%d fountains=%d toilets=%d streets=%d airquality=%s markers=%d map_texture=%s meters=%s" % [
+	var models_ok := _ambience_models_ok()
+	var ok: bool = data.get("venues", []).size() > 0 and marker_count > 0 and texture_ok and meters_ok and models_ok
+	print("SMOKE %s venues=%d trees=%d fountains=%d toilets=%d streets=%d airquality=%s markers=%d map_texture=%s meters=%s models=%s" % [
 		"OK" if ok else "FAIL", data.get("venues", []).size(), data.get("trees", []).size(), data.get("fountains", []).size(),
-		data.get("toilets", []).size(), data.get("streets", []).size(), data.has("airquality"), marker_count, texture_ok, meters_ok])
+		data.get("toilets", []).size(), data.get("streets", []).size(), data.has("airquality"), marker_count, texture_ok, meters_ok, models_ok])
 	get_tree().quit(0 if ok else 1)
+
+
+## True when every riverboat carries its 3D model. A stale `.godot/imported` cache makes the .glb
+## fail to load — the river then renders empty while everything else looks healthy, which is exactly
+## what a release gate has to catch. `godot --headless --import game/godot` (see tools/check.sh)
+## refreshes the cache before an export.
+func _ambience_models_ok() -> bool:
+	if map_view == null:
+		return false
+	var ambience: Node = map_view.get("_ambience")
+	if ambience == null:
+		return false
+	var boats: Array = ambience.get("boats")
+	if boats == null or boats.is_empty():
+		return false
+	for boat: Node in boats:
+		var pivot: Node3D = boat.get("pivot")
+		if pivot == null or pivot.get_child_count() == 0:
+			return false
+	return true
 
 
 func _start_game() -> void:
@@ -87,6 +111,7 @@ func _start_game() -> void:
 	chat.message_submitted.connect(send_message)
 	chat.decision_selected.connect(apply_decision)
 	data = get_node("/root/Data").load_all()
+	_index = State.build_index(data)
 	if data.is_empty() or data.get("venues", []).is_empty():
 		chat.set_status("Spieldaten fehlen. Bitte Installation pruefen.")
 		day_bar.set_enabled(false)
@@ -302,7 +327,7 @@ func send_message(text: String) -> void:
 func apply_decision(id: String) -> void:
 	if finished or selected.is_empty() or _resolved.has(_key(selected)):
 		return
-	var petition_before: bool = State.petition_for_day(game, data, game.day).get("fulfilled", false)
+	var petition_before: bool = State.petition_for_day(game, data, game.day, _index).get("fulfilled", false)
 	if not State.decide(game, selected, id):
 		chat.set_status("Diese Entscheidung ist nicht verfuegbar.")
 		return
@@ -315,7 +340,7 @@ func apply_decision(id: String) -> void:
 	var entry: Dictionary = State._catalogue_entry(selected.get("type", ""), id)
 	if not entry.is_empty():
 		chat.add_message("Entscheidung", "%s / %d EUR" % [entry.label, int(entry.cost)])
-	var petition := State.petition_for_day(game, data, game.day)
+	var petition := State.petition_for_day(game, data, game.day, _index)
 	if petition.get("fulfilled", false) and not petition_before:
 		chat.set_status("Anliegen erfüllt: %s" % petition.get("title", ""))
 	else:
@@ -344,7 +369,7 @@ func _decision_chips(entity: Dictionary, with_previews := true) -> Array:
 		return chips
 	var key := "%s|%d|%d|%s" % [_key(entity), game.decisions.size(), int(game.day), State.pricing_for_day(game, game.day)]
 	if not _preview_cache.has(key):
-		_preview_cache = { key: State.preview_decisions(game, data, entity) }
+		_preview_cache = { key: State.preview_decisions(game, data, entity, _index) }
 	var previews: Dictionary = _preview_cache[key]
 	for chip: Dictionary in chips:
 		chip["preview"] = State.preview_text(previews.get(chip.id, {}))
@@ -406,12 +431,12 @@ func _after_transition() -> void:
 
 
 func _refresh() -> void:
-	meters.set_meters(State.compute_meters(game, data))
+	meters.set_meters(State.compute_meters(game, data, _index))
 	meters.set_budget(game.get("budget"))
 	day_bar.set_day(game.day, State.day_theme(game.day))
 	map_view.set_day_tint(game.day)
 	day_bar.set_pricing(State.pricing_for_day(game, game.day))
-	day_bar.set_petition(State.petition_for_day(game, data, game.day))
+	day_bar.set_petition(State.petition_for_day(game, data, game.day, _index))
 	map_view.refresh_badges(game.get("purchases", {}))
 	map_view.update_purchases(game.get("purchases", {}))
 	map_view.update_shuttles(game.get("shuttles", []))
@@ -442,7 +467,7 @@ func _key(entity: Dictionary) -> String:
 
 
 func _show_verdict() -> void:
-	var results := State.compute_meters(game, data)
+	var results := State.compute_meters(game, data, _index)
 	verdict = ColorRect.new()
 	verdict.name = "Verdict"
 	verdict.z_index = 30
@@ -479,7 +504,7 @@ func _show_verdict() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 24)
 	rows.add_child(title)
-	var petitions := State.petitions_until(game, data, State.LAST_DAY)
+	var petitions := State.petitions_until(game, data, State.LAST_DAY, _index)
 	var fulfilled: int = petitions.filter(func(p): return p.fulfilled).size()
 	var wishes := Label.new()
 	wishes.name = "Petitions"
