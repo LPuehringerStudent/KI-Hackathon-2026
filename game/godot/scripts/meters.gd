@@ -8,19 +8,24 @@ var _budget_label: Label
 
 
 func _ready() -> void:
+	var metrics := HBoxContainer.new()
+	$Rows.add_child(metrics)
 	for key: String in LABELS:
 		var row := VBoxContainer.new()
+		row.size_flags_horizontal = SIZE_EXPAND_FILL
 		row.add_theme_constant_override("separation", 3)
-		$Rows.add_child(row)
-		var heading := HBoxContainer.new()
+		metrics.add_child(row)
+		var heading := VBoxContainer.new()
 		row.add_child(heading)
 		var label := Label.new()
 		label.text = LABELS[key]
+		label.add_theme_font_size_override("font_size", 12)
 		label.size_flags_horizontal = SIZE_EXPAND_FILL
 		heading.add_child(label)
 		var value := Label.new()
 		value.custom_minimum_size.x = 56
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		value.add_theme_font_size_override("font_size", 18)
 		heading.add_child(value)
 		values[key] = value
 		var bar := ProgressBar.new()
@@ -29,9 +34,11 @@ func _ready() -> void:
 		bar.max_value = 100.0
 		var fill := StyleBoxFlat.new()
 		fill.bg_color = COLORS[key]
+		fill.set_corner_radius_all(4)
 		bar.add_theme_stylebox_override("fill", fill)
 		var background := StyleBoxFlat.new()
 		background.bg_color = Color("dce3df")
+		background.set_corner_radius_all(4)
 		bar.add_theme_stylebox_override("background", background)
 		row.add_child(bar)
 		bars[key] = bar

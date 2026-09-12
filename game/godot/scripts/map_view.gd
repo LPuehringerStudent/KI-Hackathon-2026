@@ -11,6 +11,7 @@ signal bulk_action_requested(action_id: String)
 const State := preload("res://scripts/game_state.gd")
 const META_PATH := "res://data/map_meta.json"
 const MAP_TEXTURE_PATH := "res://assets/innenstadt_map.png"
+const Ambience := preload("res://scripts/city_ambience.gd")
 const MARKER_SIZE := 18
 const TREE_MARKER_SIZE := 12  # smaller dots: baked sprite trees must stay visible
 
@@ -56,6 +57,8 @@ var _last_purchases: Dictionary = {}
 var _planted_markers: Array = []
 var _last_planted: Array = []
 var _zoom := 1.0
+var _ambience: Node2D
+var _marker_leaders := {}
 
 
 func _ready() -> void:
@@ -77,6 +80,13 @@ func _ready() -> void:
 		push_error("map_view: cannot load " + MAP_TEXTURE_PATH)
 	else:
 		_map_rect.texture = tex
+		var art := ShaderMaterial.new()
+		art.shader = load("res://assets/garden_city.gdshader")
+		_map_rect.material = art
+		_map_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_map_root.custom_minimum_size = Vector2(float(_meta.width), float(_meta.height))
+		_ambience = Ambience.new()
+		_map_root.add_child(_ambience)
 	_add_layer_controls()
 	_add_zoom_controls()
 	refresh()
@@ -109,6 +119,8 @@ func set_zoom_at(z: float, anchor_map_px) -> void:
 		anchor_view = anchor * old_zoom - Vector2(_scroll.scroll_horizontal, _scroll.scroll_vertical)
 	_map_root.custom_minimum_size = base * _zoom
 	_map_root.size = base * _zoom
+	if _ambience != null:
+		_ambience.scale = Vector2(_zoom, _zoom)
 	_relayout_markers()
 	update_shuttles(_last_shuttles)
 	update_purchases(_last_purchases)
@@ -141,12 +153,36 @@ func _event_to_map(view_pos: Vector2) -> Vector2:
 
 
 func _relayout_markers() -> void:
+	var occupied: Array[Rect2] = []
 	for id: String in markers:
 		var dot: Control = markers[id]
 		var ll: Vector2 = dot.get_meta("latlon")
 		var msize: float = dot.get_meta("msize")
-		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) * _zoom / 2.0
-		dot.scale = Vector2(_zoom, _zoom)
+		dot.position = latlon_to_pixel(ll.x, ll.y) * _zoom - Vector2(msize, msize) / 2.0
+		dot.scale = Vector2.ONE
+		if dot.get_meta("etype") == "tree":
+			continue
+		var anchor := dot.position
+		for offset in [Vector2.ZERO, Vector2(0, -28), Vector2(28, 0), Vector2(-28, 0), Vector2(0, 28), Vector2(28, -28), Vector2(-28, -28)]:
+			var candidate := Rect2(anchor + offset, Vector2(msize, msize)).grow(2)
+			var free := true
+			for other in occupied:
+				if candidate.intersects(other):
+					free = false
+					break
+			if free:
+				dot.position = anchor + offset
+				break
+		occupied.append(Rect2(dot.position, Vector2(msize, msize)).grow(2))
+		if not _marker_leaders.has(id):
+			var leader := Line2D.new()
+			leader.width = 1.0
+			leader.default_color = Color("587a6a")
+			leader.show_behind_parent = true
+			dot.add_child(leader)
+			_marker_leaders[id] = leader
+		var half := Vector2(msize, msize) / 2.0
+		_marker_leaders[id].points = PackedVector2Array([half, anchor - dot.position + half])
 
 
 ## ---- Map modes (HOI4-style layers) ------------------------------------
@@ -450,6 +486,7 @@ func refresh() -> void:
 		var entity_type: String = key.trim_suffix("s")
 		for entity: Dictionary in data[key]:
 			_add_marker(entity, entity_type)
+	_relayout_markers()
 
 
 ## Resolve the Data autoload via the scene tree (works in headless -s mode
@@ -498,6 +535,8 @@ func play_day_transition(speed := 1.0, on_finished := Callable()) -> void:
 	transition_busy = true
 	var overlay := ColorRect.new()
 	overlay.color = Color(0, 0, 0, 0)
+	if _ambience != null:
+		_ambience.night_overlay = overlay
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(overlay)
@@ -516,18 +555,23 @@ func play_day_transition(speed := 1.0, on_finished := Callable()) -> void:
 	)
 
 
-## Astra's prop sprites as marker art where they exist (crisp at any zoom);
-## tree variant by id hash. Returns null where only the dot fallback fits.
-func _marker_texture(entity_type: String, id: String) -> Texture2D:
-	match entity_type:
-		"tree":
-			var variants := ["prop_tree_broad_a", "prop_tree_broad_b", "prop_tree_broad_c", "prop_tree_conifer"]
-			return _load_sprite(variants[abs(hash(id)) % variants.size()])
-		"fountain":
-			return _load_sprite("prop_fountain")
-		"toilet":
-			return _load_sprite("prop_toilet")
-	return null
+func _marker_texture(entity_type: String, _id: String) -> Texture2D:
+	var key := "icon_" + entity_type
+	if _dot_cache.has(key):
+		return _dot_cache[key]
+	var icon := _load_sprite(key)
+	if icon == null:
+		return null
+	var side := 14 if entity_type == "tree" else 24
+	var plate := _make_dot(MARKER_COLORS[entity_type].lightened(0.8), side).get_image()
+	plate.convert(Image.FORMAT_RGBA8)
+	var glyph := icon.get_image()
+	glyph.convert(Image.FORMAT_RGBA8)
+	glyph.resize(side - 6, side - 6, Image.INTERPOLATE_LANCZOS)
+	plate.blend_rect(glyph, Rect2i(Vector2i.ZERO, glyph.get_size()), Vector2i(3, 3))
+	var texture := ImageTexture.create_from_image(plate)
+	_dot_cache[key] = texture
+	return texture
 
 
 func _add_marker(entity: Dictionary, entity_type: String) -> void:
@@ -550,8 +594,9 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	dot.set_meta("latlon", Vector2(float(entity.lat), float(entity.lon)))
 	dot.set_meta("msize", marker_size)
 	dot.set_meta("etype", entity_type)
-	dot.scale = Vector2(_zoom, _zoom)
-	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) * _zoom / 2.0
+	dot.scale = Vector2.ONE
+	dot.pivot_offset = Vector2(marker_size, marker_size) / 2.0
+	dot.position = latlon_to_pixel(float(entity.lat), float(entity.lon)) * _zoom - Vector2(marker_size, marker_size) / 2.0
 	dot.pressed.connect(func() -> void: _on_marker_pressed(id, entity_type, dot))
 	dot.mouse_entered.connect(func() -> void:
 		_hover(dot, true)
@@ -566,8 +611,6 @@ func _add_marker(entity: Dictionary, entity_type: String) -> void:
 	_map_root.add_child(dot)
 	markers[id] = dot
 	_pop_in(dot)
-	if entity_type == "venue":
-		_add_pulse_ring(dot)
 
 
 ## One-line fact per entity type for the hover tip.
@@ -715,7 +758,7 @@ func _select_visible_of_type() -> void:
 		var dot: Control = markers[id]
 		if dot.get_meta("etype") != _selection_type:
 			continue
-		var center: Vector2 = dot.position + Vector2(dot.get_meta("msize"), dot.get_meta("msize")) * _zoom / 2.0
+		var center: Vector2 = dot.position + Vector2(dot.get_meta("msize"), dot.get_meta("msize")) / 2.0
 		if view.has_point(center):
 			_selection[id] = dot
 			dot.modulate = Color(1.0, 0.62, 0.2)
@@ -765,7 +808,7 @@ func _pop_in(dot: TextureButton) -> void:
 	dot.scale = Vector2.ZERO
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(dot, "scale", Vector2(_zoom, _zoom), 0.35)
+	tween.tween_property(dot, "scale", Vector2.ONE, 0.35)
 
 
 func _hover(dot: TextureButton, on: bool) -> void:
@@ -773,7 +816,7 @@ func _hover(dot: TextureButton, on: bool) -> void:
 		return
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_SPRING)
-	var target := _zoom * 1.35 if on else _zoom
+	var target := 1.15 if on else 1.0
 	tween.tween_property(dot, "scale", Vector2(target, target), 0.18)
 
 
@@ -801,7 +844,7 @@ func focus_entity(id: String) -> void:
 	if not markers.has(id):
 		return
 	var dot: TextureButton = markers[id]
-	var w: float = dot.get_meta("msize") * _zoom
+	var w: float = dot.get_meta("msize")
 	_scroll.scroll_horizontal = int(dot.position.x + w / 2.0 - _scroll.size.x / 2.0)
 	_scroll.scroll_vertical = int(dot.position.y + w / 2.0 - _scroll.size.y / 2.0)
 

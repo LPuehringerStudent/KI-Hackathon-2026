@@ -11,6 +11,7 @@ var pricing_buttons := {}
 
 
 func _ready() -> void:
+	$Rows/Next.theme_type_variation = "PrimaryButton"
 	$Rows/Next.pressed.connect(func() -> void: advance_requested.emit())
 	$Rows.minimum_size_changed.connect(func() -> void: custom_minimum_size.y = $Rows.get_combined_minimum_size().y)
 	var label := Label.new()

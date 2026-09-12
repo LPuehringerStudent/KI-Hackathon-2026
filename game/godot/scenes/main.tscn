@@ -19,9 +19,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 offset_left = 20.0
-offset_top = 82.0
+offset_top = 18.0
 offset_right = -20.0
-offset_bottom = -38.0
+offset_bottom = -24.0
 theme_override_constants/separation = 24
 split_offset = 1080
 
@@ -29,7 +29,14 @@ split_offset = 1080
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PanelSlot" type="VBoxContainer" parent="RootSplit"]
-custom_minimum_size = Vector2(460, 0)
+[node name="PanelSlot" type="ScrollContainer" parent="RootSplit"]
+custom_minimum_size = Vector2(410, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Content" type="VBoxContainer" parent="RootSplit/PanelSlot"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12

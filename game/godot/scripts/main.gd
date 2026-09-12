@@ -41,7 +41,7 @@ var started := false
 
 func _ready() -> void:
 	theme = UITheme.create()
-	RenderingServer.set_default_clear_color(Color("f3f5f4"))
+	RenderingServer.set_default_clear_color(Color("edf4f0"))
 	_show_menu()
 	if OS.get_cmdline_user_args().has("--smoke-test"):
 		_smoke_test.call_deferred()
@@ -77,9 +77,9 @@ func _start_game() -> void:
 	meters = MetersScene.instantiate()
 	day_bar = DayScene.instantiate()
 	chat = ChatScene.instantiate()
-	$RootSplit/PanelSlot.add_child(meters)
-	$RootSplit/PanelSlot.add_child(day_bar)
-	$RootSplit/PanelSlot.add_child(chat)
+	$RootSplit/PanelSlot/Content.add_child(meters)
+	$RootSplit/PanelSlot/Content.add_child(day_bar)
+	$RootSplit/PanelSlot/Content.add_child(chat)
 	day_bar.advance_requested.connect(advance_day)
 	day_bar.pricing_selected.connect(apply_pricing)
 	chat.message_submitted.connect(send_message)
@@ -97,6 +97,8 @@ func _start_game() -> void:
 	map_view.bulk_action_requested.connect(_on_bulk_action)
 	_refresh()
 	_initial_entity.call_deferred()
+
+
 
 
 func _show_menu() -> void:
@@ -121,14 +123,14 @@ func _show_menu() -> void:
 	menu.add_child(center)
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var rows := VBoxContainer.new()
-	rows.custom_minimum_size = Vector2(420, 0)
+	rows.custom_minimum_size = Vector2(440, 0)
 	rows.add_theme_constant_override("separation", 16)
 	center.add_child(rows)
 	var title := Label.new()
 	title.text = "Bürgermeister:in fürs Festival"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.add_theme_font_size_override("font_size", 38)
+	title.add_theme_font_size_override("font_size", 36)
 	rows.add_child(title)
 	var subtitle := Label.new()
 	subtitle.text = "Drei Tage. Eine Stadt. Viele Stimmen."
@@ -153,6 +155,7 @@ func _show_menu() -> void:
 	rows.add_child(version_label)
 	var start := Button.new()
 	start.text = "Festival starten"
+	start.theme_type_variation = "PrimaryButton"
 	start.custom_minimum_size = Vector2(0, 52)
 	start.add_theme_font_size_override("font_size", 19)
 	start.pressed.connect(_start_game)
