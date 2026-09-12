@@ -14,7 +14,7 @@ das Spiel läuft trotzdem vollständig. Bildschirm auf 1600×900 oder größer.
 | 0:15 | **Festival starten** | „Linz als Miniatur aus offenen Daten. Drei Werte oben — und jeden Tag meldet sich die Stadt mit einem Anliegen." *(50 / 77 / 68)* |
 | 0:30 | Anliegen vorlesen | „Tag eins: *Lentos Kunstmuseum — wie kommen die Gäste her?* Das Lentos hängt an keiner anderen Spielstätte." |
 | 0:40 | **Lentos** → *Shuttle* | „Also ein Shuttle. Der Button sagt vorher, was es bringt: vier Besucherpunkte, 1.800 Euro — und zwei Punkte Zufriedenheit, weil wir zugehört haben. Das Anliegen wird grün." *(54 / 76 / 70)* |
-| 0:55 | **OK Platz** → *Shuttle*, **Hauptplatz** → *Fußgänger*, **Faire Preise** | „Noch ein Shuttle für den OK-Platz-Cluster, der Hauptplatz wird Fußgängerzone, faire Preise für alle." *(73 / 69 / 69)* |
+| 0:55 | **OK Platz** → *Shuttle*, **Hauptplatz** → *Für Autos sperren*, **Faire Preise** | „Noch ein Shuttle für den OK-Platz-Cluster, der Hauptplatz wird Fußgängerzone, faire Preise für alle." *(73 / 69 / 69)* |
 | 1:15 | **Nächster Tag** — Statuszeile vorlesen | „Und jetzt kommt das Festival wirklich an: *Vorfall am Ars Electronica Center — zu wenig Security für die Menge.* Zehn Punkte Zufriedenheit weg, über die Karte leuchtet die Sicherheitsebene rot." *(64 / 69 / 59)* |
 | 1:30 | **Faire Preise**, Toilette **Stadtpark Huemerstraße** → *Verlegen* | „Tag zwei bittet außerdem um eine Toilette beim C. Bechstein Centrum. Diese hier steht, wo niemand feiert — wir verlegen sie. Anliegen zwei erfüllt, plus Förderung." *(67 / 67 / 63)* |
 | 1:45 | Toilette **Promenade** → *Schließen* | „Eine doppelt versorgte sperren wir: 300 Euro zurück — die brauchen wir gleich." *(67 / 68 / 63)* |

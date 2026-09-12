@@ -16,8 +16,9 @@ also played by `test_real_data_endings`, so if the suites are green the numbers 
 
 | Mode | Command | Expect |
 |---|---|---|
-| Release binary | `cd game/godot && godot --headless --path . --export-release "Linux" build/buergermeister.x86_64` then `./build/buergermeister.x86_64` | window opens on the start menu |
-| Binary self-check | `./build/buergermeister.x86_64 --headless -- --smoke-test` | `SMOKE OK venues=20 trees=400 fountains=38 toilets=41 streets=18 airquality=true markers=517 …`, exit 0 |
+| Full gate (~1 min) | `tools/check.sh` | imports the assets, runs every suite and the smoke test, ends with `ALL GREEN` |
+| Release binary | `tools/build_game.sh` then `game/godot/build/buergermeister.x86_64` | window opens on the start menu. Use the script, not a bare `--export-release`: it refreshes the asset import cache first, and a stale one drops the 3D props |
+| Binary self-check | `./build/buergermeister.x86_64 --headless -- --smoke-test` | `SMOKE OK venues=20 … markers=517 map_texture=true meters=true models=true`, exit 0. `models=false` means the boats lost their .glb — re-run `tools/build_game.sh` |
 | Editor fallback | open `game/godot/project.godot` in Godot 4.7.2, press F5 | same start menu |
 | Live voices (optional) | `python3 mistral-proxy/server.py`, check `curl -s http://127.0.0.1:8377/health` | without the proxy the chat says **"Offline-Stimme"** — the game still works fully |
 
@@ -36,7 +37,7 @@ Each day press **Faire Preise** (the day bar resets to Standard). Hover a marker
 |---|---|---|---|---|---|---|
 | 1 | 1 | **Lentos Kunstmuseum** → *Shuttle-Haltestelle einrichten* | ≈ +2.0 Zuf · +4.0 Bes · −1.800 € | 54 / 76 / 70 | 12.200 € | **✓ Tag 1** |
 | 2 | 1 | **OK Platz** → *Shuttle-Haltestelle einrichten* | ≈ +9.1 Bes · −1.800 € | 63 / 73 / 70 | 10.400 € | ✓ |
-| 3 | 1 | street **Hauptplatz** → *Für Fußgänger sperren* | ≈ −1.0 Zuf · +2.8 Bes · −300 € | 66 / 73 / 69 | 10.100 € | ✓ |
+| 3 | 1 | street **Hauptplatz** → *Für Autos sperren* | ≈ −1.0 Zuf · +2.8 Bes · −300 € | 66 / 73 / 69 | 10.100 € | ✓ |
 | 4 | 1 | day bar **Faire Preise** | ≈ +6.6 Bes · −4.6 Geld | 73 / 69 / 69 | 10.100 € | ✓ |
 | 5 | 2 | **Nächster Tag →** — chat status **"⚠ Vorfall am Ars Electronica Center: zu wenig Security für die Menge."** | — | **64 / 69 / 59** | 10.100 € | ○ |
 | 6 | 2 | **Faire Preise** — new wish: *C. Bechstein Centrum Linz: keine Toilette in Gehweite.* | ≈ +3.1 Bes · −2.3 Geld | 67 / 66 / 59 | 10.100 € | ○ |

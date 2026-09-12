@@ -299,26 +299,31 @@ static func consult(state: Dictionary, entity: Dictionary) -> void:
 
 ## What-if for one decision: meter and budget deltas (rounded to 0.1) if `decision_id` were taken
 ## now, or {} when it isn't possible. Pure — `state` is not modified.
-static func preview_decision(state: Dictionary, data: Dictionary, entity: Dictionary, decision_id: String) -> Dictionary:
-	return _preview_against(state, data, entity, decision_id, compute_meters(state, data))
+static func preview_decision(state: Dictionary, data: Dictionary, entity: Dictionary, decision_id: String,
+		index: Dictionary = {}) -> Dictionary:
+	var geometry := _index_for(data, index)
+	return _preview_against(state, data, entity, decision_id, compute_meters(state, data, geometry), geometry)
 
 
 ## Previews for every decision currently available for `entity`: { decision_id: deltas }.
-static func preview_decisions(state: Dictionary, data: Dictionary, entity: Dictionary) -> Dictionary:
-	var before := compute_meters(state, data)
+## Scores the city once per decision, all of them against one shared geometry index.
+static func preview_decisions(state: Dictionary, data: Dictionary, entity: Dictionary, index: Dictionary = {}) -> Dictionary:
+	var geometry := _index_for(data, index)
+	var before := compute_meters(state, data, geometry)
 	var previews := {}
 	for decision: Dictionary in available_decisions(entity, state):
-		previews[decision.id] = _preview_against(state, data, entity, decision.id, before)
+		previews[decision.id] = _preview_against(state, data, entity, decision.id, before, geometry)
 	return previews
 
 
-static func _preview_against(state: Dictionary, data: Dictionary, entity: Dictionary, decision_id: String, before: Dictionary) -> Dictionary:
+static func _preview_against(state: Dictionary, data: Dictionary, entity: Dictionary, decision_id: String,
+		before: Dictionary, index: Dictionary) -> Dictionary:
 	if not _is_valid_state(state):
 		return {}
 	var simulated := state.duplicate(true)
 	if not decide(simulated, entity, decision_id):
 		return {}
-	var after := compute_meters(simulated, data)
+	var after := compute_meters(simulated, data, index)
 	return {
 		"attendance": snappedf(after.attendance - before.attendance, 0.1),
 		"money": snappedf(after.money - before.money, 0.1),
@@ -370,15 +375,58 @@ static func day_theme(day: int) -> Dictionary:
 	return DAY_THEMES[clampi(day, 1, LAST_DAY)].duplicate()
 
 
-## Records without an id or a finite lat/lon (and venues without a numeric event_weight) are
-## ignored, as are malformed decision records — bad data degrades the score, never corrupts it.
-static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
+## Geometry that follows from `data` alone: the trees within SHADE_RADIUS_M of each venue, and the
+## union of those trees. Building it is the one pass over trees x venues that scoring needs; pass it
+## to compute_meters() and the preview functions to skip that pass — a single click previews five or
+## six decisions, each of which scores the whole city.
+##
+## The index belongs to the caller and is only valid for the data it was built from: rebuild it when
+## the data changes (the game loads its data once, so it builds the index once). Every function that
+## takes one also works without it and builds its own.
+static func build_index(data: Dictionary) -> Dictionary:
 	var venues := _scorable_venues(data)
 	var trees := _records(data, "trees")
+	var by_id := {}
+	for tree: Dictionary in trees:
+		by_id[str(tree.id)] = tree
+	var by_venue := {}
+	var near_any := {}
+	for venue: Dictionary in venues:
+		var lat := float(venue.lat)
+		var lon := float(venue.lon)
+		var box := _box_deltas(lat, SHADE_RADIUS_M)
+		var near: Array = []
+		for tree: Dictionary in trees:
+			if absf(float(tree.lat) - lat) > box.x or absf(float(tree.lon) - lon) > box.y:
+				continue
+			if _distance_m(lat, lon, tree.lat, tree.lon) > SHADE_RADIUS_M:
+				continue
+			near.append(tree)
+			near_any[str(tree.id)] = tree
+		by_venue[str(venue.id)] = near
+	return {
+		"venues": venues, "trees": trees, "trees_by_id": by_id,
+		"fountains": _records(data, "fountains"), "toilets": _records(data, "toilets"),
+		"streets": _records(data, "streets"),
+		"shade_by_venue": by_venue, "shade_trees": near_any.values(),
+	}
+
+
+## The caller's index when it is one, a freshly built one otherwise.
+static func _index_for(data: Dictionary, index: Dictionary) -> Dictionary:
+	return index if index.has("shade_by_venue") and index.has("trees_by_id") else build_index(data)
+
+
+## Records without an id or a finite lat/lon (and venues without a numeric event_weight) are
+## ignored, as are malformed decision records — bad data degrades the score, never corrupts it.
+static func compute_meters(state: Dictionary, data: Dictionary, index: Dictionary = {}) -> Dictionary:
+	var geometry := _index_for(data, index)
+	var venues: Array = geometry.venues
 	var latest := _latest_decisions(state)
-	var fountains := _effective_services(_records(data, "fountains"), "fountain", state, latest, venues)
-	var toilets := _effective_services(_records(data, "toilets"), "toilet", state, latest, venues)
-	var carfree_streets := _records(data, "streets").filter(
+	var decided_trees := _decided_trees(state, geometry)
+	var fountains := _effective_services(geometry.fountains, "fountain", state, latest, venues)
+	var toilets := _effective_services(geometry.toilets, "toilet", state, latest, venues)
+	var carfree_streets: Array = geometry.streets.filter(
 		func(s): return latest.get(_key("street", s.id)) == "carfree")
 
 	var happiness := HAPPINESS_BASE
@@ -386,15 +434,16 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 	happiness += TOILET_WEIGHT * _coverage_score(venues, toilets, CONFIG.walk_radius)
 	var closed_services := 0
 	for type: String in ["fountain", "toilet"]:
-		closed_services += _records(data, type + "s").filter(func(r): return latest.get(_key(type, r.id)) == "close").size()
+		closed_services += geometry[type + "s"].filter(func(r): return latest.get(_key(type, r.id)) == "close").size()
 	happiness -= CLOSED_SERVICE_PENALTY * closed_services
 	var planted := _planted_trees(state, data)
-	happiness += SHADE_WEIGHT * _shade_score(venues, trees, latest, planted)
-	happiness -= _cut_penalty(venues, trees, latest)
+	happiness += SHADE_WEIGHT * _shade_score(venues, geometry.shade_trees, latest, planted)
+	happiness -= _cut_penalty(venues, decided_trees, latest)
 	happiness += minf(PLANT_GREENING_CAP, PLANT_GREENING_BONUS * planted.size())
 	happiness -= minf(CARFREE_HAPPINESS_CAP, CARFREE_HAPPINESS_PENALTY * carfree_streets.size())
 	happiness += air_quality_modifier(state, data)
-	var fulfilled_petitions: int = petitions_until(state, data, int(state.get("day", 1)) if _is_number(state.get("day")) else 1).filter(
+	var fulfilled_petitions: int = petitions_until(state, data,
+		int(state.get("day", 1)) if _is_number(state.get("day")) else 1, geometry).filter(
 		func(p): return p.fulfilled).size()
 	happiness += PETITION_REWARD * fulfilled_petitions
 
@@ -408,7 +457,7 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 
 	var food_factor := 1.0 if food_short < 0.0 else lerpf(FOOD_ATTENDANCE_MAX, FOOD_ATTENDANCE_MIN, food_short)
 	var pricing := _pricing_factors(state, latest)
-	var attendance := 100.0 * _reachability(state, venues, carfree_streets, latest, trees) * food_factor
+	var attendance := 100.0 * _reachability(state, venues, carfree_streets, latest, decided_trees) * food_factor
 	attendance -= INCIDENT_ATTENDANCE_CAP * incident_share
 	attendance = clampf(attendance * pricing.attendance, 0.0, 100.0)
 
@@ -421,12 +470,15 @@ static func compute_meters(state: Dictionary, data: Dictionary) -> Dictionary:
 
 ## The day's petition: { day, kind, title, ask, venue_id, venue_name, fulfilled } — {} when the data
 ## has no venue that fails this day's ask.
-static func petition_for_day(state: Dictionary, data: Dictionary, day: int) -> Dictionary:
-	var venues := _scorable_venues(data)
+static func petition_for_day(state: Dictionary, data: Dictionary, day: int, index: Dictionary = {}) -> Dictionary:
+	var geometry := _index_for(data, index)
+	var venues: Array = geometry.venues
 	var kind: String = ["mobility", "sanitation", "shade"][clampi(day, 1, LAST_DAY) - 1]
+	# Each ask reads one collection, and the shade ask reads only the trees near the venue.
+	var records := _petition_records(geometry, kind)
 	var target := {}
 	for venue: Dictionary in venues:
-		if _petition_open_at(venue, venues, data, kind) and (target.is_empty() or float(venue.event_weight) > float(target.event_weight)):
+		if _petition_open_at(venue, venues, records, kind, geometry) and (target.is_empty() or float(venue.event_weight) > float(target.event_weight)):
 			target = venue
 	if target.is_empty():
 		return {}
@@ -440,58 +492,102 @@ static func petition_for_day(state: Dictionary, data: Dictionary, day: int) -> D
 	return {
 		"day": clampi(day, 1, LAST_DAY), "kind": kind, "title": texts[kind][0], "ask": texts[kind][1],
 		"venue_id": str(target.id), "venue_name": name,
-		"fulfilled": _petition_fulfilled(target, venues, state, data, kind),
+		"fulfilled": _petition_fulfilled(target, venues, state, data, records, kind, geometry),
 	}
 
 
 ## All petitions up to and including `day`, most recent first — for the day bar and the verdict.
-static func petitions_until(state: Dictionary, data: Dictionary, day: int) -> Array:
+static func petitions_until(state: Dictionary, data: Dictionary, day: int, index: Dictionary = {}) -> Array:
 	var list: Array = []
+	var geometry := _index_for(data, index)
 	for d in range(1, clampi(day, 1, LAST_DAY) + 1):
-		var petition := petition_for_day(state, data, d)
+		var petition := petition_for_day(state, data, d, geometry)
 		if not petition.is_empty():
 			list.append(petition)
 	list.reverse()
 	return list
 
 
+## The one collection a day's ask reads: toilets for sanitation, trees for shade, none for mobility
+## (which only compares venues with each other).
+static func _petition_records(index: Dictionary, kind: String) -> Array:
+	match kind:
+		"sanitation":
+			return index.toilets
+		"shade":
+			return index.trees
+	return []
+
+
 ## True while the venue still fails the day's ask in the untouched city (petition selection).
-static func _petition_open_at(venue: Dictionary, venues: Array, data: Dictionary, kind: String) -> bool:
+static func _petition_open_at(venue: Dictionary, venues: Array, records: Array, kind: String, index: Dictionary) -> bool:
 	match kind:
 		"mobility":
 			return not _near_any(venue, venues, VENUE_CLUSTER_RADIUS_M)
 		"sanitation":
-			return not _near_any(venue, _records(data, "toilets"), CONFIG.walk_radius)
+			return not _near_any(venue, records, CONFIG.walk_radius)
 		"shade":
-			return _crown_near(venue, _records(data, "trees"), {}, []) < PETITION_SHADE_TARGET_M
+			return _crown_near(venue, _shade_candidates(venue, records, index), {}, []) < PETITION_SHADE_TARGET_M
 	return false
 
 
-static func _petition_fulfilled(venue: Dictionary, venues: Array, state: Dictionary, data: Dictionary, kind: String) -> bool:
+static func _petition_fulfilled(venue: Dictionary, venues: Array, state: Dictionary, data: Dictionary,
+		records: Array, kind: String, index: Dictionary) -> bool:
 	var latest := _latest_decisions(state)
 	match kind:
 		"mobility":
 			return _near_any(venue, _positions(state.get("shuttles")), CONFIG.shuttle_radius)
 		"sanitation":
-			var toilets := _effective_services(_records(data, "toilets"), "toilet", state, latest, venues)
+			var toilets := _effective_services(records, "toilet", state, latest, venues)
 			return _near_any(venue, toilets, CONFIG.walk_radius)
 		"shade":
-			return _crown_near(venue, _records(data, "trees"), latest, _planted_trees(state, data)) >= PETITION_SHADE_TARGET_M
+			return _crown_near(venue, _shade_candidates(venue, records, index), latest,
+				_planted_trees(state, data)) >= PETITION_SHADE_TARGET_M
 	return false
+
+
+## The tree records this state has decided on, in decision order — the only ones whose felling or
+## trimming can change a score.
+static func _decided_trees(state: Dictionary, index: Dictionary) -> Array:
+	var by_id: Dictionary = index.get("trees_by_id", {})
+	var seen := {}
+	var decided: Array = []
+	for decision: Dictionary in _decisions(state):
+		if str(decision.entity_type) != "tree":
+			continue
+		var id := str(decision.entity_id)
+		if seen.has(id) or not by_id.has(id):
+			continue
+		seen[id] = true
+		decided.append(by_id[id])
+	return decided
+
+
+## The trees this venue's shade ask has to look at: its own short list from the index, or every
+## tree when the index does not know this venue (data the index was not built from).
+static func _shade_candidates(venue: Dictionary, trees: Array, index: Dictionary) -> Array:
+	var by_venue: Dictionary = index.get("shade_by_venue", {})
+	var key := str(venue.get("id", ""))
+	return by_venue[key] if by_venue.has(key) else trees
 
 
 ## Crown diameter standing within SHADE_RADIUS_M of one venue (felled 0, trimmed halved, planted counted).
 static func _crown_near(venue: Dictionary, trees: Array, latest: Dictionary, planted: Array) -> float:
+	var lat := float(venue.lat)
+	var lon := float(venue.lon)
+	var box := _box_deltas(lat, SHADE_RADIUS_M)
 	var crown := 0.0
 	for tree: Dictionary in trees:
-		if not _is_number(tree.get("crown_m")) or _distance_m(venue.lat, venue.lon, tree.lat, tree.lon) > SHADE_RADIUS_M:
+		if absf(float(tree.lat) - lat) > box.x or absf(float(tree.lon) - lon) > box.y:
+			continue
+		if not _is_number(tree.get("crown_m")) or _distance_m(lat, lon, tree.lat, tree.lon) > SHADE_RADIUS_M:
 			continue
 		var decision: String = latest.get(_key("tree", tree.id), "")
 		if decision == "cut":
 			continue
 		crown += float(tree.crown_m) * (TRIM_SHADE_FACTOR if decision == "trim" else 1.0)
 	for young: Dictionary in planted:
-		if _distance_m(venue.lat, venue.lon, young.lat, young.lon) <= SHADE_RADIUS_M:
+		if _distance_m(lat, lon, young.lat, young.lon) <= SHADE_RADIUS_M:
 			crown += float(young.crown_m)
 	return crown
 
@@ -780,19 +876,22 @@ static func _heaviest_uncovered_venue(venues: Array, services: Array, radius: fl
 
 ## 0..1: crown diameter within SHADE_RADIUS_M of any venue (felled trees 0, trimmed
 ## TRIM_SHADE_FACTOR, planted trees PLANTED_CROWN_M), SHADE_FULL_CROWN_M = full.
-static func _shade_score(venues: Array, trees: Array, latest: Dictionary, planted: Array = []) -> float:
+## `near_venues` are the standing trees already known to be in range (see build_index); planted
+## trees come from the state and are placed here.
+static func _shade_score(venues: Array, near_venues: Array, latest: Dictionary, planted: Array = []) -> float:
 	var crown := 0.0
 	for young: Dictionary in planted:
 		if _near_any(young, venues, SHADE_RADIUS_M):
 			crown += float(young.crown_m)
-	for tree: Dictionary in trees:
+	for tree: Dictionary in near_venues:
 		var decision: String = latest.get(_key("tree", tree.id), "")
-		if decision == "cut" or not _is_number(tree.get("crown_m")) or not _near_any(tree, venues, SHADE_RADIUS_M):
+		if decision == "cut" or not _is_number(tree.get("crown_m")):
 			continue
 		crown += float(tree.crown_m) * (TRIM_SHADE_FACTOR if decision == "trim" else 1.0)
 	return minf(1.0, crown / SHADE_FULL_CROWN_M)
 
 
+## `trees` only has to contain the trees with a decision on them (see _decided_trees).
 static func _cut_penalty(venues: Array, trees: Array, latest: Dictionary) -> float:
 	var penalty := 0.0
 	for tree: Dictionary in trees:
@@ -1010,16 +1109,23 @@ static func _is_valid_state(state: Dictionary) -> bool:
 		and _is_number(state.get("day")) and _is_number(state.get("budget"))
 
 
+## Half-width of a lat/lon box that contains every point within `radius` of `lat`. Conservative
+## (it uses the smaller cos of one degree further from the equator), so it never rejects a point
+## that the haversine would accept — it only skips obviously far pairs before the expensive test.
+static func _box_deltas(lat: float, radius: float) -> Vector2:
+	return Vector2(radius / BOX_METERS_PER_DEG_LAT,
+		radius / (BOX_METERS_PER_DEG_LAT * maxf(0.01, cos(deg_to_rad(absf(lat) + 1.0)))))
+
+
 ## True if any of `others` (dicts with lat/lon) is within radius of point, ignoring point itself.
-## A conservative lat/lon box rejects far pairs before the haversine (previews simulate compute_meters
-## several times per click, and most tree–venue pairs are far apart).
+## The box rejects far pairs before the haversine (previews simulate compute_meters several times
+## per click, and most tree–venue pairs are far apart).
 static func _near_any(point: Dictionary, others: Array, radius: float) -> bool:
 	var lat := float(point.lat)
 	var lon := float(point.lon)
-	var max_d_lat := radius / BOX_METERS_PER_DEG_LAT
-	var max_d_lon := radius / (BOX_METERS_PER_DEG_LAT * maxf(0.01, cos(deg_to_rad(absf(lat) + 1.0))))
+	var box := _box_deltas(lat, radius)
 	for other: Dictionary in others:
-		if absf(float(other.lat) - lat) > max_d_lat or absf(float(other.lon) - lon) > max_d_lon:
+		if absf(float(other.lat) - lat) > box.x or absf(float(other.lon) - lon) > box.y:
 			continue
 		if not is_same(other, point) and _distance_m(lat, lon, other.lat, other.lon) <= radius:
 			return true
